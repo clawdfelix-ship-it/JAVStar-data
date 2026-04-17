@@ -3,13 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #1a1a2e;
-  --color-secondary: #16213e;
-  --color-accent: #e94560;
-  --color-text-primary: #eaeaea;
-  --color-text-secondary: #a0a0a0;
-  --color-success: #4ade80;
-  --color-border: #2a2a4a;
+  /* 主題：深色 + 紅色accent（參考 av-event.jp） */
+  --color-primary: #0a0a0a;
+  --color-secondary: #141414;
+  --color-accent: #ff2d55;
+  --color-accent-secondary: #ff6b6b;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #888888;
+  --color-success: #34c759;
+  --color-border: #2a2a2a;
+  --color-section-title: #a855f7;
 }
 
 body {
@@ -48,23 +51,23 @@ body {
 }
 
 /* Card hover effect */
-.actress-card {
+.card-hover {
   @apply transition-all duration-300;
 }
 
-.actress-card:hover {
-  @apply border-accent/60;
-  box-shadow: 0 4px 24px rgba(233, 69, 96, 0.2), 0 0 0 1px rgba(233, 69, 96, 0.1);
-  transform: translateY(-2px);
+.card-hover:hover {
+  @apply transform scale-105 shadow-lg;
+  box-shadow: 0 10px 40px rgba(255, 45, 85, 0.2);
 }
 
-/* Skeleton loading */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
+/* Section title style */
+.section-title {
+  @apply text-2xl font-bold mb-6;
+  color: var(--color-section-title);
 }
 
-.skeleton {
-  @apply bg-gray-700 rounded;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+/* Event card accent border */
+.event-card {
+  @apply border-l-4 border-solid;
+  border-left-color: var(--color-accent);
 }
