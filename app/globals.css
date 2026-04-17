@@ -3,29 +3,27 @@
 @tailwind utilities;
 
 :root {
-  /* 白灰紅配色 */
-  --color-primary: #ffffff;
+  --color-primary: #e94560;
+  --color-primary-dark: #c73e54;
   --color-secondary: #f5f5f5;
   --color-accent: #e94560;
-  --color-accent-dark: #cc2233;
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #666666;
-  --color-success: #22c55e;
-  --color-border: #e5e5e5;
-  --color-section-title: #e94560;
+  --color-text-primary: #333333;
+  --color-text-secondary: #888888;
+  --color-success: #4caf50;
+  --color-border: #f0f0f0;
   --color-card-bg: #ffffff;
-  --color-card-border: #e5e5e5;
+  --color-card-border: #f0f0f0;
 }
 
 body {
-  background-color: var(--color-primary);
+  background-color: var(--color-secondary);
   color: var(--color-text-primary);
-  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+  font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
   overflow-x: hidden;
 }
 
 .font-japanese {
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
 }
 
 .font-mono {
@@ -54,18 +52,18 @@ body {
 
 /* Card hover effect */
 .card-hover {
-  @apply transition-all duration-300;
+  @apply transition-all duration-200;
 }
 
 .card-hover:hover {
-  @apply transform scale-105 shadow-lg;
-  box-shadow: 0 10px 40px rgba(233, 69, 96, 0.15);
+  @apply transform -translate-y-1;
+  box-shadow: 0 5px 20px rgba(233, 69, 96, 0.25);
 }
 
 /* Section title style */
 .section-title {
   @apply text-2xl font-bold mb-6;
-  color: var(--color-section-title);
+  color: var(--color-text-primary);
 }
 
 /* Event card accent border */
@@ -74,16 +72,11 @@ body {
   border-left-color: var(--color-accent);
 }
 
-/* Navbar/Header — 保持深色方便閱讀 */
-header, nav {
-  background-color: var(--color-text-primary) !important;
-  color: var(--color-primary) !important;
-}
-
-/* 女優卡片 — 白色背景 + 邊框 */
+/* 女優卡片 — 白色背景 + 輕 shadow */
 .actress-card {
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
+  @apply rounded-xl overflow-hidden;
 }
 
 /* Stat numbers */
@@ -91,3 +84,59 @@ header, nav {
   @apply text-3xl font-bold;
   color: var(--color-accent);
 }
+
+/* Header gradient (jumbotron style) */
+.header-gradient {
+  background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+}
+
+/* Tab pill buttons */
+.tab-pill {
+  @apply px-5 py-2 rounded-full text-sm font-medium transition-all duration-200;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+.tab-pill:hover:not(.active) {
+  background: rgba(255,255,255,0.3);
+}
+
+.tab-pill.active {
+  background: #fff;
+  color: var(--color-primary);
+}
+
+/* Sidebar section headers */
+.sidebar-title {
+  @apply text-sm font-bold mb-2 pb-1;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+/* Vote badge */
+.vote-badge {
+  background: var(--color-primary);
+  color: #fff;
+  @apply px-2 py-1 rounded-full text-xs font-bold;
+}
+
+/* Card image */
+.card-image {
+  @apply w-full aspect-square object-cover;
+}
+
+/* Toast */
+.toast {
+  @apply fixed bottom-8 left-1/2 px-6 py-3 rounded-full text-sm;
+  transform: translateX(-50%) translateY(100px);
+  @apply transition-all duration-300 opacity-0;
+  z-index: 2000;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  @apply opacity-100;
+}
+
+.toast.success { background: #4caf50; }
+.toast.error { background: #f44336; }

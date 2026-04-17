@@ -7,13 +7,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#1a1a2e',
-        secondary: '#16213e',
+        primary: '#e94560',
+        'primary-dark': '#c73e54',
+        secondary: '#f5f5f5',
         accent: '#e94560',
-        'text-primary': '#eaeaea',
-        'text-secondary': '#a0a0a0',
-        success: '#4ade80',
-        border: '#2a2a4a',
+        'text-primary': '#333333',
+        'text-secondary': '#888888',
+        success: '#4caf50',
+        border: '#f0f0f0',
       },
       fontFamily: {
         japanese: ['"Noto Sans JP"', 'sans-serif'],

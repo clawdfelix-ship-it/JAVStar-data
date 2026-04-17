@@ -149,7 +149,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-primary">
       {/* Hero Section */}
-      <header className="bg-gradient-to-br from-secondary via-primary to-primary">
+      <header className="header-gradient">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
           {/* Main Title */}
           <div className="text-center mb-8">
