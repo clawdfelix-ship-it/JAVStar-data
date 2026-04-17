@@ -41,14 +41,14 @@ async function runWithLock(fn: () => Promise<void>, name: string) {
 
 // Scrape and store events
 async function updateEvents() {
-  const [scrapedEvents, eventCounts] = await Promise.all([
+  const [scrapedEvents, _eventCounts] = await Promise.all([
     scrapeUpcomingEvents(),
     scrapeActressEventCounts(),
   ]);
 
   // Resolve actress names to IDs (simple name matching)
-  const actressList = await sql`SELECT id, name_ja FROM actresses`;
-  const nameToId = new Map((actressList as any[]).map((a: any) => [a.name_ja, a.id]));
+  const actressList = await sql`SELECT id, name_ja FROM actresses` as any[];
+  const nameToId = new Map(actressList.map((a: any) => [a.name_ja, a.id]));
 
   // Insert/update events
   for (const event of scrapedEvents) {

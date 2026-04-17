@@ -3,30 +3,27 @@
  * 
  * Scrapes actress data from minnano-av.com
  * Updates frequency: daily at 2:00 AM JST
- * 
- * Community-driven site - be respectful
  */
 
 import * as cheerio from 'cheerio';
 import fetch from 'node-fetch';
 
 const BASE_URL = 'https://www.minnano-av.com';
-const DELAY_MS = 3000; // More respectful for community site
+const DELAY_MS = 2000;
 
 async function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function fetchPage(url: string): Promise<any | null> {
+async function fetchPage(url: string): Promise<cheerio.CheerioAPI | null> {
   await delay(DELAY_MS);
   
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'AV-Intelligence-Bot/1.0 (+https://av-intelligence.local)',
-        'Accept': 'text/html,application/xhtml+xml',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'ja,en-US;q=0.9',
-        'Referer': BASE_URL,
       }
     });
 
@@ -59,8 +56,8 @@ export interface ActressData {
 // Parse birthday string to ISO format
 function parseBirthday(birthdayStr: string | null): string | null {
   if (!birthdayStr) return null;
-  // Format: 1990年06月12日 or 1990/06/12
-  const match = birthdayStr.match(/(\d+)[年/](\d+)[月/](\d+)/);
+  // Format: 2006年01月08日 or 2006/01/08 or 2006-01-08
+  const match = birthdayStr.match(/(\d+)[年\-/](\d+)[月\-/](\d+)/);
   if (match) {
     const [, year, month, day] = match;
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
@@ -68,71 +65,99 @@ function parseBirthday(birthdayStr: string | null): string | null {
   return null;
 }
 
-// Extract actress profile from listing page
-function extractActressFromCard($: any, link: string): ActressData | null {
+// Extract actress profile from detail page
+async function extractActressFromDetailPage($: cheerio.CheerioAPI, url: string): Promise<ActressData | null> {
   try {
-    const name_ja = $('[class*="name"]').text().trim() ||
-                   $('h3').first().text().trim() ||
-                   $('h2').first().text().trim();
+    // Get ID from URL like actress993545.html
+    const idMatch = url.match(/actress(\d+)\.html/i);
+    const id = idMatch ? idMatch[1] : url.split('/').pop()?.replace('.html', '') || '';
+    
+    // Get name from h1 - only text nodes, not child elements
+    const h1 = $('h1').first();
+    const name_ja = h1.clone().children().remove().end().text().trim() ||
+                   h1.text().trim().split('（')[0].trim();
     
     if (!name_ja) return null;
 
-    // Extract basic stats from card
-    const stats = $('[class*="stat"]').map((_: number, el: any) => $(el).text().trim()).get();
+    // Profile data is in table 1 (after the ratings table)
+    // Find the table that contains span-based labels like 生年月日
+    const profileData: Record<string, string> = {};
     
+    $('table').each((tableIdx: number, table: any) => {
+      const rows = $(table).find('tr');
+      let hasProfileLabels = false;
+      
+      rows.each((_: number, row: any) => {
+        const span = $(row).find('span').first();
+        if (span.length && span.text().includes('年月日')) {
+          hasProfileLabels = true;
+        }
+      });
+      
+      if (hasProfileLabels) {
+        // Parse this table's profile data
+        rows.each((_: number, row: any) => {
+          const span = $(row).find('span').first();
+          const p = $(row).find('p').first();
+          if (span.length && p.length) {
+            const label = span.text().trim();
+            const value = p.text().trim().split('（')[0].trim();
+            profileData[label] = value;
+          }
+        });
+        return false; // break
+      }
+    });
+
+    // Get avatar from profile image
+    const avatarImg = $('[class*="act-area"] img').first() ||
+                     $('img[src*="/p_actress_"]').first();
+    let avatar_url = avatarImg.attr('src') || null;
+    if (avatar_url && !avatar_url.startsWith('http')) {
+      avatar_url = `${BASE_URL}${avatar_url}`;
+    }
+
+    // Parse size info from "サイズ" field (e.g., "T158 / B95 / W56 / H88 / S")
     let height: number | null = null;
     let bust: number | null = null;
     let waist: number | null = null;
     let hip: number | null = null;
+    
+    const sizeStr = profileData['サイズ'] || '';
+    const heightMatch = sizeStr.match(/T(\d+)/);
+    const bustMatch = sizeStr.match(/B(\d+)/);
+    const waistMatch = sizeStr.match(/W(\d+)/);
+    const hipMatch = sizeStr.match(/H(\d+)/);
+    
+    if (heightMatch) height = parseInt(heightMatch[1]);
+    if (bustMatch) bust = parseInt(bustMatch[1]);
+    if (waistMatch) waist = parseInt(waistMatch[1]);
+    if (hipMatch) hip = parseInt(hipMatch[1]);
 
-    for (const stat of stats) {
-      const hMatch = stat.match(/(\d{3})cm/);
-      if (hMatch) height = parseInt(hMatch[1]);
-      
-      const bMatch = stat.match(/B(\d+)/);
-      if (bMatch) bust = parseInt(bMatch[1]);
-      
-      const wMatch = stat.match(/W(\d+)/);
-      if (wMatch) waist = parseInt(wMatch[1]);
-      
-      const iMatch = stat.match(/H(\d+)/);
-      if (iMatch) hip = parseInt(iMatch[1]);
+    // Parse debut date from "AV出演期間" or "デビュー作品"
+    let debut_date: string | null = null;
+    const avPeriod = profileData['AV出演期間'] || '';
+    const debutMatch = avPeriod.match(/(\d{4})年/);
+    if (debutMatch) {
+      debut_date = `${debutMatch[1]}-01-01`; // Just year
     }
-
-    const id = link.split('/').pop()?.replace(/\.html$/, '') || link;
 
     return {
       id,
       name_ja,
-      name_cn: '', // Will be derived from name_ja or empty
-      birthday: null,
+      name_cn: profileData['別名'] || '',
+      birthday: parseBirthday(profileData['生年月日']),
       height,
       bust,
       waist,
       hip,
-      debut_date: null,
-      avatar_url: extractAvatarUrl($, id),
+      debut_date,
+      avatar_url,
     };
-  } catch {
+  } catch (error) {
+    console.error('Error extracting profile:', error);
     return null;
   }
-}
-
-// Get avatar URL from page
-function extractAvatarUrl($: any, actressId: string): string | null {
-  // Look for image in various patterns
-  const img = $('[class*="photo"] img').first() ||
-              $('[class*="avatar"] img').first() ||
-              $('[class*="profile"] img').first() ||
-              $('img').first();
-  
-  if (img.length) {
-    const src = img.attr('src') || img.attr('data-src');
-    if (src && !src.includes('noimage')) {
-      return src;
-    }
-  }
-  return null;
 }
 
 // Scrape actress ranking page (top 100)
@@ -147,74 +172,55 @@ export async function scrapeActressRanking(): Promise<ActressData[]> {
     return actresses;
   }
 
-  // Find actress cards/links
-  const actressLinks: string[] = [];
-  $('a[href*="/actress/"]').each((_: number, el: any) => {
-    const href = $(el).attr('href');
-    if (href) actressLinks.push(href);
-  });
+  // Find the ranking table
+  const table = $('table').first();
+  const rows = table.find('tr');
+  console.log(`Found ${rows.length} table rows (including header)`);
 
-  console.log(`Found ${actressLinks.length} actress links`);
-
-  // Process top results (be respectful - don't scrape entire database)
-  const uniqueLinks = [...new Set(actressLinks)].slice(0, 100);
-  
-  for (const link of uniqueLinks) {
+  // Parse each row (skip header row 0)
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows.eq(i);
+    const cells = row.find('td');
+    
+    if (cells.length < 3) continue;
+    
+    // Get rank
+    const rank = cells.eq(0).text().trim();
+    
+    // Get name from h2.ttl a in third cell
+    const nameCell = cells.eq(2);
+    const nameLink = nameCell.find('h2.ttl a');
+    const name_ja = nameLink.text().trim();
+    
+    // Get detail page URL
+    const href = nameLink.attr('href');
+    
+    if (!name_ja || !href) continue;
+    
+    console.log(`[${i}] Rank ${rank}: ${name_ja}`);
+    
+    // Scrape detail page for full profile
     await delay(DELAY_MS);
+    const detailUrl = href.startsWith('http') ? href : `${BASE_URL}/${href}`;
+    const detail$ = await fetchPage(detailUrl);
     
-    const fullUrl = link.startsWith('http') ? link : `${BASE_URL}${link}`;
-    const page$ = await fetchPage(fullUrl);
+    if (detail$ && detail$.html()) {
+      const data = await extractActressFromDetailPage(detail$, detailUrl);
+      if (data) {
+        actresses.push(data);
+        console.log(`  -> birthday=${data.birthday}, height=${data.height}, B${data.bust || '?'}W${data.waist || '?'}H${data.hip || '?'}`);
+      }
+    }
     
-    if (!page$ || !page$.html()) continue;
-
-    const data = extractActressFromProfile(page$, link);
-    if (data) actresses.push(data);
-    
-    console.log(`Scraped: ${data?.name_ja || link}`);
+    // Limit to 20 for testing
+    if (actresses.length >= 20) {
+      console.log('Reached limit of 20 actresses');
+      break;
+    }
   }
 
   console.log(`Total actresses scraped: ${actresses.length}`);
   return actresses;
-}
-
-// Extract full profile from actress detail page
-function extractActressFromProfile($: any, url: string): ActressData | null {
-  try {
-    const id = url.split('/').pop()?.replace(/\.html$/, '') || '';
-    
-    // Get name
-    const name_ja = $('[class*="name"]').text().trim() ||
-                    $('h1').first().text().trim() ||
-                    $('h2').first().text().trim();
-    
-    if (!name_ja) return null;
-
-    // Parse profile table
-    const profileData: Record<string, string> = {};
-    $('table tr').each((_: number, row: any) => {
-      const cells = $(row).find('td');
-      if (cells.length >= 2) {
-        const label = cells.eq(0).text().trim();
-        const value = cells.eq(1).text().trim();
-        profileData[label] = value;
-      }
-    });
-
-    return {
-      id,
-      name_ja,
-      name_cn: '', // Could add Chinese conversion logic
-      birthday: parseBirthday(profileData['生年月日'] || profileData['誕生日']),
-      height: profileData['身長'] ? parseInt(profileData['身長']) : null,
-      bust: profileData['サイズ'] ? parseInt(profileData['サイズ'].match(/B(\d+)/)?.[1] || '0') : null,
-      waist: profileData['サイズ'] ? parseInt(profileData['サイズ'].match(/W(\d+)/)?.[1] || '0') : null,
-      hip: profileData['サイズ'] ? parseInt(profileData['サイズ'].match(/H(\d+)/)?.[1] || '0') : null,
-      debut_date: parseBirthday(profileData['デビュー'] || profileData['AVデビュー']),
-      avatar_url: extractAvatarUrl($, id),
-    };
-  } catch {
-    return null;
-  }
 }
 
 // Scrape all new arrivals (recent debuts)
@@ -223,28 +229,38 @@ export async function scrapeNewActresses(): Promise<ActressData[]> {
   
   const actresses: ActressData[] = [];
   
-  const $ = await fetchPage(`${BASE_URL}/av_list.html?sort=new`);
+  const $ = await fetchPage(`${BASE_URL}/ranking_actress.php?daily`);
   if (!$ || !$.html()) {
     console.log('Failed to load new arrivals page');
     return actresses;
   }
 
-  const actressLinks: string[] = [];
-  $('a[href*="/actress/"]').each((_: number, el: any) => {
-    const href = $(el).attr('href');
-    if (href) actressLinks.push(href);
-  });
+  const table = $('table').first();
+  const rows = table.find('tr');
 
-  const uniqueLinks = [...new Set(actressLinks)].slice(0, 50);
-  
-  for (const link of uniqueLinks) {
-    await delay(DELAY_MS);
+  for (let i = 1; i < Math.min(rows.length, 51); i++) {
+    const row = rows.eq(i);
+    const cells = row.find('td');
     
-    const page$ = await fetchPage(`${BASE_URL}${link}`);
-    if (!page$ || !page$.html()) continue;
-
-    const data = extractActressFromProfile(page$, link);
-    if (data) actresses.push(data);
+    if (cells.length < 3) continue;
+    
+    const nameCell = cells.eq(2);
+    const nameLink = nameCell.find('h2.ttl a');
+    const name_ja = nameLink.text().trim();
+    const href = nameLink.attr('href');
+    
+    if (!name_ja || !href) continue;
+    
+    await delay(DELAY_MS);
+    const detailUrl = href.startsWith('http') ? href : `${BASE_URL}/${href}`;
+    const detail$ = await fetchPage(detailUrl);
+    
+    if (detail$ && detail$.html()) {
+      const data = await extractActressFromDetailPage(detail$, detailUrl);
+      if (data) {
+        actresses.push(data);
+      }
+    }
   }
 
   return actresses;
