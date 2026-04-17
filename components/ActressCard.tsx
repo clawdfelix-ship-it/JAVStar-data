@@ -111,7 +111,7 @@ export default function ActressCard({
           </div>
 
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-2 ring-border hover:ring-accent transition-all">
+          <div className="w-20 h-20 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-2 ring-border hover:ring-accent hover:ring-4 transition-all duration-300 shadow-lg hover:shadow-accent/30">
             {avatar_url ? (
               <img
                 src={avatar_url}
@@ -137,10 +137,26 @@ export default function ActressCard({
 
             {/* Quick stats row */}
             <div className="flex flex-wrap gap-1.5 mt-2">
-              {age && <StatBadge label="年" value={`${age}`} />}
-              {zodiac && <StatBadge label="星" value={zodiac} />}
-              {cup && <StatBadge label="罩" value={cup} />}
-              {height && <StatBadge label="身" value={`${height}cm`} />}
+              {age && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 text-accent text-xs rounded-md font-medium">
+                  {age}歲
+                </span>
+              )}
+              {zodiac && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/10 text-purple-400 text-xs rounded-md">
+                  {zodiac}
+                </span>
+              )}
+              {cup && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-pink-500/10 text-pink-400 text-xs rounded-md font-mono">
+                  {cup} cup
+                </span>
+              )}
+              {height && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md">
+                  📏 {height}cm
+                </span>
+              )}
             </div>
 
             {/* Measurements */}
@@ -181,11 +197,11 @@ export default function ActressCard({
       <div className="mt-3 pt-3 border-t border-border flex justify-between items-center">
         <div className="flex items-center gap-3">
           {debut_year && (
-            <span className="text-text-secondary text-xs font-mono">
-              出道: {debut_year}
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-success/10 text-success text-xs rounded-md font-medium">
+              🎬 出道 {debut_year}
             </span>
           )}
-          <span className="text-text-secondary/50 text-xs">ID: {id}</span>
+          <span className="text-text-secondary/50 text-xs font-mono">#{id.slice(0, 8)}</span>
         </div>
 
         <div className="flex items-center gap-3">

@@ -48,12 +48,13 @@ body {
 
 /* Card hover effect */
 .actress-card {
-  @apply transition-all duration-200;
+  @apply transition-all duration-300;
 }
 
 .actress-card:hover {
-  @apply transform scale-[1.02];
-  box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+  @apply border-accent/60;
+  box-shadow: 0 4px 24px rgba(233, 69, 96, 0.2), 0 0 0 1px rgba(233, 69, 96, 0.1);
+  transform: translateY(-2px);
 }
 
 /* Skeleton loading */

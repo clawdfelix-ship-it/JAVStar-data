@@ -162,15 +162,18 @@ export default function ActressPage() {
             <div className="bg-secondary rounded-lg border border-border overflow-hidden mb-8">
               <div className="p-6">
                 <div className="flex flex-col md:flex-row items-start gap-6">
-                  {/* Avatar */}
-                  <div className="w-40 h-40 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-4 ring-accent/30">
-                    {actress.avatar_url ? (
-                      <img src={actress.avatar_url} alt={actress.name_ja} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-5xl font-japanese text-text-secondary">
-                        {actress.name_ja[0]}
-                      </div>
-                    )}
+                  {/* Avatar with gradient backdrop */}
+                  <div className="relative flex-shrink-0">
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-purple-500/30 rounded-full blur-xl" />
+                    <div className="relative w-40 h-40 rounded-full bg-primary overflow-hidden ring-4 ring-accent/50 shadow-2xl shadow-accent/20">
+                      {actress.avatar_url ? (
+                        <img src={actress.avatar_url} alt={actress.name_ja} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-5xl font-japanese text-text-secondary">
+                          {actress.name_ja[0]}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Main info */}
@@ -182,54 +185,54 @@ export default function ActressPage() {
                       <p className="text-text-secondary text-lg mb-4">{actress.name_cn}</p>
                     )}
 
-                    {/* Quick badges */}
+                    {/* Quick badges - enhanced with icons */}
                     <div className="flex flex-wrap gap-2 mb-6">
                       {actress.age && (
-                        <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm font-medium">
-                          {actress.age}歲
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/15 text-accent rounded-full text-sm font-semibold border border-accent/20">
+                          🎂 {actress.age}歲
                         </span>
                       )}
                       {actress.zodiac && (
-                        <span className="px-3 py-1 bg-primary text-text-secondary rounded-full text-sm">
-                          ♓ {actress.zodiac}
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/15 text-purple-300 rounded-full text-sm border border-purple-500/20">
+                          ✨ {actress.zodiac}
                         </span>
                       )}
                       {actress.cup && (
-                        <span className="px-3 py-1 bg-primary text-text-secondary rounded-full text-sm font-mono">
-                          Cup: {actress.cup}
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-pink-500/15 text-pink-300 rounded-full text-sm font-mono border border-pink-500/20">
+                          💋 Cup {actress.cup}
                         </span>
                       )}
                       {actress.debut_year && (
-                        <span className="px-3 py-1 bg-success/20 text-success rounded-full text-sm">
-                          出道: {actress.debut_year}
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-success/15 text-success rounded-full text-sm border border-success/20">
+                          🎬 {actress.debut_year} 出道
                         </span>
                       )}
                     </div>
 
-                    {/* Stats grid */}
+                    {/* Stats grid - enhanced cards */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="bg-primary rounded-lg p-4 text-center">
-                        <div className="font-mono text-2xl font-bold text-accent">{actress.stats.total_events}</div>
-                        <div className="text-text-secondary text-sm mt-1">總活動數</div>
+                      <div className="bg-gradient-to-br from-accent/20 to-accent/5 rounded-xl p-4 text-center border border-accent/20 hover:border-accent/40 transition-colors">
+                        <div className="font-mono text-3xl font-bold text-accent">{actress.stats.total_events}</div>
+                        <div className="text-text-secondary text-sm mt-2">📊 總活動</div>
                       </div>
-                      <div className="bg-primary rounded-lg p-4 text-center">
-                        <div className="font-mono text-2xl font-bold text-success">{actress.stats.year_2026_events}</div>
-                        <div className="text-text-secondary text-sm mt-1">2026 年</div>
+                      <div className="bg-gradient-to-br from-success/20 to-success/5 rounded-xl p-4 text-center border border-success/20 hover:border-success/40 transition-colors">
+                        <div className="font-mono text-3xl font-bold text-success">{actress.stats.year_2026_events}</div>
+                        <div className="text-text-secondary text-sm mt-2">📅 2026 年</div>
                       </div>
-                      <div className="bg-primary rounded-lg p-4 text-center">
-                        <div className="font-mono text-2xl font-bold text-yellow-400">{actress.stats.month_04_2026_events}</div>
-                        <div className="text-text-secondary text-sm mt-1">4 月活動</div>
+                      <div className="bg-gradient-to-br from-yellow-400/20 to-yellow-400/5 rounded-xl p-4 text-center border border-yellow-400/20 hover:border-yellow-400/40 transition-colors">
+                        <div className="font-mono text-3xl font-bold text-yellow-400">{actress.stats.month_04_2026_events}</div>
+                        <div className="text-text-secondary text-sm mt-2">🗓️ 4月活動</div>
                       </div>
-                      <div className="bg-primary rounded-lg p-4 text-center">
-                        <div className="font-mono text-2xl font-bold text-blue-400">{actress.vote_count}</div>
-                        <div className="text-text-secondary text-sm mt-1">投票數</div>
+                      <div className="bg-gradient-to-br from-blue-400/20 to-blue-400/5 rounded-xl p-4 text-center border border-blue-400/20 hover:border-blue-400/40 transition-colors">
+                        <div className="font-mono text-3xl font-bold text-blue-400">{actress.vote_count}</div>
+                        <div className="text-text-secondary text-sm mt-2">❤️ 投票</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Profile details grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 mt-8 pt-6 border-t border-border">
+                {/* Profile details grid - enhanced with icons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8 pt-6 border-t border-border">
                   {actress.birthday && (
                     <div className="flex flex-col">
                       <span className="text-text-secondary text-xs uppercase tracking-wide">生日</span>
@@ -289,22 +292,19 @@ export default function ActressPage() {
                   </div>
                 )}
 
-                {/* External links */}
+                {/* External links - enhanced buttons */}
                 {(actress.blog || actress.official_site) && (
                   <div className="mt-6 pt-6 border-t border-border">
-                    <span className="text-text-secondary text-xs uppercase tracking-wide block mb-3">外部連結</span>
+                    <span className="text-text-secondary text-xs uppercase tracking-wide block mb-3">🔗 外部連結</span>
                     <div className="flex flex-wrap gap-3">
                       {actress.official_site && (
                         <a
                           href={actress.official_site}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition-colors text-sm font-medium"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-accent to-pink-500 text-white rounded-xl hover:from-accent/90 hover:to-pink-500/90 transition-all text-sm font-semibold shadow-lg shadow-accent/25 hover:shadow-accent/40 hover:-translate-y-0.5"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                          </svg>
-                          官網
+                          🌐 官網
                         </a>
                       )}
                       {actress.blog && (
@@ -312,29 +312,26 @@ export default function ActressPage() {
                           href={actress.blog}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-primary border border-border text-text-primary rounded-lg hover:border-accent transition-colors text-sm"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-500/30 text-purple-300 rounded-xl hover:from-purple-500/30 hover:to-purple-600/30 hover:border-purple-500/50 transition-all text-sm font-medium"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                          </svg>
-                          博客
+                          📝 博客
                         </a>
                       )}
                       <a
                         href={`https://www.minnano-av.com/actress/${actress.id}.html`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary border border-border text-text-primary rounded-lg hover:border-accent transition-colors text-sm"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary border border-border text-text-primary rounded-xl hover:border-accent hover:text-accent transition-all text-sm font-medium"
                       >
-                        minnano-av
+                        📺 minnano-av
                       </a>
                       <a
                         href={`https://www.av-event.jp/search/?q=${encodeURIComponent(actress.name_ja)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary border border-border text-text-primary rounded-lg hover:border-accent transition-colors text-sm"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary border border-border text-text-primary rounded-xl hover:border-accent hover:text-accent transition-all text-sm font-medium"
                       >
-                        av-event.jp
+                        🎫 av-event
                       </a>
                     </div>
                   </div>

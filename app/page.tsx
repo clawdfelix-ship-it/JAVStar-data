@@ -85,11 +85,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-primary">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-secondary border-b border-border">
+      <header className="sticky top-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="font-japanese text-2xl font-bold text-accent">
+              <h1 className="font-japanese text-2xl font-bold bg-gradient-to-r from-accent to-pink-400 bg-clip-text text-transparent">
                 AV Intelligence 🇭🇰
               </h1>
               <p className="text-text-secondary text-sm mt-1">
