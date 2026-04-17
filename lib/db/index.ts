@@ -1,14 +1,19 @@
 import { neon } from '@neondatabase/serverless';
 
 // Create a lazy-initialized SQL client
-// Supports both DATABASE_URL (standard) and POSTGRES_URL (Vercel Neon integration)
+// Supports multiple env var names for Neon connections
 let _sql: ReturnType<typeof neon> | null = null;
 
 function getSql() {
   if (!_sql) {
-    const url = process.env.DATABASE_URL || process.env.POSTGRES_URL || '';
+    // Try multiple possible env var names
+    const url =
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.POSTGRES_URL_NON_POOLING ||
+      '';
     if (!url) {
-      throw new Error('Neither DATABASE_URL nor POSTGRES_URL environment variable is set');
+      throw new Error('No database connection string found in environment variables');
     }
     _sql = neon(url);
   }
