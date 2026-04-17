@@ -21,11 +21,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node-cron": "^3.0.11",
     "autoprefixer": "^10.4.21",
     "better-sqlite3": "^11.8.1",
     "cheerio": "^1.0.0",
     "drizzle-orm": "^0.40.1",
     "next": "^15.2.3",
+    "node-cron": "^4.2.1",
     "node-fetch": "^2.7.0",
     "postcss": "^8.5.3",
     "react": "^19.0.0",

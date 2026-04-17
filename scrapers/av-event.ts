@@ -196,12 +196,12 @@ export async function scrapeUpcomingEvents(): Promise<EventData[]> {
       events.push({
         id: eventPath.split('/').pop() || eventPath,
         actress_id: actressName, // Will resolve to ID later
-        title: eventData.title,
-        venue: eventData.venue,
-        prefecture: extractPrefecture(eventData.venue),
-        datetime: eventData.datetime,
-        event_type: extractEventType(eventData.title),
-        url: eventData.url,
+        title: eventData.title || 'Unknown Event',
+        venue: eventData.venue || '',
+        prefecture: extractPrefecture(eventData.venue || ''),
+        datetime: eventData.datetime || '',
+        event_type: extractEventType(eventData.title || ''),
+        url: eventData.url || '',
       });
     }
   }
@@ -297,4 +297,4 @@ if (require.main === module) {
     .catch(console.error);
 }
 
-export { scrapeUpcomingEvents as default, scrapeActressEventCounts };
+export { scrapeUpcomingEvents as default };

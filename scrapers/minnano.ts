@@ -78,7 +78,7 @@ function extractActressFromCard($: any, link: string): ActressData | null {
     if (!name_ja) return null;
 
     // Extract basic stats from card
-    const stats = $('[class*="stat"]').map((_, el) => $(el).text().trim()).get();
+    const stats = $('[class*="stat"]').map((_: number, el: any) => $(el).text().trim()).get();
     
     let height: number | null = null;
     let bust: number | null = null;
@@ -149,7 +149,7 @@ export async function scrapeActressRanking(): Promise<ActressData[]> {
 
   // Find actress cards/links
   const actressLinks: string[] = [];
-  $('a[href*="/actress/"]').each((_, el) => {
+  $('a[href*="/actress/"]').each((_: number, el: any) => {
     const href = $(el).attr('href');
     if (href) actressLinks.push(href);
   });
@@ -191,7 +191,7 @@ function extractActressFromProfile($: any, url: string): ActressData | null {
 
     // Parse profile table
     const profileData: Record<string, string> = {};
-    $('table tr').each((_, row) => {
+    $('table tr').each((_: number, row: any) => {
       const cells = $(row).find('td');
       if (cells.length >= 2) {
         const label = cells.eq(0).text().trim();
@@ -230,7 +230,7 @@ export async function scrapeNewActresses(): Promise<ActressData[]> {
   }
 
   const actressLinks: string[] = [];
-  $('a[href*="/actress/"]').each((_, el) => {
+  $('a[href*="/actress/"]').each((_: number, el: any) => {
     const href = $(el).attr('href');
     if (href) actressLinks.push(href);
   });
@@ -260,4 +260,4 @@ if (require.main === module) {
     .catch(console.error);
 }
 
-export { scrapeActressRanking as default, scrapeNewActresses };
+export { scrapeActressRanking as default };
