@@ -102,16 +102,16 @@ export default function ActressCard({
   }
 
   return (
-    <div className="actress-card bg-secondary rounded-lg p-4 border border-border hover:border-accent">
+    <div className="actress-card bg-secondary rounded-lg p-3 md:p-4 border border-border hover:border-accent">
       <Link href={`/actress/${id}`} className="block">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           {/* Rank badge */}
-          <div className={`rank-badge ${getRankClass(rank)}`}>
+          <div className={`rank-badge flex-shrink-0 ${getRankClass(rank)}`}>
             {rank}
           </div>
 
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-2 ring-border hover:ring-accent hover:ring-4 transition-all duration-300 shadow-lg hover:shadow-accent/30">
+          <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-2 ring-border hover:ring-accent hover:ring-4 transition-all duration-300 shadow-lg hover:shadow-accent/30">
             {avatar_url ? (
               <img
                 src={avatar_url}
@@ -128,7 +128,7 @@ export default function ActressCard({
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-japanese text-xl font-bold text-text-primary truncate">
+            <h3 className="font-japanese text-base md:text-xl font-bold text-text-primary truncate">
               {name_ja}
             </h3>
             {name_cn && (
@@ -178,9 +178,9 @@ export default function ActressCard({
           </div>
 
           {/* Score + mini stats */}
-          <div className="text-right flex-shrink-0 flex flex-col items-end justify-between">
+          <div className="hidden sm:flex flex-col items-end justify-between flex-shrink-0">
             <div>
-              <div className="font-mono text-2xl font-bold text-accent">
+              <div className="font-mono text-xl md:text-2xl font-bold text-accent">
                 {final_score}
               </div>
               <div className="text-text-secondary text-xs">總分</div>
@@ -194,21 +194,24 @@ export default function ActressCard({
       </Link>
 
       {/* Footer: debut year + actions */}
-      <div className="mt-3 pt-3 border-t border-border flex justify-between items-center">
-        <div className="flex items-center gap-3">
+      <div className="mt-3 pt-3 border-t border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
           {debut_year && (
             <span className="inline-flex items-center gap-1 px-2 py-1 bg-success/10 text-success text-xs rounded-md font-medium">
               🎬 出道 {debut_year}
             </span>
           )}
           <span className="text-text-secondary/50 text-xs font-mono">#{id.slice(0, 8)}</span>
+          <div className="sm:hidden flex items-center gap-1 text-xs">
+            <span className="text-accent font-mono font-bold">{final_score}</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handleVote}
             disabled={isVoting}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+            className={`px-3 py-2 sm:py-1.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
               hasVoted
                 ? 'bg-accent text-white hover:bg-accent/80'
                 : 'bg-primary border border-accent text-accent hover:bg-accent hover:text-white'
@@ -217,8 +220,8 @@ export default function ActressCard({
             {isVoting ? '處理中...' : hasVoted ? '♥ 已投' : '♡ 投票'}
           </button>
 
-          <Link href={`/actress/${id}`} className="text-accent text-sm hover:underline">
-            睇詳情 →
+          <Link href={`/actress/${id}`} className="text-accent text-sm hover:underline py-2 min-h-[44px] flex items-center">
+            詳情 →
           </Link>
         </div>
       </div>

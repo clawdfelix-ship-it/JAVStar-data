@@ -161,11 +161,11 @@ export default function ActressPage() {
             {/* Profile card */}
             <div className="bg-secondary rounded-lg border border-border overflow-hidden mb-8">
               <div className="p-6">
-                <div className="flex flex-col md:flex-row items-start gap-6">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6">
                   {/* Avatar with gradient backdrop */}
                   <div className="relative flex-shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-purple-500/30 rounded-full blur-xl" />
-                    <div className="relative w-40 h-40 rounded-full bg-primary overflow-hidden ring-4 ring-accent/50 shadow-2xl shadow-accent/20">
+                    <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full bg-primary overflow-hidden ring-4 ring-accent/50 shadow-2xl shadow-accent/20">
                       {actress.avatar_url ? (
                         <img src={actress.avatar_url} alt={actress.name_ja} className="w-full h-full object-cover" />
                       ) : (
@@ -178,7 +178,7 @@ export default function ActressPage() {
 
                   {/* Main info */}
                   <div className="flex-1">
-                    <h1 className="font-japanese text-3xl font-bold text-text-primary mb-1">
+                    <h1 className="font-japanese text-2xl sm:text-3xl font-bold text-text-primary mb-1 text-center md:text-left">
                       {actress.name_ja}
                     </h1>
                     {actress.name_cn && (
@@ -210,22 +210,22 @@ export default function ActressPage() {
                     </div>
 
                     {/* Stats grid - enhanced cards */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <div className="bg-gradient-to-br from-accent/20 to-accent/5 rounded-xl p-4 text-center border border-accent/20 hover:border-accent/40 transition-colors">
-                        <div className="font-mono text-3xl font-bold text-accent">{actress.stats.total_events}</div>
-                        <div className="text-text-secondary text-sm mt-2">📊 總活動</div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                      <div className="bg-gradient-to-br from-accent/20 to-accent/5 rounded-xl p-3 sm:p-4 text-center border border-accent/20 hover:border-accent/40 transition-colors">
+                        <div className="font-mono text-2xl sm:text-3xl font-bold text-accent">{actress.stats.total_events}</div>
+                        <div className="text-text-secondary text-xs sm:text-sm mt-1 sm:mt-2">📊 總活動</div>
                       </div>
-                      <div className="bg-gradient-to-br from-success/20 to-success/5 rounded-xl p-4 text-center border border-success/20 hover:border-success/40 transition-colors">
-                        <div className="font-mono text-3xl font-bold text-success">{actress.stats.year_2026_events}</div>
-                        <div className="text-text-secondary text-sm mt-2">📅 2026 年</div>
+                      <div className="bg-gradient-to-br from-success/20 to-success/5 rounded-xl p-3 sm:p-4 text-center border border-success/20 hover:border-success/40 transition-colors">
+                        <div className="font-mono text-2xl sm:text-3xl font-bold text-success">{actress.stats.year_2026_events}</div>
+                        <div className="text-text-secondary text-xs sm:text-sm mt-1 sm:mt-2">📅 2026 年</div>
                       </div>
-                      <div className="bg-gradient-to-br from-yellow-400/20 to-yellow-400/5 rounded-xl p-4 text-center border border-yellow-400/20 hover:border-yellow-400/40 transition-colors">
-                        <div className="font-mono text-3xl font-bold text-yellow-400">{actress.stats.month_04_2026_events}</div>
-                        <div className="text-text-secondary text-sm mt-2">🗓️ 4月活動</div>
+                      <div className="bg-gradient-to-br from-yellow-400/20 to-yellow-400/5 rounded-xl p-3 sm:p-4 text-center border border-yellow-400/20 hover:border-yellow-400/40 transition-colors">
+                        <div className="font-mono text-2xl sm:text-3xl font-bold text-yellow-400">{actress.stats.month_04_2026_events}</div>
+                        <div className="text-text-secondary text-xs sm:text-sm mt-1 sm:mt-2">🗓️ 4月活動</div>
                       </div>
-                      <div className="bg-gradient-to-br from-blue-400/20 to-blue-400/5 rounded-xl p-4 text-center border border-blue-400/20 hover:border-blue-400/40 transition-colors">
-                        <div className="font-mono text-3xl font-bold text-blue-400">{actress.vote_count}</div>
-                        <div className="text-text-secondary text-sm mt-2">❤️ 投票</div>
+                      <div className="bg-gradient-to-br from-blue-400/20 to-blue-400/5 rounded-xl p-3 sm:p-4 text-center border border-blue-400/20 hover:border-blue-400/40 transition-colors">
+                        <div className="font-mono text-2xl sm:text-3xl font-bold text-blue-400">{actress.vote_count}</div>
+                        <div className="text-text-secondary text-xs sm:text-sm mt-1 sm:mt-2">❤️ 投票</div>
                       </div>
                     </div>
                   </div>

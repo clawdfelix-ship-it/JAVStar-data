@@ -105,7 +105,7 @@ export default function HomePage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="搜尋女優..."
-                  className="w-64 px-4 py-2 bg-primary border border-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:border-accent"
+                  className="w-40 sm:w-64 px-3 sm:px-4 py-2 bg-primary border border-border rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:border-accent"
                 />
                 <button
                   type="submit"
@@ -127,30 +127,30 @@ export default function HomePage() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {/* Stats bar */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          <div className="bg-secondary rounded-lg p-4 border border-border">
-            <div className="text-text-secondary text-sm">女優總數</div>
-            <div className="font-mono text-2xl font-bold text-accent mt-1">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <div className="bg-secondary rounded-lg p-3 sm:p-4 border border-border">
+            <div className="text-text-secondary text-xs sm:text-sm">女優總數</div>
+            <div className="font-mono text-xl sm:text-2xl font-bold text-accent mt-1">
               {pagination?.total || '-'}
             </div>
           </div>
-          <div className="bg-secondary rounded-lg p-4 border border-border">
-            <div className="text-text-secondary text-sm">2026年度活動</div>
-            <div className="font-mono text-2xl font-bold text-success mt-1">
+          <div className="bg-secondary rounded-lg p-3 sm:p-4 border border-border">
+            <div className="text-text-secondary text-xs sm:text-sm">2026年度活動</div>
+            <div className="font-mono text-xl sm:text-2xl font-bold text-success mt-1">
               {actresses.reduce((sum, a) => sum + a.year_2026_events, 0)}
             </div>
           </div>
-          <div className="bg-secondary rounded-lg p-4 border border-border">
-            <div className="text-text-secondary text-sm">總投票數</div>
-            <div className="font-mono text-2xl font-bold text-yellow-400 mt-1">
+          <div className="bg-secondary rounded-lg p-3 sm:p-4 border border-border">
+            <div className="text-text-secondary text-xs sm:text-sm">總投票數</div>
+            <div className="font-mono text-xl sm:text-2xl font-bold text-yellow-400 mt-1">
               {actresses.reduce((sum, a) => sum + a.vote_count, 0)}
             </div>
           </div>
-          <div className="bg-secondary rounded-lg p-4 border border-border">
-            <div className="text-text-secondary text-sm">排名方式</div>
-            <div className="font-mono text-lg text-text-primary mt-1">70%活動＋30%投票</div>
+          <div className="bg-secondary rounded-lg p-3 sm:p-4 border border-border">
+            <div className="text-text-secondary text-xs sm:text-sm">排名方式</div>
+            <div className="font-mono text-base sm:text-lg text-text-primary mt-1">70%活動＋30%投票</div>
           </div>
         </div>
 
@@ -208,21 +208,21 @@ export default function HomePage() {
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-8">
+          <div className="flex justify-center items-center gap-2 mt-6 sm:mt-8">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-4 py-2 bg-secondary border border-border rounded-lg text-text-primary disabled:opacity-50 hover:border-accent disabled:hover:border-border"
+              className="px-3 sm:px-4 py-2 bg-secondary border border-border rounded-lg text-text-primary disabled:opacity-50 hover:border-accent disabled:hover:border-border min-h-[44px]"
             >
               ← 上一頁
             </button>
-            <span className="text-text-secondary px-4">
+            <span className="text-text-secondary px-3 sm:px-4 text-sm sm:text-base">
               第 {page} / {pagination.totalPages} 頁
             </span>
             <button
               onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
               disabled={page === pagination.totalPages}
-              className="px-4 py-2 bg-secondary border border-border rounded-lg text-text-primary disabled:opacity-50 hover:border-accent disabled:hover:border-border"
+              className="px-3 sm:px-4 py-2 bg-secondary border border-border rounded-lg text-text-primary disabled:opacity-50 hover:border-accent disabled:hover:border-border min-h-[44px]"
             >
               下一頁 →
             </button>
