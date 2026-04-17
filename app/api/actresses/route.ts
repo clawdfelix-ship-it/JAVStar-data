@@ -1,6 +1,5 @@
-import { db } from '@/lib/db';
-import { actresses, events, actress_events_count, votes } from '@/lib/db/schema';
-import { desc, sql, and, gte, like, or } from 'drizzle-orm';
+import sql from '@/lib/db';
+import { Actress, Event, Vote } from '@/lib/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET /api/actresses - List actresses with event counts + votes, sorted by weighted score
@@ -10,33 +9,41 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const search = searchParams.get('search') || '';
-
     const offset = (page - 1) * limit;
 
     // Get all actresses
-    const actressList = db.select().from(actresses).all();
+    const actressList = await sql`SELECT * FROM actresses`;
+    const actresses = actressList as Actress[];
 
-    // Get event counts for each actress
-    const eventCounts = db.select().from(actress_events_count).all();
-    const eventMap = new Map(eventCounts.map(e => [e.actress_id, e]));
+    // Get event counts
+    const eventCountsResult = await sql`
+      SELECT 
+        actress_id,
+        COUNT(*) FILTER (WHERE datetime >= '2025-01-01' AND datetime < '2026-01-01') as year_2025_events,
+        COUNT(*) FILTER (WHERE datetime >= '2026-01-01' AND datetime < '2027-01-01') as year_2026_events
+      FROM events
+      GROUP BY actress_id
+    `;
+    const eventCountsMap = new Map(
+      (eventCountsResult as any[]).map((e: any) => [e.actress_id, e])
+    );
 
-    // Get all events to count manually
-    const allEvents = db.select().from(events).all();
+    // Get vote counts
+    const voteCountsResult = await sql`
+      SELECT actress_id, COUNT(*) as vote_count 
+      FROM votes 
+      GROUP BY actress_id
+    `;
+    const voteCountsMap = new Map(
+      (voteCountsResult as any[]).map((v: any) => [v.actress_id, Number(v.vote_count)])
+    );
 
-    // Get vote counts per actress
-    const voteCounts = db
-      .select({ actress_id: votes.actress_id, vote_count: sql<number>`count(*)` })
-      .from(votes)
-      .groupBy(votes.actress_id)
-      .all();
-    const voteMap = new Map(voteCounts.map(v => [v.actress_id, v.vote_count]));
-
-    // Enrich data with weighted scoring
+    // Enrich with weighted scoring
     // Formula: final_score = year_2026_events * 0.7 + votes * 0.3
-    const enrichedActresses = actressList.map(actress => {
-      const countData = eventMap.get(actress.id);
+    const enrichedActresses = actresses.map(actress => {
+      const countData = eventCountsMap.get(actress.id);
       const yearCount = countData?.year_2026_events || 0;
-      const voteCount = voteMap.get(actress.id) || 0;
+      const voteCount = voteCountsMap.get(actress.id) || 0;
       const finalScore = Math.round(yearCount * 0.7 + voteCount * 0.3);
 
       return {
@@ -59,7 +66,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Sort by final_score descending (weighted: events 70% + votes 30%)
+    // Sort by final_score descending
     filtered.sort((a, b) => b.final_score - a.final_score);
 
     // Paginate
@@ -78,9 +85,29 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Error fetching actresses:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch actresses' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch actresses' }, { status: 500 });
+  }
+}
+
+// POST /api/actresses - Create actress
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, name_ja, name_cn, avatar_url, bio, height, bust, waist, hip } = body;
+
+    if (!id || !name_ja) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    await sql`
+      INSERT INTO actresses (id, name_ja, name_cn, avatar_url, bio, height, bust, waist, hip)
+      VALUES (${id}, ${name_ja}, ${name_cn}, ${avatar_url}, ${bio}, ${height}, ${bust}, ${waist}, ${hip})
+    `;
+
+    return NextResponse.json({ success: true }, { status: 201 });
+
+  } catch (error) {
+    console.error('Error creating actress:', error);
+    return NextResponse.json({ error: 'Failed to create actress' }, { status: 500 });
   }
 }

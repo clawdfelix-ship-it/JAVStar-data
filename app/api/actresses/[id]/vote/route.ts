@@ -1,13 +1,12 @@
-import { db } from '@/lib/db';
-import { votes, actresses } from '@/lib/db/schema';
-import { eq, and, sql } from 'drizzle-orm';
+import sql from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET /api/actresses/[id]/vote - Get vote count and if user voted
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+interface Params {
+  params: Promise<{ id: string }>;
+}
+
+// GET /api/actresses/[id]/vote - Get vote count
+export async function GET(request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
@@ -15,23 +14,17 @@ export async function GET(
                'unknown';
 
     // Get vote count
-    const voteCount = db
-      .select({ count: sql<number>`count(*)` })
-      .from(votes)
-      .where(eq(votes.actress_id, id))
-      .get();
+    const voteCountResult = await sql`SELECT COUNT(*) as count FROM votes WHERE actress_id = ${id}`;
+    const voteCount = Number((voteCountResult as any[])[0]?.count || 0);
 
     // Check if this IP has voted
-    const userVote = db
-      .select()
-      .from(votes)
-      .where(and(eq(votes.actress_id, id), eq(votes.ip_address, ip)))
-      .get();
+    const userVoteResult = await sql`SELECT * FROM votes WHERE actress_id = ${id} AND ip_address = ${ip}`;
+    const hasVoted = (userVoteResult as any[]).length > 0;
 
     return NextResponse.json({
       actress_id: id,
-      vote_count: voteCount?.count || 0,
-      has_voted: !!userVote,
+      vote_count: voteCount,
+      has_voted: hasVoted,
     });
 
   } catch (error) {
@@ -40,11 +33,8 @@ export async function GET(
   }
 }
 
-// POST /api/actresses/[id]/vote - Cast a vote
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// POST /api/actresses/[id]/vote - Cast vote
+export async function POST(request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
@@ -52,19 +42,14 @@ export async function POST(
                'unknown';
 
     // Check if actress exists
-    const actress = db.select().from(actresses).where(eq(actresses.id, id)).get();
-    if (!actress) {
+    const actressResult = await sql`SELECT * FROM actresses WHERE id = ${id}`;
+    if ((actressResult as any[]).length === 0) {
       return NextResponse.json({ error: 'Actress not found' }, { status: 404 });
     }
 
     // Check if already voted
-    const existingVote = db
-      .select()
-      .from(votes)
-      .where(and(eq(votes.actress_id, id), eq(votes.ip_address, ip)))
-      .get();
-
-    if (existingVote) {
+    const existingVoteResult = await sql`SELECT * FROM votes WHERE actress_id = ${id} AND ip_address = ${ip}`;
+    if ((existingVoteResult as any[]).length > 0) {
       return NextResponse.json(
         { error: '你已經投過呢個女優了！每個 IP 每日每女優只能投一票', voted: false },
         { status: 400 }
@@ -72,22 +57,15 @@ export async function POST(
     }
 
     // Record vote
-    db.insert(votes).values({
-      actress_id: id,
-      ip_address: ip,
-      voted_at: new Date().toISOString(),
-    }).run();
+    await sql`INSERT INTO votes (actress_id, ip_address) VALUES (${id}, ${ip})`;
 
     // Get updated count
-    const voteCount = db
-      .select({ count: sql<number>`count(*)` })
-      .from(votes)
-      .where(eq(votes.actress_id, id))
-      .get();
+    const voteCountResult = await sql`SELECT COUNT(*) as count FROM votes WHERE actress_id = ${id}`;
+    const voteCount = Number((voteCountResult as any[])[0]?.count || 0);
 
     return NextResponse.json({
       success: true,
-      vote_count: voteCount?.count || 1,
+      vote_count: voteCount,
       message: '投票成功！多謝你支持 🎉',
     });
 
@@ -98,29 +76,19 @@ export async function POST(
 }
 
 // DELETE /api/actresses/[id]/vote - Remove vote
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
                request.headers.get('x-real-ip') ||
                'unknown';
 
-    const existingVote = db
-      .select()
-      .from(votes)
-      .where(and(eq(votes.actress_id, id), eq(votes.ip_address, ip)))
-      .get();
-
-    if (!existingVote) {
+    const existingVoteResult = await sql`SELECT * FROM votes WHERE actress_id = ${id} AND ip_address = ${ip}`;
+    if ((existingVoteResult as any[]).length === 0) {
       return NextResponse.json({ error: '你未投過呢個女優' }, { status: 400 });
     }
 
-    db.delete(votes)
-      .where(and(eq(votes.actress_id, id), eq(votes.ip_address, ip)))
-      .run();
+    await sql`DELETE FROM votes WHERE actress_id = ${id} AND ip_address = ${ip}`;
 
     return NextResponse.json({
       success: true,

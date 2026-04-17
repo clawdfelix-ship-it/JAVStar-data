@@ -9,9 +9,7 @@
 import cron from 'node-cron';
 import { scrapeUpcomingEvents, scrapeActressEventCounts } from '../scrapers/av-event';
 import { scrapeActressRanking, scrapeNewActresses } from '../scrapers/minnano';
-import { db } from '../lib/db';
-import { actresses, events } from '../lib/db/schema';
-import { eq } from 'drizzle-orm';
+import sql from '../lib/db';
 
 // In-memory store for last scrape times
 const lastScrape = {
@@ -49,34 +47,24 @@ async function updateEvents() {
   ]);
 
   // Resolve actress names to IDs (simple name matching)
-  // In production, you'd maintain a name→ID mapping
-  const actressList = db.select().from(actresses).all();
-  const nameToId = new Map(actressList.map(a => [a.name_ja, a.id]));
+  const actressList = await sql`SELECT id, name_ja FROM actresses`;
+  const nameToId = new Map((actressList as any[]).map((a: any) => [a.name_ja, a.id]));
 
   // Insert/update events
   for (const event of scrapedEvents) {
     const actress_id = nameToId.get(event.actress_id) || event.actress_id;
     
     try {
-      db.insert(events).values({
-        id: event.id,
-        actress_id,
-        title: event.title,
-        venue: event.venue,
-        prefecture: event.prefecture,
-        datetime: event.datetime,
-        event_type: event.event_type,
-        url: event.url,
-      }).onConflictDoUpdate({
-        target: events.id,
-        set: {
-          title: event.title,
-          venue: event.venue,
-          prefecture: event.prefecture,
-          datetime: event.datetime,
-          event_type: event.event_type,
-        }
-      }).run();
+      await sql`
+        INSERT INTO events (id, actress_id, title, venue, prefecture, datetime, event_type, url)
+        VALUES (${event.id}, ${actress_id}, ${event.title}, ${event.venue}, ${event.prefecture}, ${event.datetime}, ${event.event_type}, ${event.url})
+        ON CONFLICT (id) DO UPDATE SET
+          title = ${event.title},
+          venue = ${event.venue},
+          prefecture = ${event.prefecture},
+          datetime = ${event.datetime},
+          event_type = ${event.event_type}
+      `;
     } catch (e) {
       // Ignore duplicate key errors
     }
@@ -91,33 +79,21 @@ async function updateActresses() {
   
   for (const actress of scrapedActresses) {
     try {
-      db.insert(actresses).values({
-        id: actress.id,
-        name_ja: actress.name_ja,
-        name_cn: actress.name_cn,
-        birthday: actress.birthday,
-        height: actress.height,
-        bust: actress.bust,
-        waist: actress.waist,
-        hip: actress.hip,
-        debut_date: actress.debut_date,
-        avatar_url: actress.avatar_url,
-        updated_at: new Date().toISOString(),
-      }).onConflictDoUpdate({
-        target: actresses.id,
-        set: {
-          name_ja: actress.name_ja,
-          name_cn: actress.name_cn,
-          birthday: actress.birthday,
-          height: actress.height,
-          bust: actress.bust,
-          waist: actress.waist,
-          hip: actress.hip,
-          debut_date: actress.debut_date,
-          avatar_url: actress.avatar_url,
-          updated_at: new Date().toISOString(),
-        }
-      }).run();
+      await sql`
+        INSERT INTO actresses (id, name_ja, name_cn, birthday, height, bust, waist, hip, debut_date, avatar_url, updated_at)
+        VALUES (${actress.id}, ${actress.name_ja}, ${actress.name_cn}, ${actress.birthday}, ${actress.height}, ${actress.bust}, ${actress.waist}, ${actress.hip}, ${actress.debut_date}, ${actress.avatar_url}, ${new Date().toISOString()})
+        ON CONFLICT (id) DO UPDATE SET
+          name_ja = ${actress.name_ja},
+          name_cn = ${actress.name_cn},
+          birthday = ${actress.birthday},
+          height = ${actress.height},
+          bust = ${actress.bust},
+          waist = ${actress.waist},
+          hip = ${actress.hip},
+          debut_date = ${actress.debut_date},
+          avatar_url = ${actress.avatar_url},
+          updated_at = ${new Date().toISOString()}
+      `;
     } catch (e) {
       // Ignore
     }
@@ -127,33 +103,21 @@ async function updateActresses() {
   const newActresses = await scrapeNewActresses();
   for (const actress of newActresses) {
     try {
-      db.insert(actresses).values({
-        id: actress.id,
-        name_ja: actress.name_ja,
-        name_cn: actress.name_cn,
-        birthday: actress.birthday,
-        height: actress.height,
-        bust: actress.bust,
-        waist: actress.waist,
-        hip: actress.hip,
-        debut_date: actress.debut_date,
-        avatar_url: actress.avatar_url,
-        updated_at: new Date().toISOString(),
-      }).onConflictDoUpdate({
-        target: actresses.id,
-        set: {
-          name_ja: actress.name_ja,
-          name_cn: actress.name_cn,
-          birthday: actress.birthday,
-          height: actress.height,
-          bust: actress.bust,
-          waist: actress.waist,
-          hip: actress.hip,
-          debut_date: actress.debut_date,
-          avatar_url: actress.avatar_url,
-          updated_at: new Date().toISOString(),
-        }
-      }).run();
+      await sql`
+        INSERT INTO actresses (id, name_ja, name_cn, birthday, height, bust, waist, hip, debut_date, avatar_url, updated_at)
+        VALUES (${actress.id}, ${actress.name_ja}, ${actress.name_cn}, ${actress.birthday}, ${actress.height}, ${actress.bust}, ${actress.waist}, ${actress.hip}, ${actress.debut_date}, ${actress.avatar_url}, ${new Date().toISOString()})
+        ON CONFLICT (id) DO UPDATE SET
+          name_ja = ${actress.name_ja},
+          name_cn = ${actress.name_cn},
+          birthday = ${actress.birthday},
+          height = ${actress.height},
+          bust = ${actress.bust},
+          waist = ${actress.waist},
+          hip = ${actress.hip},
+          debut_date = ${actress.debut_date},
+          avatar_url = ${actress.avatar_url},
+          updated_at = ${new Date().toISOString()}
+      `;
     } catch (e) {
       // Ignore
     }
