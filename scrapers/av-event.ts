@@ -69,7 +69,7 @@ async function fetchPage(url: string): Promise<cheerio.CheerioAPI | null> {
 }
 
 // Extract actress name from event page
-function extractActressName($: cheerio.Root): string | null {
+function extractActressName($: any): string | null {
   // Look for actress name in various patterns on event pages
   const possibleSelectors = [
     '.actress-name',
@@ -100,7 +100,7 @@ function extractActressName($: cheerio.Root): string | null {
 }
 
 // Extract event data from a single event card
-function extractEventCard($: cheerio.Root, eventUrl: string): Partial<EventData> | null {
+function extractEventCard($: any, eventUrl: string): Partial<EventData> | null {
   try {
     const title = $('[class*="title"]').text().trim() ||
                   $('h2').first().text().trim() ||

@@ -17,7 +17,7 @@ async function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function fetchPage(url: string): Promise<cheerio.Root | null> {
+async function fetchPage(url: string): Promise<any | null> {
   await delay(DELAY_MS);
   
   try {
@@ -69,7 +69,7 @@ function parseBirthday(birthdayStr: string | null): string | null {
 }
 
 // Extract actress profile from listing page
-function extractActressFromCard($: cheerio.Root, link: string): ActressData | null {
+function extractActressFromCard($: any, link: string): ActressData | null {
   try {
     const name_ja = $('[class*="name"]').text().trim() ||
                    $('h3').first().text().trim() ||
@@ -119,7 +119,7 @@ function extractActressFromCard($: cheerio.Root, link: string): ActressData | nu
 }
 
 // Get avatar URL from page
-function extractAvatarUrl($: cheerio.Root, actressId: string): string | null {
+function extractAvatarUrl($: any, actressId: string): string | null {
   // Look for image in various patterns
   const img = $('[class*="photo"] img').first() ||
               $('[class*="avatar"] img').first() ||
@@ -178,7 +178,7 @@ export async function scrapeActressRanking(): Promise<ActressData[]> {
 }
 
 // Extract full profile from actress detail page
-function extractActressFromProfile($: cheerio.Root, url: string): ActressData | null {
+function extractActressFromProfile($: any, url: string): ActressData | null {
   try {
     const id = url.split('/').pop()?.replace(/\.html$/, '') || '';
     
