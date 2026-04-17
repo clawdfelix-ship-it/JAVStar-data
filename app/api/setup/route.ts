@@ -1,4 +1,4 @@
-import { sql } from '@/lib/db';
+import sql from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 // GET /api/setup - Initialize database tables
