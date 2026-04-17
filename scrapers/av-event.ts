@@ -43,7 +43,7 @@ async function canScrape(path: string): Promise<boolean> {
 }
 
 // Fetch a page with rate limiting
-async function fetchPage(url: string): Promise<cheerio.Root | null> {
+async function fetchPage(url: string): Promise<cheerio.CheerioAPI | null> {
   await delay(DELAY_MS);
   
   try {
