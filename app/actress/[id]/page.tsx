@@ -143,7 +143,7 @@ export default function ActressPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-2 md:px-4 py-6 md:py-8">
         {loading ? (
           <div className="space-y-4">
             <div className="skeleton h-64 w-full rounded-lg" />
@@ -165,7 +165,7 @@ export default function ActressPage() {
                   {/* Avatar with gradient backdrop */}
                   <div className="relative flex-shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-purple-500/30 rounded-full blur-xl" />
-                    <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full bg-primary overflow-hidden ring-4 ring-accent/50 shadow-2xl shadow-accent/20">
+                    <div className="relative w-28 h-28 md:w-40 md:h-40 rounded-full bg-primary overflow-hidden ring-4 ring-accent/50 shadow-2xl shadow-accent/20">
                       {actress.avatar_url ? (
                         <img src={actress.avatar_url} alt={actress.name_ja} className="w-full h-full object-cover" />
                       ) : (

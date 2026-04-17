@@ -111,7 +111,7 @@ export default function ActressCard({
           </div>
 
           {/* Avatar */}
-          <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-2 ring-border hover:ring-accent hover:ring-4 transition-all duration-300 shadow-lg hover:shadow-accent/30">
+          <div className="w-12 h-12 md:w-20 md:h-20 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-2 ring-border hover:ring-accent hover:ring-4 transition-all duration-300 shadow-lg hover:shadow-accent/30">
             {avatar_url ? (
               <img
                 src={avatar_url}

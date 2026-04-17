@@ -195,7 +195,7 @@ export default function HomePage() {
             <p className="text-text-secondary">暫無資料</p>
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {actresses.map((actress, index) => (
               <ActressCard
                 key={actress.id}
