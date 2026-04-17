@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       const searchLower = search.toLowerCase();
       filtered = enrichedActresses.filter(a =>
         a.name_ja.toLowerCase().includes(searchLower) ||
-        a.name_cn.toLowerCase().includes(searchLower)
+        (a.name_cn && a.name_cn.toLowerCase().includes(searchLower))
       );
     }
 
