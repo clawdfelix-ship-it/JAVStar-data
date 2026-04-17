@@ -1,31 +1,37 @@
-import { neon } from '@neondatabase/serverless';
-import events from './scraped-events-search.json';
+import sql from './lib/db';
+import allEvents from './scraped-events-search.json';
 
-const sql = neon(process.env.POSTGRES_URL_NON_POOLING!);
-
-async function seed() {
-  console.log('Seeding', events.length, 'events...');
-  let success = 0;
-  let errors = 0;
-  const actressId = '985557';
-
-  for (let i = 0; i < events.length; i++) {
-    const e = events[i];
-    const id = e.href?.split('/').pop()?.replace(/\/$/, '') || 'unknown';
-    try {
-      await sql`INSERT INTO events (id, actress_id, title, datetime, event_type, venue, prefecture, url, created_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-                ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, datetime = EXCLUDED.datetime, url = EXCLUDED.url`,
-        [id, actressId, e.text || '', e.date || '', '', '', '', e.href || ''];
-      success++;
-      if (success % 100 === 0) process.stdout.write(' ' + success);
-    } catch (err: any) {
-      errors++;
-      if (errors <= 3) console.error('\nError:', id, err.message.split('\n')[0]);
-    }
-    if (i % 50 === 49) await new Promise(r => setTimeout(r, 500));
-  }
-  console.log('\nDone:', success, '/', events.length, '| Errors:', errors);
+function extractEventId(href: string | undefined): string {
+  if (!href) return 'unknown';
+  const parts = href.split('/');
+  const id = parts.slice(-2, -1)[0];
+  return id || 'unknown';
 }
 
-seed();
+async function seedBatch(start: number, end: number) {
+  let success = 0;
+  for (let i = start; i < end && i < allEvents.length; i++) {
+    const e = allEvents[i];
+    const id = extractEventId(e.href);
+    try {
+      await sql`INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, created_at)
+                 VALUES (${id}, 'unknown', ${e.text || ''}, ${e.date || ''}, '', '', '', ${e.href || ''}, NOW())
+                 ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, actress_id = 'unknown'`;
+      success++;
+    } catch (err: any) {
+      // silent duplicate or other
+    }
+  }
+  console.log(`Batch ${start}-${end}: ${success} success`);
+  return success;
+}
+
+async function main() {
+  // Resume from 1200
+  for (let start = 1200; start < 2000; start += 100) {
+    await seedBatch(start, start + 100);
+  }
+  console.log('All batches complete!');
+}
+
+main().catch(e => { console.error(e.message); process.exit(1); });
