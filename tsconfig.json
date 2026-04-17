@@ -17,5 +17,5 @@
     "paths": { "@/*": ["./*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "scrapers", "scripts", "data", "test-minnano.ts", "test-minnano.js"]
 }

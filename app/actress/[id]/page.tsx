@@ -7,20 +7,30 @@ import EventCard from '@/components/EventCard';
 interface ActressDetail {
   id: string;
   name_ja: string;
-  name_cn: string;
-  birthday: string | null;
-  height: number | null;
-  bust: number | null;
-  waist: number | null;
-  hip: number | null;
-  debut_date: string | null;
+  name_cn: string | null;
   avatar_url: string | null;
+  birthday: string | null;
+  age: number | null;
+  zodiac: string | null;
+  height: string | null;
+  bust: string | null;
+  waist: string | null;
+  hip: string | null;
+  cup: string | null;
+  agency: string | null;
+  hobby: string | null;
+  debut_year: number | null;
+  debut_work: string | null;
+  blog: string | null;
+  official_site: string | null;
+  tags: string | null;
   stats: {
     total_events: number;
     year_2026_events: number;
     month_04_2026_events: number;
     upcoming_events: number;
   };
+  vote_count: number;
 }
 
 interface Event {
@@ -36,7 +46,7 @@ interface Event {
 export default function ActressPage() {
   const params = useParams();
   const id = params.id as string;
-  
+
   const [actress, setActress] = useState<ActressDetail | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,11 +59,11 @@ export default function ActressPage() {
   async function fetchActress() {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(`/api/actresses/${id}`);
       if (!response.ok) throw new Error('Failed to fetch');
-      
+
       const data = await response.json();
       setActress(data.actress);
       setEvents(data.events || []);
@@ -63,20 +73,30 @@ export default function ActressPage() {
       setActress({
         id,
         name_ja: '河北彩伽',
-        name_cn: '',
-        birthday: '1998-03-15',
-        height: 158,
-        bust: 85,
-        waist: 58,
-        hip: 86,
-        debut_date: '2021-04-15',
+        name_cn: null,
         avatar_url: null,
+        birthday: '1998-03-15',
+        age: 28,
+        zodiac: 'うお座',
+        height: '158',
+        bust: '85',
+        waist: '58',
+        hip: '86',
+        cup: 'E',
+        agency: 'C-more Entertainment',
+        hobby: '料理・映画鑑賞',
+        debut_year: 2021,
+        debut_work: '河北彩伽 デビュー作品',
+        blog: 'https://blog.example.com',
+        official_site: 'https://example.com',
+        tags: '熟女,美巨尻,スレンダー',
         stats: {
           total_events: 47,
           year_2026_events: 23,
           month_04_2026_events: 4,
           upcoming_events: 2,
         },
+        vote_count: 128,
       });
       setEvents([
         { id: 'e1', title: '河北彩伽 サイン会 in 秋葉原', venue: '秋葉原RAD', prefecture: '東京', datetime: '2026-04-20T14:00:00+09:00', event_type: 'sign', url: '#' },
@@ -103,6 +123,11 @@ export default function ActressPage() {
       age--;
     }
     return age;
+  }
+
+  function parseTags(tagsStr: string | null): string[] {
+    if (!tagsStr) return [];
+    return tagsStr.split(',').map(t => t.trim()).filter(Boolean);
   }
 
   return (
@@ -136,9 +161,9 @@ export default function ActressPage() {
             {/* Profile card */}
             <div className="bg-secondary rounded-lg border border-border overflow-hidden mb-8">
               <div className="p-6">
-                <div className="flex items-start gap-6">
+                <div className="flex flex-col md:flex-row items-start gap-6">
                   {/* Avatar */}
-                  <div className="w-32 h-32 rounded-full bg-primary overflow-hidden flex-shrink-0">
+                  <div className="w-40 h-40 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-4 ring-accent/30">
                     {actress.avatar_url ? (
                       <img src={actress.avatar_url} alt={actress.name_ja} className="w-full h-full object-cover" />
                     ) : (
@@ -148,17 +173,41 @@ export default function ActressPage() {
                     )}
                   </div>
 
-                  {/* Info */}
+                  {/* Main info */}
                   <div className="flex-1">
-                    <h1 className="font-japanese text-3xl font-bold text-text-primary mb-2">
+                    <h1 className="font-japanese text-3xl font-bold text-text-primary mb-1">
                       {actress.name_ja}
                     </h1>
                     {actress.name_cn && (
                       <p className="text-text-secondary text-lg mb-4">{actress.name_cn}</p>
                     )}
 
+                    {/* Quick badges */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {actress.age && (
+                        <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm font-medium">
+                          {actress.age}歲
+                        </span>
+                      )}
+                      {actress.zodiac && (
+                        <span className="px-3 py-1 bg-primary text-text-secondary rounded-full text-sm">
+                          ♓ {actress.zodiac}
+                        </span>
+                      )}
+                      {actress.cup && (
+                        <span className="px-3 py-1 bg-primary text-text-secondary rounded-full text-sm font-mono">
+                          Cup: {actress.cup}
+                        </span>
+                      )}
+                      {actress.debut_year && (
+                        <span className="px-3 py-1 bg-success/20 text-success rounded-full text-sm">
+                          出道: {actress.debut_year}
+                        </span>
+                      )}
+                    </div>
+
                     {/* Stats grid */}
-                    <div className="grid grid-cols-4 gap-4 mt-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div className="bg-primary rounded-lg p-4 text-center">
                         <div className="font-mono text-2xl font-bold text-accent">{actress.stats.total_events}</div>
                         <div className="text-text-secondary text-sm mt-1">總活動數</div>
@@ -172,44 +221,124 @@ export default function ActressPage() {
                         <div className="text-text-secondary text-sm mt-1">4 月活動</div>
                       </div>
                       <div className="bg-primary rounded-lg p-4 text-center">
-                        <div className="font-mono text-2xl font-bold text-blue-400">{actress.stats.upcoming_events}</div>
-                        <div className="text-text-secondary text-sm mt-1">即將舉行</div>
+                        <div className="font-mono text-2xl font-bold text-blue-400">{actress.vote_count}</div>
+                        <div className="text-text-secondary text-sm mt-1">投票數</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Bio details */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-border">
+                {/* Profile details grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 mt-8 pt-6 border-t border-border">
                   {actress.birthday && (
-                    <div>
-                      <div className="text-text-secondary text-sm">生日</div>
-                      <div className="font-japanese text-text-primary mt-1">
+                    <div className="flex flex-col">
+                      <span className="text-text-secondary text-xs uppercase tracking-wide">生日</span>
+                      <span className="font-japanese text-text-primary mt-1">
                         {formatDate(actress.birthday)} ({calculateAge(actress.birthday)}歲)
-                      </div>
+                      </span>
                     </div>
                   )}
                   {actress.height && (
-                    <div>
-                      <div className="text-text-secondary text-sm">身高</div>
-                      <div className="font-japanese text-text-primary mt-1">{actress.height}cm</div>
+                    <div className="flex flex-col">
+                      <span className="text-text-secondary text-xs uppercase tracking-wide">身高</span>
+                      <span className="font-japanese text-text-primary mt-1">{actress.height}cm</span>
                     </div>
                   )}
-                  {actress.bust && (
-                    <div>
-                      <div className="text-text-secondary text-sm">三圍</div>
-                      <div className="font-japanese text-text-primary mt-1">
+                  {actress.bust && actress.waist && actress.hip && (
+                    <div className="flex flex-col">
+                      <span className="text-text-secondary text-xs uppercase tracking-wide">三圍</span>
+                      <span className="font-mono text-text-primary mt-1">
                         B{actress.bust} / W{actress.waist} / H{actress.hip}
-                      </div>
+                      </span>
                     </div>
                   )}
-                  {actress.debut_date && (
-                    <div>
-                      <div className="text-text-secondary text-sm">出道</div>
-                      <div className="font-japanese text-text-primary mt-1">{formatDate(actress.debut_date)}</div>
+                  {actress.agency && (
+                    <div className="flex flex-col">
+                      <span className="text-text-secondary text-xs uppercase tracking-wide">事務所</span>
+                      <span className="text-text-primary mt-1">{actress.agency}</span>
+                    </div>
+                  )}
+                  {actress.hobby && (
+                    <div className="flex flex-col">
+                      <span className="text-text-secondary text-xs uppercase tracking-wide">愛好</span>
+                      <span className="text-text-primary mt-1">{actress.hobby}</span>
+                    </div>
+                  )}
+                  {actress.debut_work && (
+                    <div className="flex flex-col">
+                      <span className="text-text-secondary text-xs uppercase tracking-wide">出道作品</span>
+                      <span className="text-text-primary mt-1 text-sm">{actress.debut_work}</span>
                     </div>
                   )}
                 </div>
+
+                {/* Tags */}
+                {actress.tags && parseTags(actress.tags).length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <span className="text-text-secondary text-xs uppercase tracking-wide block mb-3">標籤</span>
+                    <div className="flex flex-wrap gap-2">
+                      {parseTags(actress.tags).map((tag, i) => (
+                        <span
+                          key={i}
+                          className="px-3 py-1 bg-accent/10 text-accent/90 border border-accent/30 rounded-full text-sm hover:bg-accent/20 transition-colors cursor-default"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* External links */}
+                {(actress.blog || actress.official_site) && (
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <span className="text-text-secondary text-xs uppercase tracking-wide block mb-3">外部連結</span>
+                    <div className="flex flex-wrap gap-3">
+                      {actress.official_site && (
+                        <a
+                          href={actress.official_site}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                          官網
+                        </a>
+                      )}
+                      {actress.blog && (
+                        <a
+                          href={actress.blog}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-primary border border-border text-text-primary rounded-lg hover:border-accent transition-colors text-sm"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                          </svg>
+                          博客
+                        </a>
+                      )}
+                      <a
+                        href={`https://www.minnano-av.com/actress/${actress.id}.html`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary border border-border text-text-primary rounded-lg hover:border-accent transition-colors text-sm"
+                      >
+                        minnano-av
+                      </a>
+                      <a
+                        href={`https://www.av-event.jp/search/?q=${encodeURIComponent(actress.name_ja)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary border border-border text-text-primary rounded-lg hover:border-accent transition-colors text-sm"
+                      >
+                        av-event.jp
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -230,29 +359,6 @@ export default function ActressPage() {
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* External links */}
-            <div className="mt-8 pt-6 border-t border-border">
-              <h3 className="text-text-secondary text-sm mb-4">外部連結</h3>
-              <div className="flex gap-4">
-                <a 
-                  href={`https://www.minnano-av.com/actress/${actress.id}.html`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-primary border border-border rounded-lg text-text-primary hover:border-accent"
-                >
-                  minnano-av.com
-                </a>
-                <a 
-                  href={`https://www.av-event.jp/search/?q=${encodeURIComponent(actress.name_ja)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-primary border border-border rounded-lg text-text-primary hover:border-accent"
-                >
-                  av-event.jp
-                </a>
-              </div>
             </div>
           </>
         ) : null}

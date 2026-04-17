@@ -6,8 +6,18 @@ import ActressCard from '@/components/ActressCard';
 interface Actress {
   id: string;
   name_ja: string;
-  name_cn: string;
+  name_cn: string | null;
   avatar_url: string | null;
+  age: number | null;
+  zodiac: string | null;
+  cup: string | null;
+  height: string | null;
+  bust: string | null;
+  waist: string | null;
+  hip: string | null;
+  agency: string | null;
+  hobby: string | null;
+  debut_year: number | null;
   event_count: number;
   year_2026_events: number;
   vote_count: number;
@@ -54,11 +64,11 @@ export default function HomePage() {
       setError(err instanceof Error ? err.message : 'Unknown error');
       // Demo data with weighted scores
       setActresses([
-        { id: 'demo1', name_ja: '河北彩伽', name_cn: '', avatar_url: null, event_count: 23, year_2026_events: 23, vote_count: 128, final_score: 37 },
-        { id: 'demo2', name_ja: '成宮いろは', name_cn: '', avatar_url: null, event_count: 19, year_2026_events: 19, vote_count: 95, final_score: 33 },
-        { id: 'demo3', name_ja: '三上悠亜', name_cn: '', avatar_url: null, event_count: 14, year_2026_events: 14, vote_count: 82, final_score: 28 },
-        { id: 'demo4', name_ja: '橋爪quet', name_cn: '', avatar_url: null, event_count: 12, year_2026_events: 12, vote_count: 67, final_score: 24 },
-        { id: 'demo5', name_ja: '桜井るん', name_cn: '', avatar_url: null, event_count: 11, year_2026_events: 11, vote_count: 54, final_score: 22 },
+        { id: 'demo1', name_ja: '河北彩伽', name_cn: null, avatar_url: null, age: 28, zodiac: 'うお座', cup: 'E', height: '158', bust: '85', waist: '58', hip: '86', agency: 'C-more', hobby: '料理', debut_year: 2021, event_count: 23, year_2026_events: 23, vote_count: 128, final_score: 37 },
+        { id: 'demo2', name_ja: '成宮いろは', name_cn: null, avatar_url: null, age: 27, zodiac: '牡羊座', cup: 'D', height: '155', bust: '83', waist: '56', hip: '84', agency: null, hobby: '映画', debut_year: 2020, event_count: 19, year_2026_events: 19, vote_count: 95, final_score: 33 },
+        { id: 'demo3', name_ja: '三上悠亜', name_cn: null, avatar_url: null, age: 32, zodiac: '射手座', cup: 'D', height: '163', bust: '86', waist: '60', hip: '88', agency: 'FALENO', hobby: 'KTV', debut_year: 2015, event_count: 14, year_2026_events: 14, vote_count: 82, final_score: 28 },
+        { id: 'demo4', name_ja: '橋爪quet', name_cn: null, avatar_url: null, age: 25, zodiac: '双子座', cup: 'F', height: '165', bust: '88', waist: '58', hip: '87', agency: 'nine', hobby: null, debut_year: 2019, event_count: 12, year_2026_events: 12, vote_count: 67, final_score: 24 },
+        { id: 'demo5', name_ja: '桜井るん', name_cn: null, avatar_url: null, age: 23, zodiac: '水瓶座', cup: 'C', height: '153', bust: '80', waist: '55', hip: '82', agency: 'SOD', hobby: '舞蹈', debut_year: 2022, event_count: 11, year_2026_events: 11, vote_count: 54, final_score: 22 },
       ]);
       setPagination({ page: 1, limit: 20, total: 5, totalPages: 1 });
     } finally {

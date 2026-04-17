@@ -11,6 +11,17 @@ export interface Actress {
   bust: string | null;
   waist: string | null;
   hip: string | null;
+  birthday: string | null;           // 生年月日 e.g. "1997-12-24"
+  age: number | null;               // 現在 ○歳
+  zodiac: string | null;             // 星座 e.g. "やぎ座"
+  agency: string | null;             // 所属事務所 e.g. "C-more Entertainment"
+  hobby: string | null;              // 趣味・特技
+  blog: string | null;               // ブログ
+  official_site: string | null;      // 公式サイト
+  tags: string | null;              // タグ (comma separated)
+  debut_date: string | null;        // AV出演期間 - start year e.g. "2020"
+  debut_work: string | null;         // デビュー作品 (full title)
+  debut_year: number | null;         // 出道年份 (numeric, for calculations)
   created_at: string;
   updated_at: string;
 }
