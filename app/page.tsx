@@ -85,7 +85,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-primary">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-border overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -127,7 +127,7 @@ export default function HomePage() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-8 overflow-x-hidden">
         {/* Stats bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           <div className="bg-secondary rounded-lg p-3 sm:p-4 border border-border">
@@ -195,7 +195,7 @@ export default function HomePage() {
             <p className="text-text-secondary">暫無資料</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
             {actresses.map((actress, index) => (
               <ActressCard
                 key={actress.id}

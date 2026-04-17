@@ -102,9 +102,9 @@ export default function ActressCard({
   }
 
   return (
-    <div className="actress-card bg-secondary rounded-lg p-3 md:p-4 border border-border hover:border-accent">
-      <Link href={`/actress/${id}`} className="block">
-        <div className="flex items-center gap-3 md:gap-4">
+    <div className="actress-card bg-secondary rounded-lg p-3 md:p-4 border border-border hover:border-accent overflow-hidden w-full min-w-0">
+      <Link href={`/actress/${id}`} className="block w-full">
+        <div className="flex items-center gap-2 md:gap-4">
           {/* Rank badge */}
           <div className={`rank-badge flex-shrink-0 ${getRankClass(rank)}`}>
             {rank}

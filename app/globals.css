@@ -16,6 +16,7 @@ body {
   background-color: var(--color-primary);
   color: var(--color-text-primary);
   font-family: 'Inter', 'Noto Sans JP', sans-serif;
+  overflow-x: hidden;
 }
 
 .font-japanese {
