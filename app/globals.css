@@ -143,6 +143,20 @@ body {
   background-color: var(--color-primary);
 }
 
+/* Header — 紅色漸變 */
+.header-gradient {
+  background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+  color: #ffffff;
+}
+
+.header-gradient h1,
+.header-gradient h2,
+.header-gradient p,
+.header-gradient span,
+.header-gradient div {
+  color: #ffffff;
+}
+
 /* Sidebar section header — Apple style */
 .sidebar-header {
   @apply text-xs font-semibold uppercase tracking-wider;
