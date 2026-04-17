@@ -1,25 +1,32 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
       colors: {
-        primary: '#e94560',
-        'primary-dark': '#c73e54',
-        secondary: '#f5f5f5',
-        accent: '#e94560',
-        'text-primary': '#333333',
-        'text-secondary': '#888888',
-        success: '#4caf50',
-        border: '#f0f0f0',
+        primary: '#0071e3',
+        'primary-dark': '#0077ed',
+        secondary: '#f5f5f7',
+        accent: '#ff9500',
+        'text-primary': '#1d1d1f',
+        'text-secondary': '#86868b',
+        border: '#d2d2d7',
+        'card-bg': '#ffffff',
       },
       fontFamily: {
-        japanese: ['"Noto Sans JP"', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'sans-serif'],
+        mono: ['SF Mono', 'Menlo', 'monospace'],
+      },
+      borderRadius: {
+        'xl': '18px',
+      },
+      boxShadow: {
+        'apple': '0 2px 12px rgba(0,0,0,0.08)',
+        'apple-hover': '0 8px 30px rgba(0,0,0,0.12)',
       },
     },
   },
