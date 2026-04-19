@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const search = searchParams.get('search') || '';
+    const sortBy = searchParams.get('sort') || 'final_score'; // sort by: final_score, event_count, name_ja
     const offset = (page - 1) * limit;
 
     // Get all actresses
@@ -66,8 +67,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Sort by final_score descending
-    filtered.sort((a, b) => b.final_score - a.final_score);
+    // Sort based on sortBy parameter
+    if (sortBy === 'event_count') {
+      filtered.sort((a, b) => b.event_count - a.event_count || a.name_ja.localeCompare(b.name_ja));
+    } else if (sortBy === 'name_ja') {
+      filtered.sort((a, b) => a.name_ja.localeCompare(b.name_ja));
+    } else {
+      // Default: sort by final_score descending
+      filtered.sort((a, b) => b.final_score - a.final_score);
+    }
 
     // Paginate
     const total = filtered.length;
