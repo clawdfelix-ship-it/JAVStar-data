@@ -54,6 +54,7 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [sort, setSort] = useState('final_score');
 
   // Fetch events
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function HomePage() {
   // Fetch actresses
   useEffect(() => {
     fetchActresses();
-  }, [page, search]);
+  }, [page, search, sort]);
 
   async function fetchEvents() {
     setEventsLoading(true);
@@ -93,6 +94,7 @@ export default function HomePage() {
         limit: '12',
       });
       if (search) params.set('search', search);
+      params.set('sort', sort);
 
       const response = await fetch(`/api/actresses?${params}`);
       if (!response.ok) throw new Error('Failed to fetch');
@@ -266,8 +268,20 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-japanese text-xl font-semibold text-text-primary flex items-center gap-2">
               <span className="text-purple-400">●</span> 女優排名
-              <span className="text-text-secondary font-normal text-sm">(加權總分)</span>
             </h2>
+            <div className="flex items-center gap-2">
+              <select
+                value={sort}
+                onChange={(e) => { setSort(e.target.value); setPage(1); }}
+                className="px-3 py-1.5 bg-secondary border border-border rounded-lg text-text-primary text-sm focus:outline-none focus:border-accent"
+              >
+                <option value="final_score">加權總分</option>
+                <option value="event_count">活動數量</option>
+                <option value="votes">人氣度</option>
+                <option value="debut_year">出道年份</option>
+                <option value="age">年齡</option>
+              </select>
+            </div>
             <div className="text-text-secondary text-sm">
               {loading ? '載入中...' : `${pagination?.total || 0} 位女優`}
             </div>
