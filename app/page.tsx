@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
+import EventCalendar from '@/components/EventCalendar';
 
 interface Actress {
   id: string;
@@ -69,7 +71,7 @@ export default function HomePage() {
   async function fetchEvents() {
     setEventsLoading(true);
     try {
-      const response = await fetch('/api/events?limit=20');
+      const response = await fetch('/api/events?limit=2000');
       if (response.ok) {
         const data = await response.json();
         setEvents(data.data || []);
@@ -201,6 +203,18 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+
+      {/* Calendar Section */}
+      <section className="max-w-7xl mx-auto px-2 sm:px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-japanese text-xl font-semibold text-text-primary flex items-center gap-2">
+            <span className="text-yellow-400">●</span> 活動日曆
+          </h2>
+        </div>
+        <EventCalendar
+          events={events}
+        />
+      </section>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 md:py-8 overflow-x-hidden">

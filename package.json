@@ -27,6 +27,7 @@
     "autoprefixer": "^10.4.21",
     "better-sqlite3": "^11.8.1",
     "cheerio": "^1.0.0",
+    "date-fns": "^4.1.0",
     "drizzle-orm": "^0.40.1",
     "next": "^15.2.3",
     "node-cron": "^4.2.1",
