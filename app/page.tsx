@@ -218,17 +218,17 @@ export default function HomePage() {
           </div>
           
           {eventsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-secondary rounded-lg p-4 border border-border animate-pulse">
-                  <div className="h-4 bg-border rounded w-1/3 mb-3"></div>
-                  <div className="h-6 bg-border rounded w-2/3 mb-2"></div>
-                  <div className="h-4 bg-border rounded w-1/2"></div>
+                <div key={i} className="bg-secondary rounded-lg p-3 border border-border animate-pulse">
+                  <div className="h-3 bg-border rounded w-1/3 mb-2"></div>
+                  <div className="h-4 bg-border rounded w-2/3 mb-1"></div>
+                  <div className="h-3 bg-border rounded w-1/2"></div>
                 </div>
               ))}
             </div>
           ) : todayEvents.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full min-w-0">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full min-w-0">
               {todayEvents.slice(0, 6).map((event) => (
                 <EventCard
                   key={event.id}
@@ -252,7 +252,7 @@ export default function HomePage() {
                 <span className="text-text-secondary font-normal text-sm">(10日內)</span>
               </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full min-w-0">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full min-w-0">
               {upcomingEvents.slice(0, 9).map((event) => (
                 <EventCard
                   key={event.id}
