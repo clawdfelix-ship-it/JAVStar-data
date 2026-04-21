@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
         filtered.sort((a, b) => {
           const aYear = a.debut_year || 9999;
           const bYear = b.debut_year || 9999;
-          return aYear - bYear || a.name_ja.localeCompare(b.name_ja);
+          return bYear - aYear || a.name_ja.localeCompare(b.name_ja);
         });
         break;
       case 'votes':
