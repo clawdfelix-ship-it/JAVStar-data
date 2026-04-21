@@ -49,6 +49,7 @@ interface PaginationInfo {
 export default function HomePage() {
   const [actresses, setActresses] = useState<Actress[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [latestEvents, setLatestEvents] = useState<Event[]>([]);
   const [stats, setStats] = useState({ actressCount: 0, eventCount: 0 });
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,12 +62,25 @@ export default function HomePage() {
   // Fetch events
   useEffect(() => {
     fetchEvents();
+    fetchLatestEvents();
   }, []);
 
   // Fetch actresses
   useEffect(() => {
     fetchActresses();
   }, [page, search, sort]);
+
+  async function fetchLatestEvents() {
+    try {
+      const response = await fetch('/api/events?sort=created_at&order=desc&limit=5');
+      if (response.ok) {
+        const data = await response.json();
+        setLatestEvents(data.data || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch latest events:', err);
+    }
+  }
 
   async function fetchEvents() {
     setEventsLoading(true);
@@ -206,6 +220,29 @@ export default function HomePage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 md:py-8 overflow-x-hidden">
+        {/* Announcement: Latest 5 Events */}
+        {latestEvents.length > 0 && (
+          <div className="mb-6 p-4 bg-accent/10 border border-accent/30 rounded-xl">
+            <h3 className="font-japanese text-sm font-semibold text-accent mb-3 flex items-center gap-2">
+              <span>📢</span> 最新添加的5個活動
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+              {latestEvents.map((event) => (
+                <a
+                  key={event.id}
+                  href={`#event-${event.id}`}
+                  className="block p-2 bg-secondary rounded-lg hover:bg-accent/20 transition-colors text-xs"
+                >
+                  <div className="text-text-primary font-medium truncate">{event.title}</div>
+                  <div className="text-text-secondary mt-1">
+                    {new Date(event.datetime).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })} · {event.venue}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Actress Ranking Section */}
         <section>
           <div className="flex items-center justify-between mb-4">

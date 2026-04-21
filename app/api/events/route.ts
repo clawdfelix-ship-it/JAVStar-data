@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = (page - 1) * limit;
+    const sortBy = searchParams.get('sort') || 'datetime';
+    const sortOrder = searchParams.get('order') === 'asc' ? 'ASC' : 'DESC';
 
     const now = new Date();
     const nowStr = now.toISOString();
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
         FROM events e 
         LEFT JOIN actresses a ON e.actress_id = a.id 
         WHERE e.datetime >= ${nowStr}
-        ORDER BY e.datetime
+        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
         LIMIT ${limit}
       `;
     }
