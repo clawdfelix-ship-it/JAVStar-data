@@ -84,9 +84,9 @@ export async function GET(request: NextRequest) {
         break;
       case 'age':
         filtered.sort((a, b) => {
-          const aAge = a.age || 0;
-          const bAge = b.age || 0;
-          return bAge - aAge || a.name_ja.localeCompare(b.name_ja);
+          const aAge = a.age || 999;
+          const bAge = b.age || 999;
+          return aAge - bAge || a.name_ja.localeCompare(b.name_ja);
         });
         break;
       case 'name_ja':
