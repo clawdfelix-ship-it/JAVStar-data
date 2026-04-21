@@ -206,45 +206,6 @@ export default function HomePage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 md:py-8 overflow-x-hidden">
-        {/* Today's Events */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-japanese text-xl font-semibold text-text-primary flex items-center gap-2">
-              <span className="text-accent">●</span> 本日開催イベント
-            </h2>
-            {todayEvents.length > 0 && (
-              <span className="px-2 py-1 bg-accent/20 text-accent text-xs rounded-full font-medium">
-                {todayEvents.length} 個活動
-              </span>
-            )}
-          </div>
-          
-          {eventsLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-secondary rounded-lg p-3 border border-border animate-pulse">
-                  <div className="h-3 bg-border rounded w-1/3 mb-2"></div>
-                  <div className="h-4 bg-border rounded w-2/3 mb-1"></div>
-                  <div className="h-3 bg-border rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          ) : todayEvents.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full min-w-0">
-              {todayEvents.slice(0, 6).map((event) => (
-                <EventCard
-                  key={event.id}
-                  {...event}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-secondary rounded-lg p-6 border border-border text-center text-text-secondary">
-              今日沒有活動
-            </div>
-          )}
-        </section>
-
         {/* Actress Ranking Section */}
         <section>
           <div className="flex items-center justify-between mb-4">
