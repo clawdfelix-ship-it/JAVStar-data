@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         WHERE e.datetime >= ${nowStr}
           AND e.prefecture = ${prefecture}
           AND e.event_type = ${eventType}
-        ORDER BY e.datetime
+        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
         LIMIT ${limit}
       `;
     } else if (prefecture) {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN actresses a ON e.actress_id = a.id 
         WHERE e.datetime >= ${nowStr}
           AND e.prefecture = ${prefecture}
-        ORDER BY e.datetime
+        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
         LIMIT ${limit}
       `;
     } else if (eventType) {
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN actresses a ON e.actress_id = a.id 
         WHERE e.datetime >= ${nowStr}
           AND e.event_type = ${eventType}
-        ORDER BY e.datetime
+        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
         LIMIT ${limit}
       `;
     } else {
