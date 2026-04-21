@@ -382,10 +382,10 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-6 text-center text-text-secondary text-sm">
+      <footer className="bg-neutral-800 mt-12">
+        <div className="max-w-7xl mx-auto px-4 py-6 text-center text-white text-sm">
           <p>數據來源: <a href="https://www.minnano-av.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">minnano-av.com</a> + <a href="https://www.av-event.jp" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">av-event.jp</a></p>
-          <p className="mt-2 text-text-secondary/70">AV Intelligence © 2026 | 僅供研究用途</p>
+          <p className="mt-2 text-neutral-400">AV Intelligence © 2026 | 僅供研究用途</p>
         </div>
       </footer>
     </div>
