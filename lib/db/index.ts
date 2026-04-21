@@ -1,12 +1,10 @@
 import { neon } from '@neondatabase/serverless';
 
 // Create a lazy-initialized SQL client
-// Supports multiple env var names for Neon connections
 let _sql: ReturnType<typeof neon> | null = null;
 
 function getSql() {
   if (!_sql) {
-    // Try multiple possible env var names
     const url =
       process.env.DATABASE_URL ||
       process.env.POSTGRES_URL ||
@@ -20,7 +18,13 @@ function getSql() {
   return _sql;
 }
 
-// Export a function that calls the sql template tag
-export default function sql(strings: TemplateStringsArray, ...values: any[]) {
+// Named export for use with: import { sql } from '@/lib/db'
+export function sql(strings: TemplateStringsArray, ...values: any[]) {
   return getSql()(strings, ...values);
 }
+
+// Default export for backward compatibility: import sql from '@/lib/db'
+export default sql;
+
+// Export getSql for raw queries (allows unsafe() usage)
+export { getSql };

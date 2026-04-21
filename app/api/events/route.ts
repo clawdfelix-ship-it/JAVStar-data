@@ -1,4 +1,4 @@
-import sql from '@/lib/db';
+import { sql, getSql } from '@/lib/db';
 import { Event, Actress } from '@/lib/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -17,48 +17,20 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const nowStr = now.toISOString();
 
+    // Determine sort column and direction
+    const sortColumn = sortBy === 'created_at' ? 'created_at' : 'datetime';
+    const sortDir = sortOrder;
+
     // Get events with optional filters
     let eventsResult;
     if (prefecture && eventType) {
-      eventsResult = await sql`
-        SELECT e.*, a.name_ja, a.name_cn, a.avatar_url 
-        FROM events e 
-        LEFT JOIN actresses a ON e.actress_id = a.id 
-        WHERE e.datetime >= ${nowStr}
-          AND e.prefecture = ${prefecture}
-          AND e.event_type = ${eventType}
-        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
-        LIMIT ${limit}
-      `;
+      eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} AND e.prefecture = ${prefecture} AND e.event_type = ${eventType} ORDER BY ${sortColumn} ${sortDir} NULLS LAST LIMIT ${limit}` as any[];
     } else if (prefecture) {
-      eventsResult = await sql`
-        SELECT e.*, a.name_ja, a.name_cn, a.avatar_url 
-        FROM events e 
-        LEFT JOIN actresses a ON e.actress_id = a.id 
-        WHERE e.datetime >= ${nowStr}
-          AND e.prefecture = ${prefecture}
-        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
-        LIMIT ${limit}
-      `;
+      eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} AND e.prefecture = ${prefecture} ORDER BY ${sortColumn} ${sortDir} NULLS LAST LIMIT ${limit}` as any[];
     } else if (eventType) {
-      eventsResult = await sql`
-        SELECT e.*, a.name_ja, a.name_cn, a.avatar_url 
-        FROM events e 
-        LEFT JOIN actresses a ON e.actress_id = a.id 
-        WHERE e.datetime >= ${nowStr}
-          AND e.event_type = ${eventType}
-        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
-        LIMIT ${limit}
-      `;
+      eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} AND e.event_type = ${eventType} ORDER BY ${sortColumn} ${sortDir} NULLS LAST LIMIT ${limit}` as any[];
     } else {
-      eventsResult = await sql`
-        SELECT e.*, a.name_ja, a.name_cn, a.avatar_url 
-        FROM events e 
-        LEFT JOIN actresses a ON e.actress_id = a.id 
-        WHERE e.datetime >= ${nowStr}
-        ORDER BY ${sql.unsafe(sortBy === 'created_at' ? 'e.created_at' : 'e.datetime')} ${sql.unsafe(sortOrder === 'ASC' ? 'ASC NULLS LAST' : 'DESC NULLS LAST')}
-        LIMIT ${limit}
-      `;
+      eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} ORDER BY ${sortColumn} ${sortDir} NULLS LAST LIMIT ${limit}` as any[];
     }
 
     // Get total count
