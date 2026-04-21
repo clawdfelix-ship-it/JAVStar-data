@@ -204,18 +204,6 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Calendar Section */}
-      <section className="max-w-7xl mx-auto px-2 sm:px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-japanese text-xl font-semibold text-text-primary flex items-center gap-2">
-            <span className="text-yellow-400">●</span> 活動日曆
-          </h2>
-        </div>
-        <EventCalendar
-          events={events}
-        />
-      </section>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 md:py-8 overflow-x-hidden">
         {/* Today's Events */}
@@ -363,6 +351,18 @@ export default function HomePage() {
               </button>
             </div>
           )}
+        </section>
+
+        {/* Calendar Section */}
+        <section className="max-w-7xl mx-auto px-2 sm:px-4 py-4 mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-japanese text-xl font-semibold text-text-primary flex items-center gap-2">
+              <span className="text-yellow-400">●</span> 活動日曆
+            </h2>
+          </div>
+          <EventCalendar
+            events={events}
+          />
         </section>
       </main>
 
