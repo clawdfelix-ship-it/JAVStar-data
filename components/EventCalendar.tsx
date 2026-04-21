@@ -91,7 +91,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
   };
 
   return (
-    <div className="bg-secondary rounded-lg border border-border overflow-hidden">
+    <div className="bg-neutral-100 rounded-lg border border-border overflow-hidden">
       {/* Calendar Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-primary border-b border-border">
         <button
