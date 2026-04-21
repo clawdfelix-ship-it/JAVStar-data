@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const prefecture = searchParams.get('prefecture');
     const eventType = searchParams.get('type');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '200'), 1000);
     const offset = (page - 1) * limit;
     const sortBy = searchParams.get('sort') || 'datetime';
     const sortOrder = searchParams.get('order') === 'asc' ? 'ASC' : 'DESC';
