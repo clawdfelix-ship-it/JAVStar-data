@@ -50,6 +50,7 @@ export default function HomePage() {
   const [actresses, setActresses] = useState<Actress[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [latestEvents, setLatestEvents] = useState<Event[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<string>("");
   const [stats, setStats] = useState({ actressCount: 0, eventCount: 0 });
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,12 +64,25 @@ export default function HomePage() {
   useEffect(() => {
     fetchEvents();
     fetchLatestEvents();
+    fetchLastUpdate();
   }, []);
 
   // Fetch actresses
   useEffect(() => {
     fetchActresses();
   }, [page, search, sort]);
+
+  async function fetchLastUpdate() {
+    try {
+      const res = await fetch('/api/last-update');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.last_update) {
+          setLastUpdate(new Date(data.last_update).toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' }));
+        }
+      }
+    } catch (err) { console.error('Failed to fetch last update:', err); }
+  }
 
   async function fetchLatestEvents() {
     try {
@@ -225,6 +239,7 @@ export default function HomePage() {
           <div className="mb-6 p-4 bg-accent/10 border border-accent/30 rounded-xl">
             <h3 className="font-japanese text-sm font-semibold text-accent mb-3 flex items-center gap-2">
               <span>📢</span> 最新添加的5個活動
+              {lastUpdate && <span className="text-xs text-text-secondary ml-2">📅 資料更新：{lastUpdate}</span>}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
               {latestEvents.map((event) => (
