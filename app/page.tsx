@@ -59,6 +59,11 @@ export default function HomePage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState('final_score');
+  const [filterPrefecture, setFilterPrefecture] = useState('ALL');
+  const [filterType, setFilterType] = useState('ALL');
+
+  const prefectures = ['ALL', '台北', '大阪', '東京', '其他'];
+  const eventTypes = ['ALL', '見面會', '攝影會', 'TRE', '簽名會', '出道活動', '實體活動'];
 
   // Fetch events
   useEffect(() => {
@@ -169,13 +174,23 @@ export default function HomePage() {
   const todayEvents = events.filter(e => {
     const eventDate = new Date(e.datetime);
     eventDate.setHours(0, 0, 0, 0);
-    return eventDate.getTime() === today.getTime();
+    if (eventDate.getTime() !== today.getTime()) return false;
+    if (filterPrefecture !== 'ALL') {
+      const pref = filterPrefecture === '其他' ? null : filterPrefecture;
+      if (e.prefecture !== pref) return false;
+    }
+    return true;
   });
 
   const upcomingEvents = events.filter(e => {
     const eventDate = new Date(e.datetime);
     eventDate.setHours(0, 0, 0, 0);
-    return eventDate.getTime() > today.getTime() && eventDate.getTime() <= tenDaysLater.getTime();
+    if (eventDate.getTime() <= today.getTime() || eventDate.getTime() > tenDaysLater.getTime()) return false;
+    if (filterPrefecture !== 'ALL') {
+      const pref = filterPrefecture === '其他' ? null : filterPrefecture;
+      if (e.prefecture !== pref) return false;
+    }
+    return true;
   });
 
   return (
@@ -213,6 +228,26 @@ export default function HomePage() {
               </button>
             </div>
           </form>
+
+          {/* Filter Bar */}
+          <div className="flex flex-wrap justify-center gap-2 mt-4">
+            <div className="flex items-center gap-2">
+              <span className="text-text-secondary text-sm">地域:</span>
+              {prefectures.map(p => (
+                <button
+                  key={p}
+                  onClick={() => setFilterPrefecture(p)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    filterPrefecture === p
+                      ? 'bg-accent text-white'
+                      : 'bg-secondary border border-border text-text-secondary hover:border-accent'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Stats Bar */}
           <div className="flex justify-center gap-6 md:gap-12 mt-8">

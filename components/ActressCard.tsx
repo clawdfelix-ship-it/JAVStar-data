@@ -117,6 +117,7 @@ export default function ActressCard({
                 src={avatar_url}
                 alt={name_ja}
                 className="w-full h-full object-cover"
+                loading="lazy"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
               />
             ) : (
