@@ -4,6 +4,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, startOfWeek, endOfWeek, addMonths, subMonths, parseISO, differenceInDays } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 
+function safeNewDate(dateStr: string | undefined | null): Date {
+  if (!dateStr) return new Date(0);
+  try {
+    const d = parseISO(dateStr);
+    return isNaN(d.getTime()) ? new Date(0) : d;
+  } catch { return new Date(0); }
+}
+
 interface DayEvent {
   id: string;
   title: string;
@@ -29,7 +37,8 @@ interface EventCalendarProps {
 const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
 
 function generateICS(event: DayEvent): string {
-  const dt = parseISO(event.datetime);
+  let dt = new Date(0);
+  try { dt = parseISO(event.datetime); } catch { /* use epoch */ }
   const dtEnd = new Date(dt.getTime() + 2 * 60 * 60 * 1000);
   const formatICS = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const uid = `${event.id}@av-intelligence.local`;
@@ -77,7 +86,7 @@ function getEventTypeInfo(title: string, type: string): { label: string; color: 
 
 function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => void }) {
   const typeInfo = getEventTypeInfo(event.title, event.event_type || '');
-  const eventDate = parseISO(event.datetime);
+  const eventDate = safeNewDate(event.datetime || null);
   const daysUntil = differenceInDays(eventDate, new Date());
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -138,7 +147,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
     const map = new Map<string, DayEvent[]>();
     const actressMap = new Map<string, Set<string>>();
     events.forEach(ev => {
-      const dateKey = format(parseISO(ev.datetime), 'yyyy-MM-dd');
+      const dateKey = format(safeNewDate(ev.datetime || null), 'yyyy-MM-dd');
       if (!map.has(dateKey)) { map.set(dateKey, []); actressMap.set(dateKey, new Set()); }
       map.get(dateKey)!.push(ev);
       if (ev.actress_name) actressMap.get(dateKey)!.add(ev.actress_name);
@@ -209,7 +218,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
                     <div className="text-sm font-medium text-text-primary truncate">{ev.title}</div>
                     <div className="text-xs text-text-secondary mt-0.5">{ev.actress_name && <span>{ev.actress_name} · </span>}{ev.venue && <span>{ev.venue}</span>}</div>
                   </div>
-                  <div className="text-xs text-accent whitespace-nowrap">{format(parseISO(ev.datetime), 'HH:mm')}</div>
+                  <div className="text-xs text-accent whitespace-nowrap">{format(safeNewDate(ev.datetime || null), 'HH:mm')}</div>
                 </div>
               ))}
             </div>

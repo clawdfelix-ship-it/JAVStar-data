@@ -1,6 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
+function safeNewDate(dateStr: string | undefined): Date {
+  if (!dateStr) return new Date(0);
+  try {
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date(0) : d;
+  } catch { return new Date(0); }
+}
+
+function safeFormatDate(dateStr: string | undefined): string {
+  if (!dateStr) return '--';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '--';
+    return d.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+  } catch { return '--'; }
+}
 import { format } from 'date-fns';
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
@@ -83,7 +100,7 @@ export default function HomePage() {
       if (res.ok) {
         const data = await res.json();
         if (data.last_update) {
-          setLastUpdate(new Date(data.last_update).toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' }));
+          setLastUpdate((() => { try { return new Date(data.last_update).toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' }); } catch { return '--'; } })());
         }
       }
     } catch (err) { console.error('Failed to fetch last update:', err); }
@@ -172,7 +189,7 @@ export default function HomePage() {
   tenDaysLater.setDate(tenDaysLater.getDate() + 10);
 
   const todayEvents = events.filter(e => {
-    const eventDate = new Date(e.datetime);
+    const eventDate = safeNewDate(e.datetime);
     eventDate.setHours(0, 0, 0, 0);
     if (eventDate.getTime() !== today.getTime()) return false;
     if (filterPrefecture !== 'ALL') {
@@ -183,7 +200,7 @@ export default function HomePage() {
   });
 
   const upcomingEvents = events.filter(e => {
-    const eventDate = new Date(e.datetime);
+    const eventDate = safeNewDate(e.datetime);
     eventDate.setHours(0, 0, 0, 0);
     if (eventDate.getTime() <= today.getTime() || eventDate.getTime() > tenDaysLater.getTime()) return false;
     if (filterPrefecture !== 'ALL') {
@@ -285,7 +302,7 @@ export default function HomePage() {
                 >
                   <div className="text-text-primary font-medium truncate">{event.title}</div>
                   <div className="text-text-secondary mt-1">
-                    {new Date(event.datetime).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })} · {event.venue}
+                    {(() => { try { return safeFormatDate(event.datetime); } catch { return '--'; } })()} · {event.venue}
                   </div>
                 </a>
               ))}

@@ -56,8 +56,14 @@ function getEventTypeColor(type: string, title: string): string {
   return colors[t] || 'bg-neutral-600';
 }
 
+function safeNewDate(datetime: string): Date {
+  if (!datetime) return new Date(0);
+  const d = new Date(datetime);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
 function getDaysUntil(datetime: string): number {
-  const eventDate = new Date(datetime);
+  const eventDate = safeNewDate(datetime);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   eventDate.setHours(0, 0, 0, 0);
@@ -74,17 +80,17 @@ function UrgencyBadge({ datetime }: { datetime: string }) {
 }
 
 function isUpcoming(datetime: string): boolean {
-  return new Date(datetime) > new Date();
+  return safeNewDate(datetime) > new Date();
 }
 
 function isToday(datetime: string): boolean {
   const today = new Date();
-  const eventDate = new Date(datetime);
+  const eventDate = safeNewDate(datetime);
   return eventDate.toDateString() === today.toDateString();
 }
 
 function formatDateTime(datetime: string): string {
-  const date = new Date(datetime);
+  const date = safeNewDate(datetime);
   return date.toLocaleString('ja-JP', {
     month: 'numeric',
     day: 'numeric',
