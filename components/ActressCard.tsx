@@ -122,7 +122,7 @@ export default function ActressCard({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-text-secondary text-2xl font-japanese">
-                {name_ja[0]}
+                {(name_ja || '?')[0]}
               </div>
             )}
           </div>

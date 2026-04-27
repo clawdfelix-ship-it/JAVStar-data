@@ -100,7 +100,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
             <div className="flex items-center gap-3 mb-4 p-3 bg-primary rounded-xl">
               {event.actress_avatar
                 ? <img src={event.actress_avatar} alt={event.actress_name} className="w-10 h-10 rounded-full object-cover ring-2 ring-accent/30" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                : <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-japanese font-bold text-lg flex-shrink-0">{event.actress_name[0]}</div>
+                : <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-japanese font-bold text-lg flex-shrink-0">{(event.actress_name || '?')[0]}</div>
               }
               <div><div className="text-text-primary font-medium">{event.actress_name}</div><div className="text-text-secondary text-xs">出演</div></div>
             </div>
