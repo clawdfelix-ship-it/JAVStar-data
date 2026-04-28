@@ -187,8 +187,10 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const today = isToday(day);
           const hasEvents = dayEvents.length > 0;
+          const eventDensity = dayEvents.length;
+          const heatColor = eventDensity >= 4 ? 'bg-red-500/30' : eventDensity >= 2 ? 'bg-orange-500/30' : eventDensity >= 1 ? 'bg-green-500/30' : '';
           return (
-            <div key={i} onClick={() => handleDayClick(day, dayEvents)} className={`min-h-20 p-1.5 border-b border-r border-border cursor-pointer transition-colors hover:bg-primary/50 ${!isCurrentMonth ? 'bg-primary/30 opacity-50' : ''} ${isSelected ? 'bg-accent/20' : ''} ${today ? 'bg-accent/10' : ''}`}>
+            <div key={i} onClick={() => handleDayClick(day, dayEvents)} className={`min-h-20 p-1.5 border-b border-r border-border cursor-pointer transition-colors hover:bg-primary/50 ${heatColor} ${!isCurrentMonth ? 'bg-primary/30 opacity-50' : ''} ${isSelected ? 'bg-accent/20' : ''} ${today ? 'bg-accent/10' : ''}`}>
               <div className={`w-7 h-7 flex items-center justify-center rounded-full text-sm mb-1 ${today ? 'bg-accent text-white font-bold' : 'text-text-primary'}`}>{format(day, 'd')}</div>
               {dayEvents.length > 0 && (
                 <div className="space-y-0.5">

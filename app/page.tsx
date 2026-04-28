@@ -92,7 +92,7 @@ export default function HomePage() {
   // Fetch actresses
   useEffect(() => {
     fetchActresses();
-  }, [page, search, sort]);
+  }, [page, search, sort, filterPrefecture, filterType]);
 
   async function fetchLastUpdate() {
     try {
