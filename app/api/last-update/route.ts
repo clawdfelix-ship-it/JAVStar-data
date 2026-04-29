@@ -15,6 +15,8 @@ export async function GET() {
       timezone: 'UTC'
     });
   } catch (error) {
-    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    console.error('[last-update] DB error:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: 'Database error', detail: message }, { status: 500 });
   }
 }
