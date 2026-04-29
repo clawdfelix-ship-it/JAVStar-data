@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const result = await sql`SELECT MAX(created_at) as last_update FROM events`;
+    const result = await sql`SELECT MAX(updated_at) as last_update FROM events`;
     const lastUpdate = Array.isArray(result) && result.length > 0 
       ? (result[0] as any)?.last_update 
       : null;
