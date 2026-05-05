@@ -106,10 +106,9 @@ export default function HomePage() {
       const response = await fetch('/api/events?limit=2000');
       if (response.ok) {
         const data = await response.json();
-        setEvents(data.data || []);
-        if (data.meta?.total) {
-          setStats(prev => ({ ...prev, eventCount: data.meta.total }));
-        }
+        const eventList = data.data || [];
+        setEvents(eventList);
+        setStats(prev => ({ ...prev, eventCount: data.meta?.total || eventList.length || 0 }));
       }
     } catch (err) {
       console.error('Failed to fetch events:', err);
@@ -136,11 +135,10 @@ export default function HomePage() {
       if (!response.ok) throw new Error('Failed to fetch');
 
       const data = await response.json();
-      setActresses(data.data || []);
+      const actressList = data.data || [];
+      setActresses(actressList);
       setPagination(data.meta || null);
-      if (data.meta?.total) {
-        setStats(prev => ({ ...prev, actressCount: data.meta.total }));
-      }
+      setStats(prev => ({ ...prev, actressCount: data.meta?.total || actressList.length || 0 }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       // Demo data
