@@ -160,13 +160,35 @@ export default function HomePage() {
     }
   }, [page, search, sort]);
 
-  // Initial load
+  // 優先加載輕量級統計 (0.1秒內顯示數量)
+  const fetchFastStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/stats');
+      if (res.ok) {
+        const data = await res.json();
+        // 立即顯示數量，不需要等完整列表加載
+        setStats(prev => ({
+          ...prev,
+          actressCount: data.actressCount || prev.actressCount,
+          eventCount: data.eventCount || prev.eventCount
+        }));
+        // 同時更新最後更新時間
+        if (data.lastUpdate) {
+          setLastUpdate(new Date(data.lastUpdate).toLocaleString('zh-HK', { timeZone: 'Asia/Hong_Kong' }));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch fast stats:', err);
+    }
+  }, []);
+
+  // Initial load - 優先加載快的，再加載慢的
   useEffect(() => {
-    fetchLastUpdate();
+    fetchFastStats(); // 0.1秒內返回，立即顯示數量
     fetchLatestEvents();
     fetchEvents();
-    fetchActresses();
-  }, [fetchLastUpdate, fetchLatestEvents, fetchEvents, fetchActresses]);
+    fetchActresses(); // 完整列表背景加載
+  }, [fetchFastStats, fetchLatestEvents, fetchEvents, fetchActresses]);
 
   // Refetch on page change
   useEffect(() => {
