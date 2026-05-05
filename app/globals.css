@@ -2,194 +2,847 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   Froala Design Blocks Inspired Color System
+   ============================================ */
 :root {
-  --color-primary: #ffffff;
-  --color-primary-dark: #f5f5f7;
-  --color-secondary: #ffffff;
-  --color-accent: #ff9500;
-  --color-text-primary: #1d1d1f;
-  --color-text-secondary: #86868b;
-  --color-success: #34c759;
-  --color-border: #d2d2d7;
-  --color-card-bg: #ffffff;
-  --color-card-border: transparent;
+  /* Primary Colors - Professional Deep Blue Theme */
+  --color-primary: #165DFF;
+  --color-primary-light: #4080FF;
+  --color-primary-dark: #0E42D2;
+  --color-primary-gradient: linear-gradient(135deg, #165DFF 0%, #4080FF 100%);
+  
+  /* Background Colors */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F7F8FA;
+  --color-bg-tertiary: #F2F3F5;
+  --color-bg-dark: #1D2129;
+  
+  /* Text Colors */
+  --color-text-primary: #1D2129;
+  --color-text-secondary: #4E5969;
+  --color-text-tertiary: #86909C;
+  --color-text-placeholder: #C9CDD4;
+  --color-text-white: #FFFFFF;
+  
+  /* Accent Colors */
+  --color-accent: #FF7D00;
+  --color-success: #00B42A;
+  --color-warning: #FF7D00;
+  --color-danger: #F53F3F;
+  --color-purple: #722ED1;
+  
+  /* Border Colors */
+  --color-border: #E5E6EB;
+  --color-border-light: #F2F3F5;
+  --color-border-dark: #C9CDD4;
+  
+  /* Shadow System */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.10);
+  
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
 }
 
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-primary: #1D2129;
+    --color-bg-secondary: #272E3B;
+    --color-bg-tertiary: #303846;
+    --color-text-primary: #F2F3F5;
+    --color-text-secondary: #C9CDD4;
+    --color-text-tertiary: #86909C;
+    --color-border: #303846;
+    --color-border-light: #272E3B;
+    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.2);
+    --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--color-secondary);
+  background-color: var(--color-bg-secondary);
   color: var(--color-text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', sans-serif;
   overflow-x: hidden;
+  line-height: 1.6;
 }
 
+/* ============================================
+   Typography System (Froala Inspired)
+   ============================================ */
 .font-japanese {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', sans-serif;
 }
 
 .font-mono {
-  font-family: 'SF Mono', 'Menlo', monospace;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
 }
 
-/* Apple-style card */
-.apple-card {
-  background-color: var(--color-card-bg);
-  border-radius: 18px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  @apply transition-all duration-300;
+.text-display {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.text-h1 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.text-h2 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-h3 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-body-lg {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-body {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-small {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ============================================
+   Design Block Components (Froala Inspired)
+   ============================================ */
+
+/* Card Component */
+.fdb-card {
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border: 1px solid var(--color-border-light);
+}
+
+.fdb-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-4px);
+  border-color: var(--color-primary-light);
+}
+
+/* Hero Block */
+.fdb-hero {
+  background: var(--color-primary-gradient);
+  position: relative;
   overflow: hidden;
 }
 
-.apple-card:hover {
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-  @apply transform -translate-y-1;
+.fdb-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
 }
 
-/* Apple section separator */
-.section-gray {
-  background-color: var(--color-secondary);
+/* Section Block */
+.fdb-section {
+  padding: var(--spacing-2xl) 0;
 }
 
-/* Section title — Apple style */
-.section-title-apple {
-  @apply text-3xl font-semibold tracking-tight;
+/* Feature Block */
+.fdb-feature {
+  text-align: center;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.fdb-feature:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.fdb-feature-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-md);
+  background: var(--color-primary-gradient);
+  color: white;
+  font-size: 28px;
+}
+
+/* Button Styles */
+.fdb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.fdb-btn-primary {
+  background: var(--color-primary-gradient);
+  color: white;
+  box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+}
+
+.fdb-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 93, 255, 0.4);
+}
+
+.fdb-btn-secondary {
+  background-color: var(--color-bg-tertiary);
   color: var(--color-text-primary);
 }
 
-/* Hero title */
-.hero-title {
-  @apply text-5xl font-bold tracking-tight;
+.fdb-btn-secondary:hover {
+  background-color: var(--color-border);
+}
+
+.fdb-btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
   color: var(--color-text-primary);
 }
 
-/* Apple tab — clean text, no background */
-.apple-tab {
-  @apply text-base font-medium transition-all duration-200;
-  color: var(--color-text-secondary);
-}
-
-.apple-tab:hover {
-  color: var(--color-text-primary);
-}
-
-.apple-tab.active {
+.fdb-btn-outline:hover {
+  border-color: var(--color-primary);
   color: var(--color-primary);
-  @apply font-semibold;
 }
 
-/* Apple blue button */
-.btn-apple {
-  @apply px-6 py-2 rounded-full font-medium text-white text-sm;
+.fdb-btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.fdb-btn-lg {
+  padding: 16px 32px;
+  font-size: 17px;
+}
+
+/* Input Styles */
+.fdb-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.5;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.fdb-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+}
+
+.fdb-input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* Badge Styles */
+.fdb-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.fdb-badge-primary {
+  background-color: rgba(22, 93, 255, 0.1);
+  color: var(--color-primary);
+}
+
+.fdb-badge-success {
+  background-color: rgba(0, 180, 42, 0.1);
+  color: var(--color-success);
+}
+
+.fdb-badge-warning {
+  background-color: rgba(255, 125, 0, 0.1);
+  color: var(--color-warning);
+}
+
+.fdb-badge-danger {
+  background-color: rgba(245, 63, 63, 0.1);
+  color: var(--color-danger);
+}
+
+.fdb-badge-purple {
+  background-color: rgba(114, 46, 209, 0.1);
+  color: var(--color-purple);
+}
+
+/* Tag/Chip Styles */
+.fdb-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fdb-tag:hover {
+  background-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.fdb-tag.active {
   background-color: var(--color-primary);
-  @apply transition-all duration-200;
+  color: white;
 }
 
-.btn-apple:hover {
-  background-color: var(--color-primary-dark);
-  @apply scale-105;
+/* Stats Card */
+.fdb-stat {
+  text-align: center;
+  padding: var(--spacing-lg);
 }
 
-/* Rank badge */
+.fdb-stat-number {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-primary);
+  font-family: 'SF Mono', 'Menlo', monospace;
+}
+
+.fdb-stat-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+/* Testimonial Block */
+.fdb-testimonial {
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.fdb-testimonial-quote {
+  font-size: 48px;
+  line-height: 1;
+  color: var(--color-primary);
+  opacity: 0.3;
+}
+
+.fdb-testimonial-text {
+  font-size: 16px;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  margin: var(--spacing-sm) 0;
+}
+
+/* CTA Block */
+.fdb-cta {
+  background: var(--color-primary-gradient);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  color: white;
+}
+
+.fdb-cta-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.fdb-cta-desc {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ============================================
+   Rank Badge System (Podium Style)
+   ============================================ */
 .rank-badge {
-  @apply inline-flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .rank-1 {
-  background-color: #ff9500;
-  color: #fff;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #5D4037;
 }
 
 .rank-2 {
-  background-color: #8e8e93;
-  color: #fff;
+  background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
+  color: #37474F;
 }
 
 .rank-3 {
-  background-color: #cd7f32;
-  color: #fff;
+  background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+  color: white;
 }
 
-/* Stat number — Apple style */
-.stat-number {
-  @apply text-3xl font-bold tracking-tight;
-  color: var(--color-text-primary);
-}
-
-/* Image — Apple style */
-.apple-image {
-  @apply w-full object-cover;
-  border-radius: 12px;
-}
-
-/* Card name */
-.card-name {
-  @apply text-sm font-medium;
-  color: var(--color-text-primary);
-}
-
-/* Card reading */
-.card-reading {
-  @apply text-xs;
+.rank-default {
+  background-color: var(--color-bg-tertiary);
   color: var(--color-text-secondary);
 }
 
-/* Vote badge */
-.vote-badge {
-  @apply px-2 py-0.5 rounded-full text-xs font-semibold text-white;
-  background-color: var(--color-primary);
+/* ============================================
+   Grid & Layout Systems
+   ============================================ */
+.fdb-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
 }
 
-/* Header — 紅色漸變 */
-.header-gradient {
-  background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
-  color: #ffffff;
+.fdb-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
 }
 
-.header-gradient h1,
-.header-gradient h2,
-.header-gradient p,
-.header-gradient span,
-.header-gradient div {
-  color: #ffffff;
+.fdb-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
 }
 
-/* Sidebar section header — Apple style */
-.sidebar-header {
-  @apply text-xs font-semibold uppercase tracking-wider;
-  color: var(--color-text-secondary);
+.fdb-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
 }
 
-/* Actress card — shadow effect */
+/* ============================================
+   Actress Card Specific Styles
+   ============================================ */
 .actress-card {
-  background-color: var(--color-card-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 18px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border: 1px solid var(--color-border-light);
 }
 
 .actress-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-4px);
+  border-color: var(--color-primary-light);
 }
 
-/* Grid — Apple gallery style */
-.apple-grid {
+.actress-avatar {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-border) 100%);
+}
+
+.actress-info {
+  padding: var(--spacing-md);
+}
+
+.actress-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.actress-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.actress-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.actress-stat-value {
+  font-weight: 600;
+  color: var(--color-primary);
+  font-family: 'SF Mono', monospace;
+}
+
+/* ============================================
+   Event Card Specific Styles
+   ============================================ */
+.event-card {
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-xs);
+  transition: all 0.2s ease;
+  border-left: 3px solid var(--color-primary);
+}
+
+.event-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateX(4px);
+}
+
+.event-card.today {
+  border-left-color: var(--color-success);
+  background: linear-gradient(90deg, rgba(0, 180, 42, 0.05) 0%, transparent 30%);
+}
+
+.event-card.tomorrow {
+  border-left-color: var(--color-warning);
+  background: linear-gradient(90deg, rgba(255, 125, 0, 0.05) 0%, transparent 30%);
+}
+
+.event-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.event-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  flex-wrap: wrap;
+}
+
+.event-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================
+   Calendar Component Styles
+   ============================================ */
+.calendar-container {
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border-light);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background: var(--color-primary-gradient);
+  color: white;
+}
+
+.calendar-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: var(--color-border);
+}
+
+.calendar-day-header {
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-day {
+  min-height: 80px;
+  padding: 8px;
+  background-color: var(--color-bg-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.calendar-day:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.calendar-day.today {
+  background-color: rgba(22, 93, 255, 0.05);
+}
+
+.calendar-day.today::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+}
+
+.calendar-day-number {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.calendar-event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  margin-right: 2px;
+}
+
+/* ============================================
+   Filter Bar & Tabs
+   ============================================ */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+}
+
+.filter-tab {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-tab:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-primary-light);
+}
+
+.filter-tab.active {
+  color: white;
+  background: var(--color-primary-gradient);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+}
+
+/* ============================================
+   Loading States & Animations
+   ============================================ */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-bg-tertiary) 25%, var(--color-border) 50%, var(--color-bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   Responsive Breakpoints
+   ============================================ */
+@media (max-width: 1024px) {
+  .fdb-grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .fdb-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-  .apple-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    gap: 12px;
+  .fdb-grid-4,
+  .fdb-grid-3,
+  .fdb-grid-2 {
+    grid-template-columns: 1fr;
   }
-  .hero-title {
-    @apply text-3xl;
+  
+  .fdb-grid-auto {
+    grid-template-columns: repeat(2, 1fr);
   }
+  
+  .text-display {
+    font-size: 32px;
+  }
+  
+  .text-h1 {
+    font-size: 24px;
+  }
+  
+  .text-h2 {
+    font-size: 20px;
+  }
+  
+  .fdb-stat-number {
+    font-size: 28px;
+  }
+  
+  .filter-bar {
+    gap: 6px;
+  }
+  
+  .filter-tab {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fdb-grid-auto {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+.text-gradient {
+  background: var(--color-primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

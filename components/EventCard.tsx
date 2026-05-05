@@ -40,20 +40,20 @@ function getEventTypeLabel(type: string, title: string): string {
   return labels[t] || '實體活動';
 }
 
-function getEventTypeColor(type: string, title: string): string {
+function getEventTypeBadgeClass(type: string, title: string): string {
   const t = getInferredEventType(type, title);
-  const colors: Record<string, string> = {
-    sign: 'bg-blue-600',
-    debut: 'bg-yellow-500',
-    live: 'bg-green-600',
-    talk: 'bg-purple-600',
-    sale: 'bg-orange-600',
-    meeting: 'bg-blue-600',
-    photo: 'bg-purple-600',
-    tre: 'bg-red-600',
-    other: 'bg-neutral-600',
+  const classes: Record<string, string> = {
+    sign: 'fdb-badge-primary',
+    debut: 'fdb-badge-warning',
+    live: 'fdb-badge-success',
+    talk: 'fdb-badge-purple',
+    sale: 'fdb-badge-warning',
+    meeting: 'fdb-badge-primary',
+    photo: 'fdb-badge-purple',
+    tre: 'fdb-badge-danger',
+    other: 'fdb-badge',
   };
-  return colors[t] || 'bg-neutral-600';
+  return classes[t] || 'fdb-badge';
 }
 
 function safeNewDate(datetime: string): Date {
@@ -73,9 +73,9 @@ function getDaysUntil(datetime: string): number {
 function UrgencyBadge({ datetime }: { datetime: string }) {
   const days = getDaysUntil(datetime);
   if (days < 0) return null;
-  if (days <= 1) return <span className="px-2 py-0.5 bg-red-600 text-white text-xs rounded font-bold animate-pulse">🔥 今日</span>;
-  if (days <= 3) return <span className="px-2 py-0.5 bg-orange-500 text-white text-xs rounded font-bold">⚡ {days}日後</span>;
-  if (days <= 7) return <span className="px-2 py-0.5 bg-yellow-500 text-black text-xs rounded">📅 {days}日內</span>;
+  if (days <= 1) return <span className="fdb-badge-danger animate-pulse">🔥 今日</span>;
+  if (days <= 3) return <span className="fdb-badge-warning">⚡ {days}日後</span>;
+  if (days <= 7) return <span className="fdb-badge-success">📅 {days}日內</span>;
   return null;
 }
 
@@ -89,6 +89,13 @@ function isToday(datetime: string): boolean {
   return eventDate.toDateString() === today.toDateString();
 }
 
+function isTomorrow(datetime: string): boolean {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const eventDate = safeNewDate(datetime);
+  return eventDate.toDateString() === tomorrow.toDateString();
+}
+
 function formatDateTime(datetime: string): string {
   const date = safeNewDate(datetime);
   return date.toLocaleString('ja-JP', {
@@ -97,6 +104,23 @@ function formatDateTime(datetime: string): string {
     weekday: 'short',
     hour: '2-digit',
     minute: '2-digit',
+  });
+}
+
+function formatTime(datetime: string): string {
+  const date = safeNewDate(datetime);
+  return date.toLocaleTimeString('ja-JP', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function formatDateShort(datetime: string): string {
+  const date = safeNewDate(datetime);
+  return date.toLocaleDateString('ja-JP', {
+    month: 'numeric',
+    day: 'numeric',
+    weekday: 'short',
   });
 }
 
@@ -114,77 +138,102 @@ function EventCardComponent({
 }: EventCardProps) {
   const upcoming = isUpcoming(datetime);
   const today = isToday(datetime);
-  const statusColor = today ? 'border-l-4 border-l-accent' : upcoming ? 'border-l-4 border-l-success' : 'opacity-60';
+  const tomorrow = isTomorrow(datetime);
+
+  // Determine card style
+  let cardClass = 'event-card';
+  if (today) cardClass += ' today';
+  else if (tomorrow) cardClass += ' tomorrow';
+  if (!upcoming) cardClass += ' opacity-60';
 
   return (
-    <div className={`bg-secondary rounded-lg p-4 border border-border ${statusColor}`}>
-      {/* Header: Date + Type + Urgency */}
+    <div className={cardClass}>
+      {/* Top Row: Date + Type + Urgency */}
       <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-text-secondary text-sm">
-            {formatDateTime(datetime)}
-          </span>
+          {/* Date Box */}
+          <div className="flex flex-col items-center justify-center bg-bg-tertiary rounded-md px-3 py-1.5 min-w-[60px]">
+            <span className="text-caption text-text-secondary">
+              {formatDateShort(datetime)}
+            </span>
+            <span className="font-mono text-sm font-semibold text-text-primary">
+              {formatTime(datetime)}
+            </span>
+          </div>
+          
           {today && (
-            <span className="px-2 py-0.5 bg-accent text-white text-xs rounded font-bold">
-              今日
+            <span className="fdb-badge-danger animate-pulse">
+              🔥 今日
+            </span>
+          )}
+          {tomorrow && (
+            <span className="fdb-badge-warning">
+              ⚡ 聽日
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`px-2 py-0.5 ${getEventTypeColor(event_type, title)} text-white text-xs rounded`}>
+        
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={getEventTypeBadgeClass(event_type, title)}>
             {getEventTypeLabel(event_type, title)}
           </span>
           <UrgencyBadge datetime={datetime} />
         </div>
       </div>
 
-      {/* Venue (prominent) */}
+      {/* Venue Location */}
       {venue && (
-        <div className="flex items-center gap-1.5 text-text-secondary text-xs mb-2 bg-primary/50 rounded px-2 py-1">
-          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-2 mb-3 p-2 bg-bg-secondary rounded-lg">
+          <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span className="truncate">{venue}{prefecture ? ` (${prefecture})` : ''}</span>
+          <span className="text-small text-text-secondary truncate">
+            {venue}{prefecture ? ` (${prefecture})` : ''}
+          </span>
         </div>
       )}
 
-      {/* Title */}
-      <h3 className="font-japanese text-text-primary font-semibold mb-2 line-clamp-2">
+      {/* Event Title */}
+      <h3 className="event-title line-clamp-2 mb-3">
         {title}
       </h3>
 
-      {/* Actress (optional) */}
+      {/* Actress Info */}
       {showActress && actress_name && (
-        <div className="flex items-center gap-2 mb-3">
-          {actress_avatar && (
+        <div className="flex items-center gap-2 mb-3 p-2 bg-bg-secondary rounded-lg">
+          {actress_avatar ? (
             <img 
               src={actress_avatar} 
               alt={actress_name}
-              className="w-6 h-6 rounded-full object-cover"
+              className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
               loading="lazy"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-text-secondary text-sm font-japanese">
+              {(actress_name || '?')[0]}
+            </div>
           )}
-          <span className="text-text-secondary text-sm">
+          <span className="text-small text-text-secondary font-medium">
             {actress_name}
           </span>
         </div>
       )}
 
-      {/* Footer */}
-      <div className="flex justify-between items-center pt-3 border-t border-border">
-        <span className="text-text-secondary/50 text-xs font-mono">
-          {id.length > 8 ? `#${id.slice(0, 8)}` : id}
+      {/* Footer Actions */}
+      <div className="flex justify-between items-center pt-3 mt-3 border-t border-border-light">
+        <span className="text-caption text-text-tertiary font-mono">
+          #{id.length > 8 ? id.slice(0, 8) : id}
         </span>
         <a 
           href={url} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-accent text-sm hover:underline"
+          className="fdb-btn fdb-btn-sm fdb-btn-outline"
           onClick={(e) => e.stopPropagation()}
         >
-          查看詳情 →
+          詳情 →
         </a>
       </div>
     </div>

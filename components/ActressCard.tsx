@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 
 interface ActressCardProps {
@@ -29,16 +29,7 @@ function getRankClass(rank: number): string {
   if (rank === 1) return 'rank-1';
   if (rank === 2) return 'rank-2';
   if (rank === 3) return 'rank-3';
-  return 'bg-border text-text-secondary';
-}
-
-function StatBadge({ label, value }: { label: string; value: string }) {
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary rounded text-xs text-text-secondary">
-      <span className="text-text-secondary/60">{label}</span>
-      <span className="text-accent font-medium">{value}</span>
-    </span>
-  );
+  return 'rank-default';
 }
 
 export default function ActressCard({
@@ -57,7 +48,6 @@ export default function ActressCard({
   agency,
   hobby,
   debut_year,
-  event_count,
   year_2026_events,
   vote_count,
   final_score,
@@ -66,7 +56,7 @@ export default function ActressCard({
   const [hasVoted, setHasVoted] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
 
-  async function handleVote(e: React.MouseEvent) {
+  const handleVote = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -99,129 +89,149 @@ export default function ActressCard({
     } finally {
       setIsVoting(false);
     }
-  }
+  }, [id, isVoting, hasVoted, currentVoteCount]);
 
   return (
-    <div className="actress-card bg-secondary rounded-lg p-3 md:p-4 border border-border hover:border-accent overflow-hidden w-full min-w-0">
+    <div className="actress-card fade-in w-full">
       <Link href={`/actress/${id}`} className="block w-full">
-        <div className="flex items-center gap-2 md:gap-4">
-          {/* Rank badge */}
-          <div className={`rank-badge flex-shrink-0 ${getRankClass(rank)}`}>
-            {rank}
-          </div>
-
+        {/* Card Header with Avatar & Rank */}
+        <div className="relative">
           {/* Avatar */}
-          <div className="w-12 h-12 md:w-20 md:h-20 rounded-full bg-primary overflow-hidden flex-shrink-0 ring-2 ring-border hover:ring-accent hover:ring-4 transition-all duration-300 shadow-lg hover:shadow-accent/30">
+          <div className="actress-avatar relative">
             {avatar_url ? (
               <img
                 src={avatar_url}
                 alt={name_ja}
-                className="w-full h-full object-cover"
+                className="actress-avatar"
                 loading="lazy"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-text-secondary text-2xl font-japanese">
+              <div className="actress-avatar flex items-center justify-center text-text-secondary text-4xl font-japanese bg-gradient-to-br from-bg-tertiary to-border">
                 {(name_ja || '?')[0]}
               </div>
             )}
-          </div>
-
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-japanese text-base md:text-xl font-bold text-text-primary truncate">
-              {name_ja}
-            </h3>
-            {name_cn && (
-              <p className="text-text-secondary text-sm truncate">{name_cn}</p>
-            )}
-
-            {/* Quick stats row */}
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {age && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-accent/10 text-accent text-xs rounded-md font-medium">
-                  {age}歲
-                </span>
-              )}
-              {zodiac && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/10 text-purple-400 text-xs rounded-md">
-                  {zodiac}
-                </span>
-              )}
-              {cup && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-pink-500/10 text-pink-400 text-xs rounded-md font-mono">
-                  {cup} cup
-                </span>
-              )}
-              {height && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md">
-                  📏 {height}cm
-                </span>
-              )}
+            
+            {/* Rank Badge - positioned absolute */}
+            <div className="absolute top-3 left-3">
+              <div className={`rank-badge ${getRankClass(rank)} shadow-lg`}>
+                {rank}
+              </div>
             </div>
 
-            {/* Measurements */}
-            {bust && waist && hip && (
-              <div className="text-text-secondary/70 text-xs mt-1 font-mono">
-                B{bust} / W{waist} / H{hip}
+            {/* Score Badge - top right */}
+            <div className="absolute top-3 right-3">
+              <div className="fdb-badge-primary text-sm font-mono font-bold py-1.5 px-3 shadow-lg">
+                {final_score} pts
               </div>
-            )}
-
-            {/* Agency & hobby */}
-            <div className="flex flex-wrap gap-2 mt-2 text-xs text-text-secondary">
-              {agency && (
-                <span className="truncate max-w-[120px]" title={agency}>🏢 {agency}</span>
-              )}
-              {hobby && (
-                <span className="truncate max-w-[120px]" title={hobby}>🎯 {hobby}</span>
-              )}
             </div>
           </div>
+        </div>
 
-          {/* Score + mini stats */}
-          <div className="hidden sm:flex flex-col items-end justify-between flex-shrink-0">
-            <div>
-              <div className="font-mono text-xl md:text-2xl font-bold text-accent">
-                {final_score}
-              </div>
-              <div className="text-text-secondary text-xs">總分</div>
+        {/* Card Content */}
+        <div className="actress-info">
+          {/* Name */}
+          <h3 className="actress-name text-line-clamp-1">
+            {name_ja}
+          </h3>
+          {name_cn && (
+            <p className="text-small text-text-secondary line-clamp-1">{name_cn}</p>
+          )}
+
+          {/* Key Stats Row */}
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {age && (
+              <span className="fdb-badge-primary">
+                {age}歲
+              </span>
+            )}
+            {zodiac && (
+              <span className="fdb-badge-purple">
+                {zodiac}
+              </span>
+            )}
+            {cup && (
+              <span className="fdb-badge-danger">
+                {cup}
+              </span>
+            )}
+            {height && (
+              <span className="fdb-badge-success">
+                {height}cm
+              </span>
+            )}
+          </div>
+
+          {/* Measurements */}
+          {bust && waist && hip && (
+            <div className="mt-2 flex items-center gap-1 text-small text-text-secondary font-mono">
+              <span className="fdb-badge px-2 py-0.5">
+                B{bust} W{waist} H{hip}
+              </span>
             </div>
-            <div className="flex gap-2 text-xs">
-              <span className="text-success" title="年度活動">📅 {year_2026_events}</span>
-              <span className="text-accent" title="投票數">♥ {currentVoteCount}</span>
+          )}
+
+          {/* Agency & Hobby */}
+          <div className="flex flex-wrap gap-2 mt-3 text-small text-text-secondary">
+            {agency && (
+              <span className="truncate max-w-[140px] flex items-center gap-1" title={agency}>
+                <span>🏢</span> {agency}
+              </span>
+            )}
+            {hobby && (
+              <span className="truncate max-w-[140px] flex items-center gap-1" title={hobby}>
+                <span>🎯</span> {hobby}
+              </span>
+            )}
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border-light">
+            <div className="text-center">
+              <div className="font-mono text-lg font-bold text-primary">
+                {year_2026_events}
+              </div>
+              <div className="text-caption text-text-secondary">活動</div>
+            </div>
+            <div className="text-center">
+              <div className="font-mono text-lg font-bold text-accent">
+                {currentVoteCount}
+              </div>
+              <div className="text-caption text-text-secondary">投票</div>
+            </div>
+            <div className="text-center">
+              <div className="font-mono text-lg font-bold text-success">
+                {debut_year || '-'}
+              </div>
+              <div className="text-caption text-text-secondary">出道</div>
             </div>
           </div>
         </div>
       </Link>
 
-      {/* Footer: debut year + actions */}
-      <div className="mt-3 pt-3 border-t border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div className="flex items-center gap-2 sm:gap-3">
-          {debut_year && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-success/10 text-success text-xs rounded-md font-medium">
-              🎬 出道 {debut_year}
-            </span>
-          )}
-          <span className="text-text-secondary/50 text-xs font-mono">#{id.slice(0, 8)}</span>
-          <div className="sm:hidden flex items-center gap-1 text-xs">
-            <span className="text-accent font-mono font-bold">{final_score}</span>
-          </div>
+      {/* Card Footer Actions */}
+      <div className="px-4 pb-4 pt-0 flex items-center justify-between gap-2">
+        <div className="text-caption text-text-tertiary font-mono">
+          #{id.slice(0, 8)}
         </div>
-
-        <div className="flex items-center gap-2 sm:gap-3">
+        
+        <div className="flex items-center gap-2">
           <button
             onClick={handleVote}
             disabled={isVoting}
-            className={`px-3 py-2 sm:py-1.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
+            className={`fdb-btn fdb-btn-sm ${
               hasVoted
-                ? 'bg-accent text-white hover:bg-accent/80'
-                : 'bg-primary border border-accent text-accent hover:bg-accent hover:text-white'
-            } disabled:opacity-50`}
+                ? 'bg-gradient-to-r from-[#FF7D00] to-[#FF9500] text-white'
+                : 'fdb-btn-outline'
+            }`}
           >
-            {isVoting ? '處理中...' : hasVoted ? '♥ 已投' : '♡ 投票'}
+            {isVoting ? '...' : hasVoted ? '♥ 已投' : '♡ 投票'}
           </button>
 
-          <Link href={`/actress/${id}`} className="text-accent text-sm hover:underline py-2 min-h-[44px] flex items-center">
+          <Link 
+            href={`/actress/${id}`} 
+            className="fdb-btn fdb-btn-primary fdb-btn-sm"
+          >
             詳情 →
           </Link>
         </div>

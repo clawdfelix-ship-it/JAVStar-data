@@ -66,64 +66,164 @@ function downloadICS(event: DayEvent) {
   URL.revokeObjectURL(a.href);
 }
 
-function getEventTypeInfo(title: string, type: string): { label: string; color: string } {
+function getEventTypeInfo(title: string, type: string): { label: string; class: string } {
   if (!type || type === 'other') {
-    if (title.includes('見面會')) return { label: '見面會', color: 'bg-blue-600' };
-    if (title.includes('攝影會')) return { label: '攝影會', color: 'bg-purple-600' };
-    if (title.includes('TRE')) return { label: 'TRE', color: 'bg-red-600' };
-    if (title.includes('簽名')) return { label: '簽名會', color: 'bg-green-600' };
-    if (title.includes('出道') || title.includes('新星')) return { label: '出道活動', color: 'bg-yellow-500' };
-    return { label: '實體活動', color: 'bg-neutral-600' };
+    if (title.includes('見面會')) return { label: '見面會', class: 'fdb-badge-primary' };
+    if (title.includes('攝影會')) return { label: '攝影會', class: 'fdb-badge-purple' };
+    if (title.includes('TRE')) return { label: 'TRE', class: 'fdb-badge-danger' };
+    if (title.includes('簽名')) return { label: '簽名會', class: 'fdb-badge-success' };
+    if (title.includes('出道') || title.includes('新星')) return { label: '出道活動', class: 'fdb-badge-warning' };
+    return { label: '實體活動', class: 'fdb-badge' };
   }
-  const m: Record<string, { label: string; color: string }> = {
-    sign: { label: '簽名會', color: 'bg-blue-600' }, debut: { label: '出道活動', color: 'bg-yellow-500' },
-    live: { label: 'LIVE', color: 'bg-green-600' }, talk: { label: '座談會', color: 'bg-purple-600' },
-    sale: { label: '發售會', color: 'bg-orange-600' }, meeting: { label: '見面會', color: 'bg-blue-600' },
-    photo: { label: '攝影會', color: 'bg-purple-600' }, other: { label: '實體活動', color: 'bg-neutral-600' },
+  const m: Record<string, { label: string; class: string }> = {
+    sign: { label: '簽名會', class: 'fdb-badge-primary' },
+    debut: { label: '出道活動', class: 'fdb-badge-warning' },
+    live: { label: 'LIVE', class: 'fdb-badge-success' },
+    talk: { label: '座談會', class: 'fdb-badge-purple' },
+    sale: { label: '發售會', class: 'fdb-badge-warning' },
+    meeting: { label: '見面會', class: 'fdb-badge-primary' },
+    photo: { label: '攝影會', class: 'fdb-badge-purple' },
+    other: { label: '實體活動', class: 'fdb-badge' },
   };
-  return m[type] || { label: '實體活動', color: 'bg-neutral-600' };
+  return m[type] || { label: '實體活動', class: 'fdb-badge' };
 }
 
 function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => void }) {
   const typeInfo = getEventTypeInfo(event.title, event.event_type || '');
   const eventDate = safeNewDate(event.datetime || null);
   const daysUntil = differenceInDays(eventDate, new Date());
+  
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);
     document.body.style.overflow = 'hidden';
     return () => { document.removeEventListener('keydown', handler); document.body.style.overflow = ''; };
   }, [onClose]);
+  
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 fade-in">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-secondary border border-border rounded-2xl shadow-2xl overflow-hidden">
-        <div className={`h-2 ${typeInfo.color} opacity-80`} />
+      <div className="relative w-full max-w-md bg-bg-primary rounded-2xl shadow-xl overflow-hidden border border-border-light">
+        {/* Top gradient bar */}
+        <div className="h-2 bg-gradient-to-r from-primary to-primary-light opacity-80" />
+        
         <div className="p-6">
-          <button onClick={onClose} className="absolute top-4 right-4 p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-primary">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          {/* Close button */}
+          <button 
+            onClick={onClose} 
+            className="absolute top-4 right-4 p-2 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-secondary"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
-          <div className="mb-3"><span className={`inline-block px-3 py-1 ${typeInfo.color} text-white text-xs rounded-full font-medium`}>{typeInfo.label}</span></div>
-          <h2 className="font-japanese text-xl font-bold text-text-primary mb-4 leading-tight pr-8">{event.title}</h2>
+          
+          {/* Type badge */}
+          <div className="mb-3">
+            <span className={typeInfo.class}>{typeInfo.label}</span>
+          </div>
+          
+          {/* Title */}
+          <h2 className="font-japanese text-xl font-bold text-text-primary mb-4 leading-tight pr-8">
+            {event.title}
+          </h2>
+          
+          {/* Actress info */}
           {event.actress_name && (
-            <div className="flex items-center gap-3 mb-4 p-3 bg-primary rounded-xl">
-              {event.actress_avatar
-                ? <img src={event.actress_avatar} alt={event.actress_name} className="w-10 h-10 rounded-full object-cover ring-2 ring-accent/30" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                : <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-japanese font-bold text-lg flex-shrink-0">{(event.actress_name || '?')[0]}</div>
-              }
-              <div><div className="text-text-primary font-medium">{event.actress_name}</div><div className="text-text-secondary text-xs">出演</div></div>
+            <div className="flex items-center gap-3 mb-4 p-3 bg-bg-secondary rounded-xl">
+              {event.actress_avatar ? (
+                <img 
+                  src={event.actress_avatar} 
+                  alt={event.actress_name}
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/30"
+                  loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-japanese font-bold text-lg flex-shrink-0">
+                  {(event.actress_name || '?')[0]}
+                </div>
+              )}
+              <div>
+                <div className="text-text-primary font-medium">{event.actress_name}</div>
+                <div className="text-text-secondary text-xs">出演</div>
+              </div>
             </div>
           )}
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2 text-text-secondary"><span className="w-12 flex-shrink-0">📅 日期</span><span className="text-text-primary">{format(eventDate, 'yyyy年MM月dd日 (E)', { locale: zhTW })}</span></div>
-            <div className="flex items-center gap-2 text-text-secondary"><span className="w-12 flex-shrink-0">🕐 時間</span><span className="text-text-primary">{format(eventDate, 'HH:mm')}</span></div>
-            {event.venue && <div className="flex items-center gap-2 text-sm"><span className="w-12 flex-shrink-0 text-text-secondary">📍 地點</span><span className="text-text-primary">{event.venue}</span></div>}
-            {event.prefecture && <div className="flex items-center gap-2 text-sm"><span className="w-12 flex-shrink-0 text-text-secondary">🌏 地區</span><span className="text-text-primary">{event.prefecture}</span></div>}
-            {daysUntil >= 0 && <div className="flex items-center gap-2 text-sm"><span className="w-12 flex-shrink-0 text-text-secondary">⏰ 倒計</span><span className={daysUntil <= 3 ? 'text-accent font-bold' : 'text-text-primary'}>{daysUntil === 0 ? '今日舉行' : `${daysUntil}日後`}</span></div>}
+          
+          {/* Event details */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+              <span className="text-lg">📅</span>
+              <div>
+                <div className="text-xs text-text-secondary">日期</div>
+                <div className="text-text-primary font-medium">
+                  {format(eventDate, 'yyyy年MM月dd日 (E)', { locale: zhTW })}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+              <span className="text-lg">🕐</span>
+              <div>
+                <div className="text-xs text-text-secondary">時間</div>
+                <div className="text-text-primary font-medium font-mono">
+                  {format(eventDate, 'HH:mm')}
+                </div>
+              </div>
+            </div>
+            
+            {event.venue && (
+              <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+                <span className="text-lg">📍</span>
+                <div>
+                  <div className="text-xs text-text-secondary">地點</div>
+                  <div className="text-text-primary font-medium">{event.venue}</div>
+                </div>
+              </div>
+            )}
+            
+            {event.prefecture && (
+              <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+                <span className="text-lg">🌏</span>
+                <div>
+                  <div className="text-xs text-text-secondary">地區</div>
+                  <div className="text-text-primary font-medium">{event.prefecture}</div>
+                </div>
+              </div>
+            )}
+            
+            {daysUntil >= 0 && (
+              <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+                <span className="text-lg">⏰</span>
+                <div>
+                  <div className="text-xs text-text-secondary">倒計</div>
+                  <div className={daysUntil <= 3 ? 'text-danger font-bold' : 'text-text-primary font-medium'}>
+                    {daysUntil === 0 ? '今日舉行' : `${daysUntil}日後`}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="mt-4 flex gap-2">
-            {event.url && <a href={event.url} target="_blank" rel="noopener noreferrer" className="flex-1 px-4 py-2.5 bg-accent hover:bg-accent/80 text-white rounded-xl text-center font-medium transition-colors text-sm">查看原文</a>}
-            <button onClick={() => downloadICS(event)} className="flex-1 px-4 py-2.5 bg-primary hover:bg-border border border-border text-text-primary rounded-xl text-center font-medium transition-colors text-sm">下載日曆</button>
+          
+          {/* Action buttons */}
+          <div className="mt-6 flex gap-3">
+            {event.url && (
+              <a 
+                href={event.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="fdb-btn fdb-btn-primary flex-1"
+              >
+                查看原文
+              </a>
+            )}
+            <button 
+              onClick={() => downloadICS(event)} 
+              className="fdb-btn fdb-btn-outline flex-1"
+            >
+              下載日曆
+            </button>
           </div>
         </div>
       </div>
@@ -148,7 +248,10 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
     const actressMap = new Map<string, Set<string>>();
     events.forEach(ev => {
       const dateKey = format(safeNewDate(ev.datetime || null), 'yyyy-MM-dd');
-      if (!map.has(dateKey)) { map.set(dateKey, []); actressMap.set(dateKey, new Set()); }
+      if (!map.has(dateKey)) { 
+        map.set(dateKey, []); 
+        actressMap.set(dateKey, new Set()); 
+      }
       map.get(dateKey)!.push(ev);
       if (ev.actress_name) actressMap.get(dateKey)!.add(ev.actress_name);
     });
@@ -166,68 +269,158 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
     setSelectedEvent(ev);
   }
 
+  // Get heat color based on event count
+  const getHeatColor = (count: number): string => {
+    if (count >= 4) return 'bg-danger/20 hover:bg-danger/30';
+    if (count >= 2) return 'bg-warning/20 hover:bg-warning/30';
+    if (count >= 1) return 'bg-success/20 hover:bg-success/30';
+    return 'hover:bg-bg-secondary';
+  };
+
   return (
-    <div className="bg-secondary rounded-2xl border border-border overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <button onClick={() => setCurrentMonth(m => subMonths(m, 1))} className="p-2 hover:bg-primary rounded-lg transition-colors"><svg className="w-5 h-5 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
-        <h2 className="font-japanese text-lg font-semibold text-text-primary">{format(currentMonth, 'yyyy年 M月', { locale: zhTW })}</h2>
-        <button onClick={() => setCurrentMonth(m => addMonths(m, 1))} className="p-2 hover:bg-primary rounded-lg transition-colors"><svg className="w-5 h-5 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
+    <div className="calendar-container slide-up">
+      {/* Calendar Header - Froala style */}
+      <div className="calendar-header bg-gradient-to-r from-primary to-primary-light text-white">
+        <button 
+          onClick={() => setCurrentMonth(m => subMonths(m, 1))} 
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        <h2 className="font-japanese text-lg font-semibold">
+          {format(currentMonth, 'yyyy年 M月', { locale: zhTW })}
+        </h2>
+        
+        <button 
+          onClick={() => setCurrentMonth(m => addMonths(m, 1))} 
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
-      {/* Week days */}
-      <div className="grid grid-cols-7 border-b border-border">
-        {weekDays.map((d, i) => <div key={i} className={`py-2 text-center text-sm font-medium ${i === 0 ? 'text-red-500' : 'text-text-secondary'}`}>{d}</div>)}
-      </div>
-      {/* Days grid */}
-      <div className="grid grid-cols-7">
+      
+      {/* Week days header */}
+      <div className="calendar-grid">
+        {weekDays.map((d, i) => (
+          <div key={i} className="calendar-day-header">
+            {d}
+          </div>
+        ))}
+        
+        {/* Days grid */}
         {calendarDays.map((day, i) => {
           const dateKey = format(day, 'yyyy-MM-dd');
           const dayEvents = monthEvents.map.get(dateKey) || [];
           const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const today = isToday(day);
-          const hasEvents = dayEvents.length > 0;
-          const eventDensity = dayEvents.length;
-          const heatColor = eventDensity >= 4 ? 'bg-red-500/30' : eventDensity >= 2 ? 'bg-orange-500/30' : eventDensity >= 1 ? 'bg-green-500/30' : '';
+          const heatColor = getHeatColor(dayEvents.length);
+          
           return (
-            <div key={i} onClick={() => handleDayClick(day, dayEvents)} className={`min-h-20 p-1.5 border-b border-r border-border cursor-pointer transition-colors hover:bg-primary/50 ${heatColor} ${!isCurrentMonth ? 'bg-primary/30 opacity-50' : ''} ${isSelected ? 'bg-accent/20' : ''} ${today ? 'bg-accent/10' : ''}`}>
-              <div className={`w-7 h-7 flex items-center justify-center rounded-full text-sm mb-1 ${today ? 'bg-accent text-white font-bold' : 'text-text-primary'}`}>{format(day, 'd')}</div>
+            <div 
+              key={i} 
+              onClick={() => handleDayClick(day, dayEvents)} 
+              className={`
+                calendar-day transition-all duration-200
+                ${heatColor}
+                ${!isCurrentMonth ? 'opacity-40' : ''}
+                ${isSelected ? 'bg-primary/20 ring-2 ring-primary' : ''}
+              `}
+            >
+              <div className={`
+                calendar-day-number
+                ${today ? 'bg-primary text-white' : ''}
+              `}>
+                {format(day, 'd')}
+              </div>
+              
               {dayEvents.length > 0 && (
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {Array.from(monthEvents.actressMap.get(dateKey) || []).slice(0, 3).map((name, j) => {
                     const ev = dayEvents.find(e => e.actress_name === name);
-                    return <div key={j} onClick={(e) => { if (ev) handleEventClick(e, ev); }} className={`text-xs truncate hover:text-accent cursor-pointer ${isSelected ? 'text-accent' : 'text-text-secondary'}`}>{name}</div>;
+                    return (
+                      <div 
+                        key={j} 
+                        onClick={(e) => { if (ev) handleEventClick(e, ev); }}
+                        className="text-xs truncate text-text-secondary hover:text-primary cursor-pointer"
+                      >
+                        {name}
+                      </div>
+                    );
                   })}
-                  {dayEvents.length > 3 && <div className="text-xs text-accent">+{dayEvents.length - 3}</div>}
+                  {dayEvents.length > 3 && (
+                    <div className="text-xs text-primary font-medium">
+                      +{dayEvents.length - 3}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           );
         })}
       </div>
+      
       {/* Selected date panel */}
       {selectedDate && (
-        <div className="p-4 border-t border-border bg-primary">
+        <div className="p-4 border-t border-border bg-bg-secondary">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-japanese text-lg font-semibold text-text-primary">{format(selectedDate, 'MM月dd日 (E)', { locale: zhTW })}</h3>
-            <button onClick={() => setSelectedDate(null)} className="p-1 text-text-secondary hover:text-text-primary"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <h3 className="font-japanese text-lg font-semibold text-text-primary">
+              {format(selectedDate, 'MM月dd日 (E)', { locale: zhTW })}
+            </h3>
+            <button 
+              onClick={() => setSelectedDate(null)} 
+              className="p-1 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          {selectedEvents.length === 0 ? <p className="text-text-secondary text-sm">呢日冇活動</p> : (
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+          
+          {selectedEvents.length === 0 ? (
+            <div className="text-center py-8 text-text-secondary">
+              <div className="text-4xl mb-2">📅</div>
+              <p className="text-sm">呢日冇活動</p>
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
               {selectedEvents.map((ev) => (
-                <div key={ev.id} onClick={(e) => handleEventClick(e, ev)} className="flex items-start gap-2 p-2 bg-secondary rounded-lg hover:bg-accent/10 cursor-pointer transition-colors">
+                <div 
+                  key={ev.id} 
+                  onClick={(e) => handleEventClick(e, ev)} 
+                  className="flex items-start gap-3 p-3 bg-bg-primary rounded-xl hover:shadow-md cursor-pointer transition-all border border-border-light"
+                >
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-text-primary truncate">{ev.title}</div>
-                    <div className="text-xs text-text-secondary mt-0.5">{ev.actress_name && <span>{ev.actress_name} · </span>}{ev.venue && <span>{ev.venue}</span>}</div>
+                    <div className="text-sm font-medium text-text-primary line-clamp-2">
+                      {ev.title}
+                    </div>
+                    <div className="text-xs text-text-secondary mt-1 flex items-center gap-1 flex-wrap">
+                      {ev.actress_name && <span className="fdb-badge-primary">👤 {ev.actress_name}</span>}
+                      {ev.venue && <span className="fdb-badge">📍 {ev.venue}</span>}
+                    </div>
                   </div>
-                  <div className="text-xs text-accent whitespace-nowrap">{format(safeNewDate(ev.datetime || null), 'HH:mm')}</div>
+                  <div className="text-xs text-primary font-mono whitespace-nowrap bg-primary/10 px-2 py-1 rounded-md">
+                    {format(safeNewDate(ev.datetime || null), 'HH:mm')}
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
       )}
-      {selectedEvent && <EventDetailModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
+      
+      {/* Event detail modal */}
+      {selectedEvent && (
+        <EventDetailModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+        />
+      )}
     </div>
   );
 }

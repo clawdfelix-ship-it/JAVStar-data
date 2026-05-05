@@ -8,25 +8,72 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#ffffff',
-        'primary-dark': '#f5f5f7',
-        secondary: '#ffffff',
-        accent: '#ff9500',
-        'text-primary': '#1d1d1f',
-        'text-secondary': '#86868b',
-        border: '#d2d2d7',
-        'card-bg': '#ffffff',
+        // Primary Colors - Professional Deep Blue Theme
+        primary: {
+          DEFAULT: '#165DFF',
+          light: '#4080FF',
+          dark: '#0E42D2',
+        },
+        // Background Colors
+        bg: {
+          primary: '#FFFFFF',
+          secondary: '#F7F8FA',
+          tertiary: '#F2F3F5',
+          dark: '#1D2129',
+        },
+        // Text Colors
+        text: {
+          primary: '#1D2129',
+          secondary: '#4E5969',
+          tertiary: '#86909C',
+          placeholder: '#C9CDD4',
+          white: '#FFFFFF',
+        },
+        // Accent Colors
+        accent: '#FF7D00',
+        success: '#00B42A',
+        warning: '#FF7D00',
+        danger: '#F53F3F',
+        purple: '#722ED1',
+        // Border Colors
+        border: {
+          DEFAULT: '#E5E6EB',
+          light: '#F2F3F5',
+          dark: '#C9CDD4',
+        },
       },
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'sans-serif'],
-        mono: ['SF Mono', 'Menlo', 'monospace'],
+        mono: ['SF Mono', 'Menlo', 'Monaco', 'monospace'],
+        japanese: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'sans-serif'],
       },
       borderRadius: {
-        'xl': '18px',
+        'xs': '4px',
+        'sm': '8px',
+        'md': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        '2xl': '24px',
       },
       boxShadow: {
-        'apple': '0 2px 12px rgba(0,0,0,0.08)',
-        'apple-hover': '0 8px 30px rgba(0,0,0,0.12)',
+        'xs': '0 1px 2px rgba(0, 0, 0, 0.03)',
+        'sm': '0 2px 8px rgba(0, 0, 0, 0.06)',
+        'md': '0 4px 16px rgba(0, 0, 0, 0.08)',
+        'lg': '0 8px 24px rgba(0, 0, 0, 0.12)',
+        'xl': '0 16px 48px rgba(0, 0, 0, 0.16)',
+        'card': '0 2px 12px rgba(0, 0, 0, 0.04)',
+        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.10)',
+      },
+      spacing: {
+        'xs': '4px',
+        'sm': '8px',
+        'md': '16px',
+        'lg': '24px',
+        'xl': '32px',
+        '2xl': '48px',
+      },
+      transitionTimingFunction: {
+        'froala': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },
