@@ -127,7 +127,7 @@ function EventCardComponent({
           </div>
           
           {today && (
-            <span className="fdb-badge bg-gradient-to-r from-red-100 to-red-50 text-red-600 border border-red-200 animate-pulse">
+            <span className="fdb-badge bg-gradient-to-r from-red-100 to-red-50 text-red-600 border border-red-200 pulse-animation">
               🔥 今日
             </span>
           )}
