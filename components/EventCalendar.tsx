@@ -66,30 +66,7 @@ function downloadICS(event: DayEvent) {
   URL.revokeObjectURL(a.href);
 }
 
-function getEventTypeInfo(title: string, type: string): { label: string; class: string } {
-  if (!type || type === 'other') {
-    if (title.includes('見面會')) return { label: '見面會', class: 'fdb-badge-primary' };
-    if (title.includes('攝影會')) return { label: '攝影會', class: 'fdb-badge-purple' };
-    if (title.includes('TRE')) return { label: 'TRE', class: 'fdb-badge-danger' };
-    if (title.includes('簽名')) return { label: '簽名會', class: 'fdb-badge-success' };
-    if (title.includes('出道') || title.includes('新星')) return { label: '出道活動', class: 'fdb-badge-warning' };
-    return { label: '實體活動', class: 'fdb-badge' };
-  }
-  const m: Record<string, { label: string; class: string }> = {
-    sign: { label: '簽名會', class: 'fdb-badge-primary' },
-    debut: { label: '出道活動', class: 'fdb-badge-warning' },
-    live: { label: 'LIVE', class: 'fdb-badge-success' },
-    talk: { label: '座談會', class: 'fdb-badge-purple' },
-    sale: { label: '發售會', class: 'fdb-badge-warning' },
-    meeting: { label: '見面會', class: 'fdb-badge-primary' },
-    photo: { label: '攝影會', class: 'fdb-badge-purple' },
-    other: { label: '實體活動', class: 'fdb-badge' },
-  };
-  return m[type] || { label: '實體活動', class: 'fdb-badge' };
-}
-
 function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => void }) {
-  const typeInfo = getEventTypeInfo(event.title, event.event_type || '');
   const eventDate = safeNewDate(event.datetime || null);
   const daysUntil = differenceInDays(eventDate, new Date());
   
@@ -103,9 +80,9 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 fade-in">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-bg-primary rounded-2xl shadow-xl overflow-hidden border border-border-light">
-        {/* Top gradient bar */}
-        <div className="h-2 bg-gradient-to-r from-primary to-primary-light opacity-80" />
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-froala-lg overflow-hidden border border-border">
+        {/* Top gradient bar - NIPPON COLORS */}
+        <div className="h-2 bg-gradient-to-r from-nadeshiko-dark to-nadeshiko" />
         
         <div className="p-6">
           {/* Close button */}
@@ -118,11 +95,6 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
             </svg>
           </button>
           
-          {/* Type badge */}
-          <div className="mb-3">
-            <span className={typeInfo.class}>{typeInfo.label}</span>
-          </div>
-          
           {/* Title */}
           <h2 className="font-japanese text-xl font-bold text-text-primary mb-4 leading-tight pr-8">
             {event.title}
@@ -130,17 +102,17 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
           
           {/* Actress info */}
           {event.actress_name && (
-            <div className="flex items-center gap-3 mb-4 p-3 bg-bg-secondary rounded-xl">
+            <div className="flex items-center gap-3 mb-4 p-3 bg-sakura-gray/20 rounded-xl">
               {event.actress_avatar ? (
                 <img 
                   src={event.actress_avatar} 
                   alt={event.actress_name}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/30"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-nadeshiko/30"
                   loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-japanese font-bold text-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-nadeshiko-light to-nadeshiko flex items-center justify-center text-white font-japanese font-bold text-lg flex-shrink-0">
                   {(event.actress_name || '?')[0]}
                 </div>
               )}
@@ -153,7 +125,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
           
           {/* Event details */}
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+            <div className="flex items-center gap-3 p-2 bg-sakura-gray/20 rounded-lg">
               <span className="text-lg">📅</span>
               <div>
                 <div className="text-xs text-text-secondary">日期</div>
@@ -163,7 +135,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
               </div>
             </div>
             
-            <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+            <div className="flex items-center gap-3 p-2 bg-sakura-gray/20 rounded-lg">
               <span className="text-lg">🕐</span>
               <div>
                 <div className="text-xs text-text-secondary">時間</div>
@@ -174,7 +146,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
             </div>
             
             {event.venue && (
-              <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+              <div className="flex items-center gap-3 p-2 bg-sakura-gray/20 rounded-lg">
                 <span className="text-lg">📍</span>
                 <div>
                   <div className="text-xs text-text-secondary">地點</div>
@@ -184,7 +156,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
             )}
             
             {event.prefecture && (
-              <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+              <div className="flex items-center gap-3 p-2 bg-sakura-gray/20 rounded-lg">
                 <span className="text-lg">🌏</span>
                 <div>
                   <div className="text-xs text-text-secondary">地區</div>
@@ -194,7 +166,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
             )}
             
             {daysUntil >= 0 && (
-              <div className="flex items-center gap-3 p-2 bg-bg-secondary rounded-lg">
+              <div className="flex items-center gap-3 p-2 bg-sakura-gray/20 rounded-lg">
                 <span className="text-lg">⏰</span>
                 <div>
                   <div className="text-xs text-text-secondary">倒計</div>
@@ -269,18 +241,18 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
     setSelectedEvent(ev);
   }
 
-  // Get heat color based on event count
+  // NIPPON COLORS Heat map - 梅鼠色系漸變
   const getHeatColor = (count: number): string => {
-    if (count >= 4) return 'bg-danger/20 hover:bg-danger/30';
-    if (count >= 2) return 'bg-warning/20 hover:bg-warning/30';
-    if (count >= 1) return 'bg-success/20 hover:bg-success/30';
-    return 'hover:bg-bg-secondary';
+    if (count >= 4) return 'bg-gradient-to-br from-red-100 to-red-50 hover:from-red-200';
+    if (count >= 2) return 'bg-gradient-to-br from-amber-50 to-amber-100 hover:from-amber-100';
+    if (count >= 1) return 'bg-gradient-to-br from-nadeshiko-light/40 to-sakura hover:from-nadeshiko-light/60';
+    return 'hover:bg-sakura-gray/20';
   };
 
   return (
-    <div className="calendar-container slide-up">
-      {/* Calendar Header - Froala style */}
-      <div className="calendar-header bg-gradient-to-r from-primary to-primary-light text-white">
+    <div className="slide-up">
+      {/* Calendar Header - Froala + NIPPON COLORS style */}
+      <div className="bg-gradient-to-r from-nadeshiko-dark to-nadeshiko text-white rounded-t-2xl p-4 flex items-center justify-between">
         <button 
           onClick={() => setCurrentMonth(m => subMonths(m, 1))} 
           className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -304,77 +276,81 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
         </button>
       </div>
       
-      {/* Week days header */}
-      <div className="calendar-grid">
-        {weekDays.map((d, i) => (
-          <div key={i} className="calendar-day-header">
-            {d}
-          </div>
-        ))}
+      {/* Calendar body */}
+      <div className="fdb-card rounded-t-none border-t-0">
+        {/* Week days header */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {weekDays.map((d, i) => (
+            <div key={i} className="text-center text-sm font-semibold text-text-secondary py-2">
+              {d}
+            </div>
+          ))}
+        </div>
         
         {/* Days grid */}
-        {calendarDays.map((day, i) => {
-          const dateKey = format(day, 'yyyy-MM-dd');
-          const dayEvents = monthEvents.map.get(dateKey) || [];
-          const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
-          const isSelected = selectedDate && isSameDay(day, selectedDate);
-          const today = isToday(day);
-          const heatColor = getHeatColor(dayEvents.length);
-          
-          return (
-            <div 
-              key={i} 
-              onClick={() => handleDayClick(day, dayEvents)} 
-              className={`
-                calendar-day transition-all duration-200
-                ${heatColor}
-                ${!isCurrentMonth ? 'opacity-40' : ''}
-                ${isSelected ? 'bg-primary/20 ring-2 ring-primary' : ''}
-              `}
-            >
-              <div className={`
-                calendar-day-number
-                ${today ? 'bg-primary text-white' : ''}
-              `}>
-                {format(day, 'd')}
-              </div>
-              
-              {dayEvents.length > 0 && (
-                <div className="space-y-1">
-                  {Array.from(monthEvents.actressMap.get(dateKey) || []).slice(0, 3).map((name, j) => {
-                    const ev = dayEvents.find(e => e.actress_name === name);
-                    return (
+        <div className="grid grid-cols-7 gap-1">
+          {calendarDays.map((day, i) => {
+            const dateKey = format(day, 'yyyy-MM-dd');
+            const dayEvents = monthEvents.map.get(dateKey) || [];
+            const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
+            const isSelected = selectedDate && isSameDay(day, selectedDate);
+            const today = isToday(day);
+            const heatColor = getHeatColor(dayEvents.length);
+            
+            return (
+              <div 
+                key={i} 
+                onClick={() => handleDayClick(day, dayEvents)} 
+                className={`
+                  min-h-[80px] p-2 rounded-xl cursor-pointer transition-all duration-200
+                  ${heatColor}
+                  ${!isCurrentMonth ? 'opacity-40' : ''}
+                  ${isSelected ? 'ring-2 ring-nadeshiko shadow-lg shadow-nadeshiko/30' : ''}
+                `}
+              >
+                <div className={`
+                  text-sm font-semibold mb-1 w-7 h-7 flex items-center justify-center rounded-lg ${
+                    today 
+                      ? 'bg-gradient-to-br from-nadeshiko-dark to-nadeshiko text-white shadow-md' 
+                      : 'text-text-primary'
+                  }`}>
+                  {format(day, 'd')}
+                </div>
+                
+                {dayEvents.length > 0 && (
+                  <div className="space-y-0.5">
+                    {Array.from(monthEvents.actressMap.get(dateKey) || []).slice(0, 2).map((name, j) => (
                       <div 
                         key={j} 
-                        onClick={(e) => { if (ev) handleEventClick(e, ev); }}
-                        className="text-xs truncate text-text-secondary hover:text-primary cursor-pointer"
+                        onClick={(e) => { if (dayEvents[j]) handleEventClick(e, dayEvents[j]); }}
+                        className="text-[10px] truncate text-text-secondary hover:text-nadeshiko-dark cursor-pointer font-medium"
                       >
-                        {name}
+                        {name.length > 4 ? name.slice(0, 4) : name}
                       </div>
-                    );
-                  })}
-                  {dayEvents.length > 3 && (
-                    <div className="text-xs text-primary font-medium">
-                      +{dayEvents.length - 3}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+                    ))}
+                    {dayEvents.length > 2 && (
+                      <div className="text-[10px] text-nadeshiko-dark font-bold">
+                        +{dayEvents.length - 2}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
       
       {/* Selected date panel */}
       {selectedDate && (
-        <div className="p-4 border-t border-border bg-bg-secondary">
-          <div className="flex items-center justify-between mb-3">
+        <div className="fdb-card mt-4 !rounded-t-2xl">
+          <div className="p-4 border-b border-border flex items-center justify-between">
             <h3 className="font-japanese text-lg font-semibold text-text-primary">
               {format(selectedDate, 'MM月dd日 (E)', { locale: zhTW })}
             </h3>
             <button 
               onClick={() => setSelectedDate(null)} 
-              className="p-1 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-tertiary"
+              className="p-1 text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-bg-secondary"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -382,35 +358,37 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
             </button>
           </div>
           
-          {selectedEvents.length === 0 ? (
-            <div className="text-center py-8 text-text-secondary">
-              <div className="text-4xl mb-2">📅</div>
-              <p className="text-sm">呢日冇活動</p>
-            </div>
-          ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              {selectedEvents.map((ev) => (
-                <div 
-                  key={ev.id} 
-                  onClick={(e) => handleEventClick(e, ev)} 
-                  className="flex items-start gap-3 p-3 bg-bg-primary rounded-xl hover:shadow-md cursor-pointer transition-all border border-border-light"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-text-primary line-clamp-2">
-                      {ev.title}
+          <div className="p-4">
+            {selectedEvents.length === 0 ? (
+              <div className="text-center py-8 text-text-secondary">
+                <div className="text-4xl mb-2">📅</div>
+                <p className="text-sm">呢日冇活動</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {selectedEvents.map((ev) => (
+                  <div 
+                    key={ev.id} 
+                    onClick={(e) => handleEventClick(e, ev)} 
+                    className="flex items-start gap-3 p-3 bg-sakura-gray/20 rounded-xl hover:shadow-md cursor-pointer transition-all"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-text-primary line-clamp-2">
+                        {ev.title}
+                      </div>
+                      <div className="text-xs text-text-secondary mt-1 flex items-center gap-1 flex-wrap">
+                        {ev.actress_name && <span className="fdb-badge fdb-badge-primary">👤 {ev.actress_name}</span>}
+                        {ev.venue && <span className="fdb-badge">📍 {ev.venue}</span>}
+                      </div>
                     </div>
-                    <div className="text-xs text-text-secondary mt-1 flex items-center gap-1 flex-wrap">
-                      {ev.actress_name && <span className="fdb-badge-primary">👤 {ev.actress_name}</span>}
-                      {ev.venue && <span className="fdb-badge">📍 {ev.venue}</span>}
+                    <div className="text-xs text-nadeshiko-dark font-mono whitespace-nowrap bg-nadeshiko-light/30 px-2 py-1 rounded-md font-semibold">
+                      {format(safeNewDate(ev.datetime || null), 'HH:mm')}
                     </div>
                   </div>
-                  <div className="text-xs text-primary font-mono whitespace-nowrap bg-primary/10 px-2 py-1 rounded-md">
-                    {format(safeNewDate(ev.datetime || null), 'HH:mm')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
       

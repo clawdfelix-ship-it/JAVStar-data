@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 
 interface EventCardProps {
   id: string;
@@ -40,43 +39,10 @@ function getEventTypeLabel(type: string, title: string): string {
   return labels[t] || '實體活動';
 }
 
-function getEventTypeBadgeClass(type: string, title: string): string {
-  const t = getInferredEventType(type, title);
-  const classes: Record<string, string> = {
-    sign: 'fdb-badge-primary',
-    debut: 'fdb-badge-warning',
-    live: 'fdb-badge-success',
-    talk: 'fdb-badge-purple',
-    sale: 'fdb-badge-warning',
-    meeting: 'fdb-badge-primary',
-    photo: 'fdb-badge-purple',
-    tre: 'fdb-badge-danger',
-    other: 'fdb-badge',
-  };
-  return classes[t] || 'fdb-badge';
-}
-
 function safeNewDate(datetime: string): Date {
   if (!datetime) return new Date(0);
   const d = new Date(datetime);
   return isNaN(d.getTime()) ? new Date(0) : d;
-}
-
-function getDaysUntil(datetime: string): number {
-  const eventDate = safeNewDate(datetime);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  eventDate.setHours(0, 0, 0, 0);
-  return Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function UrgencyBadge({ datetime }: { datetime: string }) {
-  const days = getDaysUntil(datetime);
-  if (days < 0) return null;
-  if (days <= 1) return <span className="fdb-badge-danger animate-pulse">🔥 今日</span>;
-  if (days <= 3) return <span className="fdb-badge-warning">⚡ {days}日後</span>;
-  if (days <= 7) return <span className="fdb-badge-success">📅 {days}日內</span>;
-  return null;
 }
 
 function isUpcoming(datetime: string): boolean {
@@ -140,103 +106,90 @@ function EventCardComponent({
   const today = isToday(datetime);
   const tomorrow = isTomorrow(datetime);
 
-  // Determine card style
-  let cardClass = 'event-card';
-  if (today) cardClass += ' today';
-  else if (tomorrow) cardClass += ' tomorrow';
-  if (!upcoming) cardClass += ' opacity-60';
-
   return (
-    <div className={cardClass}>
-      {/* Top Row: Date + Type + Urgency */}
+    <a 
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`fdb-card block p-4 ${!upcoming ? 'opacity-60' : ''}`}
+    >
+      {/* Top Row: Date + Type + Status */}
       <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
         <div className="flex items-center gap-2">
-          {/* Date Box */}
-          <div className="flex flex-col items-center justify-center bg-bg-tertiary rounded-md px-3 py-1.5 min-w-[60px]">
-            <span className="text-caption text-text-secondary">
+          {/* Date Box - NIPPON COLORS style */}
+          <div className="flex flex-col items-center justify-center bg-nadeshiko-light/20 rounded-lg px-3 py-2 min-w-[65px]">
+            <span className="text-xs text-nadeshiko-dark font-medium">
               {formatDateShort(datetime)}
             </span>
-            <span className="font-mono text-sm font-semibold text-text-primary">
+            <span className="font-mono text-sm font-bold text-nadeshiko-dark">
               {formatTime(datetime)}
             </span>
           </div>
           
           {today && (
-            <span className="fdb-badge-danger animate-pulse">
+            <span className="fdb-badge bg-gradient-to-r from-red-100 to-red-50 text-red-600 border border-red-200 animate-pulse">
               🔥 今日
             </span>
           )}
           {tomorrow && (
-            <span className="fdb-badge-warning">
+            <span className="fdb-badge bg-gradient-to-r from-amber-100 to-amber-50 text-amber-600 border border-amber-200">
               ⚡ 聽日
             </span>
           )}
         </div>
         
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={getEventTypeBadgeClass(event_type, title)}>
-            {getEventTypeLabel(event_type, title)}
-          </span>
-          <UrgencyBadge datetime={datetime} />
-        </div>
+        <span className="fdb-badge fdb-badge-primary">
+          {getEventTypeLabel(event_type, title)}
+        </span>
       </div>
 
       {/* Venue Location */}
       {venue && (
-        <div className="flex items-center gap-2 mb-3 p-2 bg-bg-secondary rounded-lg">
-          <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span className="text-small text-text-secondary truncate">
+        <div className="flex items-center gap-2 mb-3 p-2.5 bg-sakura-gray/20 rounded-lg">
+          <span className="text-kamenozoki-dark">📍</span>
+          <span className="text-sm text-text-secondary truncate">
             {venue}{prefecture ? ` (${prefecture})` : ''}
           </span>
         </div>
       )}
 
       {/* Event Title */}
-      <h3 className="event-title line-clamp-2 mb-3">
+      <h3 className="font-japanese font-semibold text-text-primary text-sm leading-relaxed line-clamp-2 mb-3">
         {title}
       </h3>
 
       {/* Actress Info */}
       {showActress && actress_name && (
-        <div className="flex items-center gap-2 mb-3 p-2 bg-bg-secondary rounded-lg">
+        <div className="flex items-center gap-2 mb-3 p-2.5 bg-sakura-gray/20 rounded-lg">
           {actress_avatar ? (
             <img 
               src={actress_avatar} 
               alt={actress_name}
-              className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm"
+              className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-sm"
               loading="lazy"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-text-secondary text-sm font-japanese">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-nadeshiko-light to-nadeshiko flex items-center justify-center text-white text-xs font-japanese font-bold">
               {(actress_name || '?')[0]}
             </div>
           )}
-          <span className="text-small text-text-secondary font-medium">
+          <span className="text-sm text-text-secondary font-medium truncate">
             {actress_name}
           </span>
         </div>
       )}
 
-      {/* Footer Actions */}
-      <div className="flex justify-between items-center pt-3 mt-3 border-t border-border-light">
-        <span className="text-caption text-text-tertiary font-mono">
+      {/* Footer */}
+      <div className="flex justify-between items-center pt-3 mt-3 border-t border-border">
+        <span className="text-xs text-text-tertiary font-mono">
           #{id.length > 8 ? id.slice(0, 8) : id}
         </span>
-        <a 
-          href={url} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="fdb-btn fdb-btn-sm fdb-btn-outline"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <span className="text-xs text-nadeshiko-dark font-medium flex items-center gap-1">
           詳情 →
-        </a>
+        </span>
       </div>
-    </div>
+    </a>
   );
 }
 

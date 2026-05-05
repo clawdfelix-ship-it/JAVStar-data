@@ -2,298 +2,137 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================
-   Froala Design Blocks Inspired Color System
-   ============================================ */
+/* =========================================
+   NIPPON COLORS - 日本傳統配色系統
+   ========================================= */
 :root {
-  /* Primary Colors - Soft Pink Theme */
-  --color-primary: #F472B6;
-  --color-primary-light: #F9A8D4;
-  --color-primary-dark: #EC4899;
-  --color-primary-gradient: linear-gradient(135deg, #EC4899 0%, #F472B6 50%, #F9A8D4 100%);
-  
-  /* Background Colors - High Contrast for Readability */
-  --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #FDF2F8;
-  --color-bg-tertiary: #FCE7F3;
-  --color-bg-dark: #1D2129;
-  
-  /* Text Colors - Enhanced Contrast */
-  --color-text-primary: #1D2129;
-  --color-text-secondary: #374151;
-  --color-text-tertiary: #6B7280;
-  --color-text-placeholder: #9CA3AF;
-  --color-text-white: #FFFFFF;
-  
-  /* Accent Colors */
-  --color-accent: #EC4899;
-  --color-success: #059669;
-  --color-warning: #D97706;
-  --color-danger: #DC2626;
-  --color-purple: #9333EA;
-  
-  /* Border Colors */
-  --color-border: #FBCFE8;
-  --color-border-light: #FCE7F3;
-  --color-border-dark: #F9A8D4;
-  
-  /* Shadow System - Pink Tinted */
-  --shadow-xs: 0 1px 2px rgba(236, 72, 153, 0.03);
-  --shadow-sm: 0 2px 8px rgba(236, 72, 153, 0.06);
-  --shadow-md: 0 4px 16px rgba(236, 72, 153, 0.08);
-  --shadow-lg: 0 8px 24px rgba(236, 72, 153, 0.12);
-  --shadow-xl: 0 16px 48px rgba(236, 72, 153, 0.16);
-  --shadow-card: 0 2px 12px rgba(236, 72, 153, 0.04);
-  --shadow-card-hover: 0 8px 30px rgba(236, 72, 153, 0.10);
-  
-  /* Border Radius */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  
-  /* Spacing */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
+  /* 櫻色 - さくらいろ - 背景色 */
+  --color-sakura: 255, 245, 247;
+  /* 撫子色 - なでしこいろ - 主色 */
+  --color-nadeshiko: 244, 114, 182;
+  /* 撫子深 - 深粉紅 */
+  --color-nadeshiko-dark: 236, 72, 153;
+  /* 撫子淺 - 淺粉紅 */
+  --color-nadeshiko-light: 249, 168, 212;
+  /* 灰櫻色 - 邊框/分隔線 */
+  --color-sakura-gray: 229, 211, 216;
+  /* 瓶覗色 - かめのぞき - 亮點藍 */
+  --color-kamenozoki: 186, 230, 253;
+  /* 瓶覗深 */
+  --color-kamenozoki-dark: 125, 211, 252;
+  /* 梅鼠色 - うめねずみ - 重點文字 (代替黑色) */
+  --color-umenezumi: 100, 77, 87;
+  /* 梅鼠淺 - 次要文字 */
+  --color-umenezumi-light: 136, 112, 122;
+  /* 梅鼠更淺 - 第三層文字 */
+  --color-umenezumi-lighter: 168, 152, 160;
+  /* 純白背景 */
+  --color-shiro: 255, 255, 255;
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg-primary: #1D2129;
-    --color-bg-secondary: #1F2937;
-    --color-bg-tertiary: #374151;
-    --color-text-primary: #F9FAFB;
-    --color-text-secondary: #E5E7EB;
-    --color-text-tertiary: #D1D5DB;
-    --color-border: #374151;
-    --color-border-light: #1F2937;
-    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.2);
-    --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.3);
-  }
-}
+/* =========================================
+   Froala Design Blocks Design System
+   ========================================= */
 
-/* ============================================
-   Base Styles
-   ============================================ */
-* {
+/* ---- Base Typography ---- */
+body {
+  font-family: 'Noto Sans HK', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background-color: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', sans-serif;
-  overflow-x: hidden;
-  line-height: 1.6;
-}
-
-/* Font Classes */
 .font-japanese {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  font-family: 'Noto Sans JP', 'Noto Sans HK', -apple-system, sans-serif;
 }
 
-.font-mono {
-  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
-}
-
-/* ============================================
-   Card Components - Froala Design Blocks Inspired
-   ============================================ */
+/* ---- Card Components ---- */
 .fdb-card {
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-border-light);
-  transition: all 0.3s var(--froala-ease);
-  overflow: hidden;
+  @apply bg-white rounded-2xl border border-[rgba(var(--color-sakura-gray),0.6)] shadow-sm transition-all duration-300;
 }
 
 .fdb-card:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
-  border-color: var(--color-border);
+  @apply shadow-md shadow-pink-100/50 translate-y-[-2px];
 }
 
-.fdb-card-flat {
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
-}
-
-/* ============================================
-   Button Components
-   ============================================ */
-.fdb-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  border-radius: var(--radius-lg);
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.2s var(--froala-ease);
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-  gap: 8px;
-}
-
-.fdb-btn-primary {
-  background: var(--color-primary-gradient);
-  color: white;
-  box-shadow: 0 4px 12px rgba(244, 114, 182, 0.3);
-}
-
-.fdb-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(244, 114, 182, 0.4);
-}
-
-.fdb-btn-outline {
-  background: transparent;
-  color: var(--color-primary-dark);
-  border: 2px solid var(--color-border-dark);
-}
-
-.fdb-btn-outline:hover {
-  background: var(--color-bg-tertiary);
-  border-color: var(--color-primary-dark);
-}
-
-.fdb-btn-ghost {
-  background: transparent;
-  color: var(--color-text-secondary);
-}
-
-.fdb-btn-ghost:hover {
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-}
-
-.fdb-btn-sm {
-  padding: 6px 12px;
-  font-size: 13px;
-  border-radius: var(--radius-md);
-}
-
-.fdb-btn-lg {
-  padding: 14px 28px;
-  font-size: 16px;
-}
-
-/* ============================================
-   Badge Components
-   ============================================ */
+/* ---- Badge Components ---- */
 .fdb-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-secondary);
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold transition-all;
 }
 
 .fdb-badge-primary {
-  background: linear-gradient(135deg, rgba(244, 114, 182, 0.15) 0%, rgba(236, 72, 153, 0.1) 100%);
-  color: #BE185D;
-  border: 1px solid rgba(244, 114, 182, 0.3);
+  @apply bg-gradient-to-r from-[rgba(var(--color-nadeshiko),0.15)] to-[rgba(var(--color-nadeshiko-light),0.1)] text-[rgb(var(--color-nadeshiko-dark))] border border-[rgba(var(--color-nadeshiko),0.2)];
 }
 
-.fdb-badge-success {
-  background: rgba(5, 150, 105, 0.1);
-  color: #047857;
+.fdb-badge-secondary {
+  @apply bg-[rgba(var(--color-sakura-gray),0.3)] text-[rgb(var(--color-umenezumi))];
 }
 
-.fdb-badge-warning {
-  background: rgba(217, 119, 6, 0.1);
-  color: #B45309;
+/* ---- Button Components ---- */
+.fdb-btn {
+  @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer;
 }
 
-.fdb-badge-danger {
-  background: rgba(220, 38, 38, 0.1);
-  color: #B91C1C;
+.fdb-btn-primary {
+  @apply bg-gradient-to-r from-[rgb(var(--color-nadeshiko-dark))] to-[rgb(var(--color-nadeshiko))] text-white shadow-lg shadow-pink-300/30 hover:shadow-pink-400/40 hover:scale-[1.02] active:scale-[0.98];
 }
 
-.fdb-badge-purple {
-  background: rgba(147, 51, 234, 0.1);
-  color: #7E22CE;
+.fdb-btn-outline {
+  @apply border-2 border-[rgba(var(--color-sakura-gray),0.8)] text-[rgb(var(--color-umenezumi))] bg-white hover:border-[rgb(var(--color-nadeshiko))] hover:text-[rgb(var(--color-nadeshiko-dark))];
 }
 
-/* ============================================
-   Tag Components
-   ============================================ */
-.fdb-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  font-weight: 500;
-  background: var(--color-bg-secondary);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border-light);
+.fdb-btn-ghost {
+  @apply text-[rgb(var(--color-umenezumi))] hover:bg-[rgba(var(--color-sakura-gray),0.3)];
 }
 
-/* ============================================
-   Input Components
-   ============================================ */
+/* ---- Form Inputs ---- */
 .fdb-input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--color-border);
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  font-size: 14px;
-  transition: all 0.2s var(--froala-ease);
-  outline: none;
+  @apply w-full px-4 py-3 bg-white border-2 border-[rgba(var(--color-sakura-gray),0.6)] rounded-xl text-[rgb(var(--color-umenezumi))] placeholder-[rgb(var(--color-umenezumi-lighter))] focus:border-[rgb(var(--color-nadeshiko))] focus:ring-4 focus:ring-pink-100 focus:outline-none transition-all text-sm;
 }
 
-.fdb-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.1);
+/* ---- Section Dividers ---- */
+.fdb-divider {
+  @apply h-px bg-gradient-to-r from-transparent via-[rgba(var(--color-sakura-gray),0.6)] to-transparent my-8;
 }
 
-.fdb-input::placeholder {
-  color: var(--color-text-placeholder);
+/* ---- Hero Gradients ---- */
+.fdb-hero-gradient {
+  background: linear-gradient(135deg, 
+    rgb(var(--color-sakura)) 0%, 
+    rgb(var(--color-shiro)) 50%, 
+    rgba(var(--color-kamenozoki), 0.2) 100%);
 }
 
-/* ============================================
+/* =========================================
    Animation Utilities
-   ============================================ */
-:root {
-  --froala-ease: cubic-bezier(0.4, 0, 0.2, 1);
-}
+   ========================================= */
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Slide Up */
+.slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 @keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to { 
+  to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Fade In */
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Pulse */
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes pulse {
@@ -301,306 +140,96 @@ body {
   50% { opacity: 0.5; }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* Marquee */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-.fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
+.marquee {
+  animation: marquee 25s linear infinite;
 }
 
-.slide-up {
-  animation: slideUp 0.4s ease-out forwards;
+/* =========================================
+   Tailwind Overrides - Nippon Colors
+   ========================================= */
+
+@layer base {
+  :root {
+    --background: var(--color-sakura);
+    --foreground: var(--color-umenezumi);
+    --primary: var(--color-nadeshiko-dark);
+    --primary-light: var(--color-nadeshiko);
+    --primary-lighter: var(--color-nadeshiko-light);
+    --secondary: var(--color-kamenozoki-dark);
+    --secondary-light: var(--color-kamenozoki);
+    --border: var(--color-sakura-gray);
+    --muted: var(--color-umenezumi-light);
+    --muted-foreground: var(--color-umenezumi-lighter);
+    --card: var(--color-shiro);
+    --card-foreground: var(--color-umenezumi);
+  }
 }
 
-.pulse {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.shimmer {
-  background: linear-gradient(90deg, 
-    var(--color-bg-tertiary) 25%, 
-    var(--color-bg-secondary) 50%, 
-    var(--color-bg-tertiary) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-/* Animation Delays */
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
-.delay-500 { animation-delay: 0.5s; }
-
-/* ============================================
-   Skeleton Loading
-   ============================================ */
-.skeleton {
-  background: var(--color-bg-tertiary);
-  border-radius: var(--radius-md);
-  position: relative;
-  overflow: hidden;
-}
-
-.skeleton::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.4) 50%, 
-    transparent 100%
-  );
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-/* ============================================
-   Layout Utilities
-   ============================================ */
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.grid-auto {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-lg);
-}
-
-/* ============================================
-   Text Utilities
-   ============================================ */
-.text-gradient {
-  background: var(--color-primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* ============================================
-   Stats Card
-   ============================================ */
-.stat-card {
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-lg);
-  border: 1px solid var(--color-border-light);
-  text-align: center;
-  transition: all 0.3s var(--froala-ease);
-}
-
-.stat-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.stat-number {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--color-primary-dark);
-  margin-bottom: var(--spacing-xs);
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-}
-
-/* ============================================
-   Section Header
-   ============================================ */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.section-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.section-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--color-primary-gradient);
-}
-
-/* ============================================
-   Avatar Components
-   ============================================ */
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-primary-gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  border: 2px solid white;
-  box-shadow: var(--shadow-sm);
-}
-
-.avatar-lg {
-  width: 56px;
-  height: 56px;
-  font-size: 20px;
-}
-
-.avatar-sm {
-  width: 32px;
-  height: 32px;
-  font-size: 12px;
-}
-
-/* ============================================
-   Calendar Components
-   ============================================ */
-.calendar-container {
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  border: 1px solid var(--color-border-light);
-  box-shadow: var(--shadow-card);
-}
-
-.calendar-header {
-  background: var(--color-primary-gradient);
-  padding: var(--spacing-md) var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: white;
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  background: var(--color-border);
-}
-
-.calendar-day-header {
-  background: var(--color-bg-secondary);
-  padding: var(--spacing-sm);
-  text-align: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.calendar-day {
-  background: var(--color-bg-primary);
-  min-height: 100px;
-  padding: var(--spacing-sm);
-  cursor: pointer;
-  transition: all 0.2s var(--froala-ease);
-}
-
-.calendar-day:hover {
-  background: var(--color-bg-secondary);
-}
-
-.calendar-day-number {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  margin-bottom: var(--spacing-xs);
-}
-
-.calendar-day-number.bg-primary {
-  background: var(--color-primary-gradient);
-  color: white;
-}
-
-/* ============================================
-   Responsive Utilities
-   ============================================ */
-@media (max-width: 768px) {
-  .stat-number {
-    font-size: 2rem;
+@layer utilities {
+  .bg-bg-secondary {
+    background-color: rgb(var(--color-sakura));
   }
   
-  .section-title {
-    font-size: 1.25rem;
+  .text-text-primary {
+    color: rgb(var(--color-umenezumi));
   }
   
-  .calendar-day {
-    min-height: 70px;
+  .text-text-secondary {
+    color: rgb(var(--color-umenezumi-light));
   }
-}
-
-/* ============================================
-   Scrollbar Styling
-   ============================================ */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-bg-secondary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-border-dark);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  
+  .text-text-tertiary {
+    color: rgb(var(--color-umenezumi-lighter));
+  }
+  
+  .border-border {
+    border-color: rgba(var(--color-sakura-gray), 0.6);
+  }
+  
+  .border-border-dark {
+    border-color: rgb(var(--color-sakura-gray));
+  }
+  
+  .bg-bg-tertiary {
+    background-color: rgba(var(--color-sakura-gray), 0.3);
+  }
+  
+  .text-primary-dark {
+    color: rgb(var(--color-nadeshiko-dark));
+  }
+  
+  .bg-primary {
+    background-color: rgb(var(--color-nadeshiko));
+  }
+  
+  .bg-primary-dark {
+    background-color: rgb(var(--color-nadeshiko-dark));
+  }
+  
+  .text-danger {
+    color: #ef4444;
+  }
+  
+  /* Skeleton loading */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(var(--color-sakura-gray), 0.3) 25%,
+      rgba(var(--color-sakura-gray), 0.1) 50%,
+      rgba(var(--color-sakura-gray), 0.3) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton 1.5s infinite;
+  }
+  
+  @keyframes skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 }

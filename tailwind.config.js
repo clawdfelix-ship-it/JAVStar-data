@@ -1,81 +1,79 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: ['class'],
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
   theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px',
+      },
+    },
     extend: {
       colors: {
-        // Primary Colors - Soft Pink Theme
+        // NIPPON COLORS - 日本傳統配色
+        sakura: 'rgb(var(--color-sakura))',
+        nadeshiko: {
+          DEFAULT: 'rgb(var(--color-nadeshiko))',
+          dark: 'rgb(var(--color-nadeshiko-dark))',
+          light: 'rgb(var(--color-nadeshiko-light))',
+        },
+        'sakura-gray': 'rgb(var(--color-sakura-gray))',
+        kamenozoki: {
+          DEFAULT: 'rgb(var(--color-kamenozoki))',
+          dark: 'rgb(var(--color-kamenozoki-dark))',
+        },
+        umenezumi: {
+          DEFAULT: 'rgb(var(--color-umenezumi))',
+          light: 'rgb(var(--color-umenezumi-light))',
+          lighter: 'rgb(var(--color-umenezumi-lighter))',
+        },
+        shiro: 'rgb(var(--color-shiro))',
+        
+        // Legacy mappings (for backward compatibility)
         primary: {
-          DEFAULT: '#F472B6',
-          light: '#F9A8D4',
-          dark: '#EC4899',
+          DEFAULT: 'rgb(var(--color-nadeshiko-dark))',
+          light: 'rgb(var(--color-nadeshiko))',
+          lighter: 'rgb(var(--color-nadeshiko-light))',
         },
-        // Background Colors
-        bg: {
-          primary: '#FFFFFF',
-          secondary: '#FDF2F8',
-          tertiary: '#FCE7F3',
-          dark: '#1D2129',
+        secondary: {
+          DEFAULT: 'rgb(var(--color-kamenozoki-dark))',
+          light: 'rgb(var(--color-kamenozoki))',
         },
-        // Text Colors
-        text: {
-          primary: '#1D2129',
-          secondary: '#4E5969',
-          tertiary: '#86909C',
-          placeholder: '#C9CDD4',
-          white: '#FFFFFF',
-        },
-        // Accent Colors
-        accent: '#EC4899',
-        success: '#00B42A',
-        warning: '#FF7D00',
-        danger: '#F53F3F',
-        purple: '#A855F7',
-        // Border Colors
         border: {
-          DEFAULT: '#FBCFE8',
-          light: '#FCE7F3',
-          dark: '#F9A8D4',
+          DEFAULT: 'rgba(var(--color-sakura-gray), 0.6)',
+          dark: 'rgb(var(--color-sakura-gray))',
         },
-      },
-      fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'sans-serif'],
-        mono: ['SF Mono', 'Menlo', 'Monaco', 'monospace'],
-        japanese: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'sans-serif'],
+        bg: {
+          secondary: 'rgb(var(--color-sakura))',
+          tertiary: 'rgba(var(--color-sakura-gray), 0.3)',
+        },
+        text: {
+          primary: 'rgb(var(--color-umenezumi))',
+          secondary: 'rgb(var(--color-umenezumi-light))',
+          tertiary: 'rgb(var(--color-umenezumi-lighter))',
+        },
+        danger: '#ef4444',
       },
       borderRadius: {
-        'xs': '4px',
-        'sm': '8px',
-        'md': '12px',
-        'lg': '16px',
-        'xl': '20px',
-        '2xl': '24px',
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       boxShadow: {
-        'xs': '0 1px 2px rgba(236, 72, 153, 0.03)',
-        'sm': '0 2px 8px rgba(236, 72, 153, 0.06)',
-        'md': '0 4px 16px rgba(236, 72, 153, 0.08)',
-        'lg': '0 8px 24px rgba(236, 72, 153, 0.12)',
-        'xl': '0 16px 48px rgba(236, 72, 153, 0.16)',
-        'card': '0 2px 12px rgba(236, 72, 153, 0.04)',
-        'card-hover': '0 8px 30px rgba(236, 72, 153, 0.10)',
-      },
-      spacing: {
-        'xs': '4px',
-        'sm': '8px',
-        'md': '16px',
-        'lg': '24px',
-        'xl': '32px',
-        '2xl': '48px',
+        'froala': '0 4px 20px rgba(236, 72, 153, 0.1)',
+        'froala-lg': '0 8px 30px rgba(236, 72, 153, 0.15)',
       },
       transitionTimingFunction: {
         'froala': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 }
