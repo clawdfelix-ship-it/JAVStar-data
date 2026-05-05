@@ -407,7 +407,7 @@ export default function HomePage() {
         {/* Calendar Tab */}
         {activeTab === 'calendar' && (
           <div>
-            <EventCalendar events={events} loading={eventsLoading} />
+            <EventCalendar events={events} />
           </div>
         )}
 
