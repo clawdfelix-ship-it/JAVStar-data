@@ -44,8 +44,10 @@ interface Event {
 interface PaginationInfo {
   page: number;
   limit: number;
-  total: number;
-  totalPages: number;
+  total?: number;
+  count?: number;
+  totalItems?: number;
+  totalPages?: number;
 }
 
 // ====================
