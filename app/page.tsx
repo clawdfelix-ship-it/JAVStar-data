@@ -397,7 +397,7 @@ export default function HomePage() {
                 </span>
                 
                 <button
-                  onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                  onClick={() => setPage(p => Math.min(pagination.totalPages || 1, p + 1))}
                   disabled={page === pagination.totalPages}
                   className="px-4 py-2 bg-white border border-border rounded-xl text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:border-nadeshiko hover:text-nadeshiko-dark transition-colors"
                 >
