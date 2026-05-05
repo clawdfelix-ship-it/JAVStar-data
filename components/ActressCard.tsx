@@ -92,137 +92,121 @@ export default function ActressCard({
   }, [id, isVoting, hasVoted, currentVoteCount]);
 
   return (
-    <div className="actress-card fade-in w-full">
-      <Link href={`/actress/${id}`} className="block w-full">
-        {/* Card Header with Avatar & Rank */}
-        <div className="relative">
-          {/* Avatar */}
-          <div className="actress-avatar relative">
-            {avatar_url ? (
-              <img
-                src={avatar_url}
-                alt={name_ja}
-                className="actress-avatar"
-                loading="lazy"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-              />
-            ) : (
-              <div className="actress-avatar flex items-center justify-center text-text-secondary text-4xl font-japanese bg-gradient-to-br from-bg-tertiary to-border">
-                {(name_ja || '?')[0]}
-              </div>
-            )}
+    <div className="fdb-card hover:shadow-lg transition-all duration-300">
+      <Link href={`/actress/${id}`} className="block">
+        {/* Top Section: Avatar + Basic Info - COMPACT */}
+        <div className="p-4 flex items-start gap-4">
+          {/* Avatar - Smaller */}
+          <div className="relative flex-shrink-0">
+            <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center">
+              {avatar_url ? (
+                <img
+                  src={avatar_url}
+                  alt={name_ja}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+              ) : (
+                <span className="text-2xl font-japanese font-bold text-pink-500">
+                  {(name_ja || '?')[0]}
+                </span>
+              )}
+            </div>
             
-            {/* Rank Badge - positioned absolute */}
-            <div className="absolute top-3 left-3">
-              <div className={`rank-badge ${getRankClass(rank)} shadow-lg`}>
-                {rank}
+            {/* Rank Badge - Smaller */}
+            <div className={`absolute -top-1 -left-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md ${
+              rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
+              rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500' :
+              rank === 3 ? 'bg-gradient-to-br from-amber-500 to-amber-700' :
+              'bg-gradient-to-br from-pink-400 to-pink-600'
+            }`}>
+              {rank}
+            </div>
+          </div>
+
+          {/* Info - Tighter spacing */}
+          <div className="flex-1 min-w-0">
+            {/* Name + Score */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h3 className="font-japanese font-bold text-text-primary text-base leading-tight truncate">
+                  {name_ja}
+                </h3>
+                {name_cn && (
+                  <p className="text-xs text-text-secondary truncate mt-0.5">{name_cn}</p>
+                )}
               </div>
+              <span className="fdb-badge-primary flex-shrink-0 text-xs font-mono font-bold">
+                {final_score}
+              </span>
             </div>
 
-            {/* Score Badge - top right */}
-            <div className="absolute top-3 right-3">
-              <div className="fdb-badge-primary text-sm font-mono font-bold py-1.5 px-3 shadow-lg">
-                {final_score} pts
-              </div>
+            {/* Tags - More compact */}
+            <div className="flex flex-wrap gap-1 mt-2">
+              {age && <span className="fdb-badge text-xs py-0.5 px-2">{age}歲</span>}
+              {cup && <span className="fdb-badge-danger text-xs py-0.5 px-2">{cup}</span>}
+              {height && <span className="fdb-badge-success text-xs py-0.5 px-2">{height}cm</span>}
+              {bust && waist && hip && (
+                <span className="fdb-badge text-xs py-0.5 px-2 font-mono">
+                  {bust}-{waist}-{hip}
+                </span>
+              )}
+            </div>
+
+            {/* Agency & Hobby - Compact */}
+            <div className="flex flex-wrap gap-2 mt-2 text-xs text-text-tertiary">
+              {agency && (
+                <span className="truncate max-w-[120px] flex items-center gap-1" title={agency}>
+                  🏢 {agency}
+                </span>
+              )}
+              {hobby && (
+                <span className="truncate max-w-[120px] flex items-center gap-1" title={hobby}>
+                  🎯 {hobby}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Card Content */}
-        <div className="actress-info">
-          {/* Name */}
-          <h3 className="actress-name text-line-clamp-1">
-            {name_ja}
-          </h3>
-          {name_cn && (
-            <p className="text-small text-text-secondary line-clamp-1">{name_cn}</p>
-          )}
-
-          {/* Key Stats Row */}
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {age && (
-              <span className="fdb-badge-primary">
-                {age}歲
-              </span>
-            )}
-            {zodiac && (
-              <span className="fdb-badge-purple">
-                {zodiac}
-              </span>
-            )}
-            {cup && (
-              <span className="fdb-badge-danger">
-                {cup}
-              </span>
-            )}
-            {height && (
-              <span className="fdb-badge-success">
-                {height}cm
-              </span>
-            )}
+        {/* Stats Bar - Very compact */}
+        <div className="grid grid-cols-3 gap-px bg-border-light">
+          <div className="bg-bg-secondary py-2.5 px-3 text-center">
+            <div className="font-mono text-base font-bold text-primary-dark">
+              {year_2026_events}
+            </div>
+            <div className="text-[10px] text-text-secondary">活動</div>
           </div>
-
-          {/* Measurements */}
-          {bust && waist && hip && (
-            <div className="mt-2 flex items-center gap-1 text-small text-text-secondary font-mono">
-              <span className="fdb-badge px-2 py-0.5">
-                B{bust} W{waist} H{hip}
-              </span>
+          <div className="bg-bg-secondary py-2.5 px-3 text-center">
+            <div className="font-mono text-base font-bold text-warning">
+              {currentVoteCount}
             </div>
-          )}
-
-          {/* Agency & Hobby */}
-          <div className="flex flex-wrap gap-2 mt-3 text-small text-text-secondary">
-            {agency && (
-              <span className="truncate max-w-[140px] flex items-center gap-1" title={agency}>
-                <span>🏢</span> {agency}
-              </span>
-            )}
-            {hobby && (
-              <span className="truncate max-w-[140px] flex items-center gap-1" title={hobby}>
-                <span>🎯</span> {hobby}
-              </span>
-            )}
+            <div className="text-[10px] text-text-secondary">投票</div>
           </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border-light">
-            <div className="text-center">
-              <div className="font-mono text-lg font-bold text-primary">
-                {year_2026_events}
-              </div>
-              <div className="text-caption text-text-secondary">活動</div>
+          <div className="bg-bg-secondary py-2.5 px-3 text-center">
+            <div className="font-mono text-base font-bold text-success">
+              {debut_year || '-'}
             </div>
-            <div className="text-center">
-              <div className="font-mono text-lg font-bold text-accent">
-                {currentVoteCount}
-              </div>
-              <div className="text-caption text-text-secondary">投票</div>
-            </div>
-            <div className="text-center">
-              <div className="font-mono text-lg font-bold text-success">
-                {debut_year || '-'}
-              </div>
-              <div className="text-caption text-text-secondary">出道</div>
-            </div>
+            <div className="text-[10px] text-text-secondary">出道</div>
           </div>
         </div>
       </Link>
 
-      {/* Card Footer Actions */}
-      <div className="px-4 pb-4 pt-0 flex items-center justify-between gap-2">
-        <div className="text-caption text-text-tertiary font-mono">
+      {/* Footer - Compact */}
+      <div className="p-3 pt-3 flex items-center justify-between gap-2">
+        <span className="text-[10px] text-text-tertiary font-mono">
           #{id.slice(0, 8)}
-        </div>
+        </span>
         
         <div className="flex items-center gap-2">
           <button
             onClick={handleVote}
             disabled={isVoting}
-            className={`fdb-btn fdb-btn-sm ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               hasVoted
-                ? 'bg-gradient-to-r from-[#FF7D00] to-[#FF9500] text-white'
-                : 'fdb-btn-outline'
+                ? 'bg-gradient-to-r from-warning to-[#FF9500] text-white shadow-md'
+                : 'bg-bg-tertiary text-text-secondary hover:bg-pink-100 hover:text-pink-600'
             }`}
           >
             {isVoting ? '...' : hasVoted ? '♥ 已投' : '♡ 投票'}
@@ -230,7 +214,7 @@ export default function ActressCard({
 
           <Link 
             href={`/actress/${id}`} 
-            className="fdb-btn fdb-btn-primary fdb-btn-sm"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-primary-dark to-primary text-white shadow-md hover:shadow-lg transition-all"
           >
             詳情 →
           </Link>

@@ -8,17 +8,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary Colors - Professional Deep Blue Theme
+        // Primary Colors - Soft Pink Theme
         primary: {
-          DEFAULT: '#165DFF',
-          light: '#4080FF',
-          dark: '#0E42D2',
+          DEFAULT: '#F472B6',
+          light: '#F9A8D4',
+          dark: '#EC4899',
         },
         // Background Colors
         bg: {
           primary: '#FFFFFF',
-          secondary: '#F7F8FA',
-          tertiary: '#F2F3F5',
+          secondary: '#FDF2F8',
+          tertiary: '#FCE7F3',
           dark: '#1D2129',
         },
         // Text Colors
@@ -30,16 +30,16 @@ module.exports = {
           white: '#FFFFFF',
         },
         // Accent Colors
-        accent: '#FF7D00',
+        accent: '#EC4899',
         success: '#00B42A',
         warning: '#FF7D00',
         danger: '#F53F3F',
-        purple: '#722ED1',
+        purple: '#A855F7',
         // Border Colors
         border: {
-          DEFAULT: '#E5E6EB',
-          light: '#F2F3F5',
-          dark: '#C9CDD4',
+          DEFAULT: '#FBCFE8',
+          light: '#FCE7F3',
+          dark: '#F9A8D4',
         },
       },
       fontFamily: {
@@ -56,13 +56,13 @@ module.exports = {
         '2xl': '24px',
       },
       boxShadow: {
-        'xs': '0 1px 2px rgba(0, 0, 0, 0.03)',
-        'sm': '0 2px 8px rgba(0, 0, 0, 0.06)',
-        'md': '0 4px 16px rgba(0, 0, 0, 0.08)',
-        'lg': '0 8px 24px rgba(0, 0, 0, 0.12)',
-        'xl': '0 16px 48px rgba(0, 0, 0, 0.16)',
-        'card': '0 2px 12px rgba(0, 0, 0, 0.04)',
-        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.10)',
+        'xs': '0 1px 2px rgba(236, 72, 153, 0.03)',
+        'sm': '0 2px 8px rgba(236, 72, 153, 0.06)',
+        'md': '0 4px 16px rgba(236, 72, 153, 0.08)',
+        'lg': '0 8px 24px rgba(236, 72, 153, 0.12)',
+        'xl': '0 16px 48px rgba(236, 72, 153, 0.16)',
+        'card': '0 2px 12px rgba(236, 72, 153, 0.04)',
+        'card-hover': '0 8px 30px rgba(236, 72, 153, 0.10)',
       },
       spacing: {
         'xs': '4px',
