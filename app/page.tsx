@@ -382,7 +382,7 @@ export default function HomePage() {
             )}
 
             {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
+            {pagination?.totalPages && pagination.totalPages > 1 && (
               <div className="flex justify-center items-center gap-2 mt-8">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
