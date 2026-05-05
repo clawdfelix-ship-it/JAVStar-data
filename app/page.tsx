@@ -107,8 +107,10 @@ export default function HomePage() {
       if (response.ok) {
         const data = await response.json();
         const eventList = data.data || [];
+        const metaData = data.meta || data.pagination || null;
         setEvents(eventList);
-        setStats(prev => ({ ...prev, eventCount: data.meta?.total || eventList.length || 0 }));
+        const totalCount = metaData?.total || metaData?.count || metaData?.totalItems || eventList.length || 0;
+        setStats(prev => ({ ...prev, eventCount: totalCount }));
       }
     } catch (err) {
       console.error('Failed to fetch events:', err);
@@ -136,9 +138,11 @@ export default function HomePage() {
 
       const data = await response.json();
       const actressList = data.data || [];
+      const metaData = data.meta || data.pagination || null;
       setActresses(actressList);
-      setPagination(data.meta || null);
-      setStats(prev => ({ ...prev, actressCount: data.meta?.total || actressList.length || 0 }));
+      setPagination(metaData);
+      const totalCount = metaData?.total || metaData?.count || metaData?.totalItems || actressList.length || 0;
+      setStats(prev => ({ ...prev, actressCount: totalCount }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       // Demo data
@@ -343,7 +347,7 @@ export default function HomePage() {
               </div>
               
               <div className="text-sm text-text-tertiary">
-                共 {pagination?.total || 0} 位女優
+                共 {pagination?.total || pagination?.count || stats.actressCount || 0} 位女優
               </div>
             </div>
 
