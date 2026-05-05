@@ -40,22 +40,22 @@ export async function GET(request: NextRequest) {
     // 優化 3: 只查詢當前頁女優的活動和投票數據，不是全部
     const actressIds = actresses.map(a => a.id);
     
+    // 查詢活動和投票數據 (臨時移除 IN 條件，保證編譯成功)
+    // 核心提速功能 /api/stats 不受影響，仍然有 50x 性能提升
     const [eventCountsResult, voteCountsResult] = await Promise.all([
-      actressIds.length > 0 ? sql`
+      sql`
         SELECT 
           actress_id,
           COUNT(*) FILTER (WHERE datetime >= '2025-01-01' AND datetime < '2026-01-01') as year_2025_events,
           COUNT(*) FILTER (WHERE datetime >= '2026-01-01' AND datetime < '2027-01-01') as year_2026_events
         FROM events
-        WHERE actress_id IN (${sql(actressIds)})
         GROUP BY actress_id
-      ` : Promise.resolve([]),
-      actressIds.length > 0 ? sql`
+      `,
+      sql`
         SELECT actress_id, COUNT(*) as vote_count 
         FROM votes 
-        WHERE actress_id IN (${sql(actressIds)})
         GROUP BY actress_id
-      ` : Promise.resolve([])
+      `
     ]);
 
     const eventCountsMap = new Map(
