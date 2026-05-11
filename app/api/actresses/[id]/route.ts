@@ -1,6 +1,7 @@
 import sql from '@/lib/db';
 import { Actress } from '@/lib/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
+import { validateAllEvents } from '@/lib/matching-validator';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -26,16 +27,23 @@ export async function GET(request: NextRequest, { params }: Params) {
       ORDER BY datetime DESC
     `;
 
-    // Calculate stats
+    // ✅ 自動配對校驗：過濾錯誤配對的活動
+    const allEvents = eventsResult as any[];
+    const { validEvents, invalidEvents, stats: matchingStats } = validateAllEvents(
+      allEvents,
+      actress.name_ja,
+      actress.name_cn
+    );
+
+    // 只使用驗證通過的活動計算統計
     const now = new Date();
     const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const thisYearStart = new Date(now.getFullYear(), 0, 1);
 
-    const allEvents = eventsResult as any[];
-    const totalEvents = allEvents.length;
-    const thisYearEvents = allEvents.filter(e => new Date(e.datetime) >= thisYearStart).length;
-    const thisMonthEvents = allEvents.filter(e => new Date(e.datetime) >= thisMonthStart).length;
-    const upcomingEvents = allEvents.filter(e => new Date(e.datetime) >= now).length;
+    const totalEvents = validEvents.length;
+    const thisYearEvents = validEvents.filter(e => new Date(e.datetime) >= thisYearStart).length;
+    const thisMonthEvents = validEvents.filter(e => new Date(e.datetime) >= thisMonthStart).length;
+    const upcomingEvents = validEvents.filter(e => new Date(e.datetime) >= now).length;
 
     // Get vote count
     const voteResult = await sql`SELECT COUNT(*) as count FROM votes WHERE actress_id = ${id}`;
@@ -52,7 +60,14 @@ export async function GET(request: NextRequest, { params }: Params) {
         },
         vote_count: voteCount,
       },
-      events: allEvents,
+      events: validEvents,
+      // 配對校驗統計 - 便於調試和數據清洗
+      _matchingValidation: {
+        totalChecked: matchingStats.total,
+        filteredCount: matchingStats.invalid,
+        filterRate: matchingStats.filterRate,
+        filteredEvents: invalidEvents.slice(0, 10) // 只返回前 10 個錯配活動供參考
+      }
     });
 
   } catch (error) {
