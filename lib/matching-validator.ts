@@ -103,14 +103,15 @@ function normalizeString(str: string): string {
 /**
  * 批量驗證活動配對
  * 返回校驗後的活動列表和統計信息
+ * 泛型支持：保留原始活動的完整類型
  */
-export function validateAllEvents(
-  events: Array<{ id: string; title: string }>,
+export function validateAllEvents<T extends { id: string; title: string }>(
+  events: T[],
   actressNameJa: string,
   actressNameCn?: string | null
 ): {
-  validEvents: typeof events;
-  invalidEvents: Array<typeof events[0] & { validation: MatchingValidationResult }>;
+  validEvents: T[];
+  invalidEvents: Array<T & { validation: MatchingValidationResult }>;
   stats: {
     total: number;
     valid: number;
@@ -118,8 +119,8 @@ export function validateAllEvents(
     filterRate: number;
   };
 } {
-  const invalidEvents: Array<typeof events[0] & { validation: MatchingValidationResult }> = [];
-  const validEvents: typeof events = [];
+  const invalidEvents: Array<T & { validation: MatchingValidationResult }> = [];
+  const validEvents: T[] = [];
 
   for (const event of events) {
     const validation = validateActressEventMatch(event.title, actressNameJa, actressNameCn);
