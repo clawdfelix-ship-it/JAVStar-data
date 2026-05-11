@@ -52,6 +52,11 @@ export default function ActressPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [matchingStats, setMatchingStats] = useState<{
+    totalChecked: number;
+    filteredCount: number;
+    filterRate: number;
+  } | null>(null);
 
   useEffect(() => {
     fetchActress();
@@ -68,6 +73,7 @@ export default function ActressPage() {
       const data = await response.json();
       setActress(data.actress);
       setEvents(data.events || []);
+      setMatchingStats(data._matchingValidation || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       // Show demo data
@@ -347,11 +353,32 @@ export default function ActressPage() {
 
             {/* Events section */}
             <div>
-              <h2 className="font-japanese text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
+              <h2 className="font-japanese text-xl font-bold text-text-primary mb-4 flex items-center gap-2 flex-wrap">
                 <span className="text-pink-600">●</span>
                 活動記錄 
-                <span className="text-text-secondary font-normal text-base">({events.length})</span>
+                <span className="text-text-secondary font-normal text-base">
+                  (顯示 {events.length} 個{matchingStats && matchingStats.filteredCount > 0 ? `，已自動過濾 ${matchingStats.filteredCount} 個錯配` : ''})
+                </span>
               </h2>
+              
+              {/* 配對校驗提示 - 解釋為什麼數量與首頁不一致 */}
+              {matchingStats && matchingStats.filteredCount > 0 && (
+                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">⚠️</span>
+                    <div>
+                      <p className="font-medium text-amber-800">已自動過濾 {matchingStats.filteredCount} 個錯誤配對的活動</p>
+                      <p className="text-sm text-amber-700 mt-1">
+                        活動標題不包含女優姓名「{actress?.name_ja}」，可能是數據爬蟲時配對錯誤。
+                        已自動隱藏以保證數據準確性。
+                      </p>
+                      <p className="text-xs text-amber-600 mt-2">
+                        💡 首頁顯示的是原始數據庫統計，未經過濾，因此數量可能不一致
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {events.length === 0 ? (
                 <div className="fdb-card p-8 text-center">
