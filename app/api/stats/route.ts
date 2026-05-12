@@ -16,14 +16,20 @@ export async function GET() {
       sql`SELECT COUNT(*) as count FROM votes`
     ]);
 
-    // 取得最後更新時間
-    const lastUpdateResult = await sql`
-      SELECT MAX(updated_at) as last_update FROM (
-        SELECT updated_at FROM actresses
-        UNION ALL
-        SELECT updated_at FROM events
-      ) as all_updates
-    `;
+    // 取得最後更新時間 - 並行查兩個表的 MAX，再在 JS 取最大值
+    const [actressMaxUpdate, eventMaxUpdate] = await Promise.all([
+      sql`SELECT MAX(updated_at) as max_update FROM actresses`,
+      sql`SELECT MAX(updated_at) as max_update FROM events`
+    ]);
+    
+    const actressLastUpdate = (actressMaxUpdate as any[])[0]?.max_update;
+    const eventLastUpdate = (eventMaxUpdate as any[])[0]?.max_update;
+    
+    // 取兩者最大值
+    const dates = [actressLastUpdate, eventLastUpdate].filter(Boolean).map(d => new Date(d));
+    const lastUpdateResult = dates.length > 0 
+      ? [{ last_update: new Date(Math.max(...dates.map(d => d.getTime()))).toISOString() }]
+      : [{ last_update: null }];
 
     const actressCountNum = Number((actressCount as any[])[0]?.count || 0);
     const eventCountNum = Number((eventCount as any[])[0]?.count || 0);
