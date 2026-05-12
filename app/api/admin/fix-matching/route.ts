@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const isDryRun = searchParams.get('dry-run') === 'true';
     const targetActressId = searchParams.get('actress_id') || null;
+    const deleteOrphans = searchParams.get('delete-orphans') === 'true';
 
     // 1. 獲取所有女優
     const allActresses = await sql`SELECT id, name_ja, name_cn FROM actresses` as any[];
@@ -36,10 +37,12 @@ export async function GET(request: NextRequest) {
       mismatched: 0,
       fixed: 0,
       cannotFix: 0,
+      deleted: 0,
     };
 
     const mismatchedEvents: any[] = [];
     const fixedEvents: any[] = [];
+    const deletedEvents: any[] = [];
     const errors: any[] = [];
 
     for (const event of allEvents) {
@@ -102,7 +105,20 @@ export async function GET(request: NextRequest) {
           }
         }
       } else {
+        // 低置信度無法修復 - 如果設了 delete-orphans=true 則刪除
         stats.cannotFix++;
+        if (deleteOrphans && !isDryRun) {
+          try {
+            await sql`DELETE FROM events WHERE id = ${event.id}`;
+            stats.deleted++;
+            deletedEvents.push(mismatchInfo);
+          } catch (err) {
+            errors.push({
+              ...mismatchInfo,
+              error: `Delete failed: ${String(err)}`,
+            });
+          }
+        }
       }
     }
 
@@ -118,13 +134,14 @@ export async function GET(request: NextRequest) {
       },
       mismatchedEvents: mismatchedEvents.slice(0, 100), // 最多返回 100 個
       fixedEvents: fixedEvents.slice(0, 100),
+      deletedEvents: deletedEvents.slice(0, 100),
       errors: errors.slice(0, 50),
       summary: {
         message: isDryRun 
-          ? `預覽完成：發現 ${stats.mismatched} 個錯配，可修復 ${stats.mismatched - stats.cannotFix} 個`
-          : `修復完成：已修正 ${stats.fixed} 個錯配活動`,
+          ? `預覽完成：發現 ${stats.mismatched} 個錯配，可修復 ${stats.mismatched - stats.cannotFix} 個${deleteOrphans ? `，可刪除 ${stats.cannotFix} 個孤立活動` : ''}`
+          : `修復完成：已修正 ${stats.fixed} 個錯配活動${deleteOrphans ? `，已刪除 ${stats.deleted} 個孤立活動` : ''}`,
         nextStep: isDryRun
-          ? '如果結果滿意，去掉 dry-run=true 參數執行實際修復'
+          ? '如果結果滿意，去掉 dry-run=true 參數執行實際修復；加上 delete-orphans=true 可一併刪除無法修復的孤立活動'
           : '修復完成，建議重新檢查女優頁面確認數據正確',
       },
     });
