@@ -1,61 +1,60 @@
 import { notFound } from 'next/navigation';
+import { sql } from '@/lib/db';
 import ActressClient from './ActressClient';
 
-// 服務端數據獲取
+// 服務端直接查詢數據庫 (更快、更穩定、唔依賴環境變數)
 async function fetchActressServer(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/actresses/${id}`, {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // 1. 查詢女優基本資料
+    const actresses = await sql`
+      SELECT * FROM actresses WHERE id = ${id} LIMIT 1
+    `;
+    
+    if (!actresses || (actresses as any[]).length === 0) {
+      return null;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Server fetch error:', error);
-    // 開發環境兜底返回數據
-    if (process.env.NODE_ENV === 'development') {
-      return {
-        actress: {
-          id,
-          name_ja: '河北彩伽',
-          name_cn: '河北彩花',
-          avatar_url: null,
-          birthday: '1998-03-15',
-          age: 28,
-          zodiac: 'うお座',
-          height: '158',
-          bust: '85',
-          waist: '58',
-          hip: '86',
-          cup: 'E',
-          agency: 'C-more Entertainment',
-          hobby: '料理・映画鑑賞',
-          debut_year: 2021,
-          debut_work: '河北彩伽 デビュー作品',
-          blog: null,
-          official_site: null,
-          tags: '熟女,美巨尻,スレンダー',
-          stats: {
-            total_events: 47,
-            year_2026_events: 23,
-            upcoming_events: 2,
-          },
-          vote_count: 128,
+    
+    const actress = (actresses as any[])[0];
+    
+    // 2. 查詢女優嘅活動
+    const events = await sql`
+      SELECT * FROM events 
+      WHERE actress_id = ${id} 
+      ORDER BY datetime DESC
+    `;
+    
+    // 3. 計算統計數據
+    const eventList = events as any[];
+    const year2026Events = eventList.filter(e => {
+      const date = new Date(e.datetime);
+      return date.getFullYear() === 2026;
+    }).length;
+    
+    const upcomingEvents = eventList.filter(e => {
+      return new Date(e.datetime) > new Date();
+    }).length;
+    
+    // 4. 查詢投票數
+    const votes = await sql`
+      SELECT COUNT(*) as count FROM votes WHERE actress_id = ${id}
+    `;
+    
+    return {
+      actress: {
+        ...actress,
+        stats: {
+          total_events: eventList.length,
+          year_2026_events: year2026Events,
+          month_04_2026_events: year2026Events, // 兼容舊字段
+          upcoming_events: upcomingEvents,
         },
-        events: [],
-        _matchingValidation: null,
-      };
-    }
+        vote_count: Number((votes as any[])[0]?.count || 0),
+      },
+      events: eventList,
+      _matchingValidation: null,
+    };
+  } catch (error) {
+    console.error('Server DB query error:', error);
     return null;
   }
 }
