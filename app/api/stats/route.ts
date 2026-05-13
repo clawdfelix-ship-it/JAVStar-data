@@ -16,25 +16,20 @@ export async function GET() {
       sql`SELECT COUNT(*) as count FROM votes`
     ]);
 
-    // 取得最後更新時間 - 並行查兩個表的 MAX，再在 JS 取最大值
-    const [actressMaxUpdate, eventMaxUpdate] = await Promise.all([
-      sql`SELECT MAX(updated_at) as max_update FROM actresses`,
-      sql`SELECT MAX(updated_at) as max_update FROM events`
-    ]);
+    // 取得最後更新時間 - 只查 actresses 表 (events 可能冇 updated_at 字段)
+    const actressMaxUpdate = await sql`SELECT MAX(created_at) as max_update FROM actresses LIMIT 1`;
     
     const actressLastUpdate = (actressMaxUpdate as any[])[0]?.max_update;
-    const eventLastUpdate = (eventMaxUpdate as any[])[0]?.max_update;
     
-    // 取兩者最大值
-    const dates = [actressLastUpdate, eventLastUpdate].filter(Boolean).map(d => new Date(d));
-    const lastUpdateResult = dates.length > 0 
-      ? [{ last_update: new Date(Math.max(...dates.map(d => d.getTime()))).toISOString() }]
-      : [{ last_update: null }];
+    // 安全處理：如果冇數據就用而家時間
+    const lastUpdate = actressLastUpdate 
+      ? new Date(actressLastUpdate).toISOString() 
+      : new Date().toISOString();
 
     const actressCountNum = Number((actressCount as any[])[0]?.count || 0);
     const eventCountNum = Number((eventCount as any[])[0]?.count || 0);
     const voteCountNum = Number((voteCount as any[])[0]?.count || 0);
-    const lastUpdate = (lastUpdateResult as any[])[0]?.last_update || new Date().toISOString();
+    // lastUpdate 已經係上面處理好嘅 ISO string
 
     const duration = Date.now() - startTime;
 
