@@ -26,12 +26,14 @@ export async function GET(request: NextRequest) {
     const actresses = actressList as Actress[];
 
     // Get event counts
-    // 改用 EXTRACT(YEAR FROM datetime) 確保日期格式唔影響結果
+    // 直接用字符串匹配！唔使 timestamp 轉換，完全唔會出錯！
+    // 支援各種日期格式：2026-05-13, 2026/5/13, 2026年5月13日 等等
     const eventCountsResult = await sql`
       SELECT 
         actress_id,
-        COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM datetime::timestamp) = 2025) as year_2025_events,
-        COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM datetime::timestamp) = 2026) as year_2026_events
+        COUNT(*) FILTER (WHERE datetime LIKE '2025%') as year_2025_events,
+        COUNT(*) FILTER (WHERE datetime LIKE '2026%') as year_2026_events,
+        COUNT(*) as total_events
       FROM events
       GROUP BY actress_id
     `;
