@@ -26,11 +26,12 @@ export async function GET(request: NextRequest) {
     const actresses = actressList as Actress[];
 
     // Get event counts
+    // 改用 EXTRACT(YEAR FROM datetime) 確保日期格式唔影響結果
     const eventCountsResult = await sql`
       SELECT 
         actress_id,
-        COUNT(*) FILTER (WHERE datetime >= '2025-01-01' AND datetime < '2026-01-01') as year_2025_events,
-        COUNT(*) FILTER (WHERE datetime >= '2026-01-01' AND datetime < '2027-01-01') as year_2026_events
+        COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM datetime::timestamp) = 2025) as year_2025_events,
+        COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM datetime::timestamp) = 2026) as year_2026_events
       FROM events
       GROUP BY actress_id
     `;
