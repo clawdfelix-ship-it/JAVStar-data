@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import EventCard from '@/components/EventCard';
+import ActivityTimeline from '@/components/ActivityTimeline';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface ActressDetail {
   id: string;
@@ -62,6 +64,10 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [matchingStats, setMatchingStats] = useState(initialData._matchingValidation || null);
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  
+  // 收藏功能
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   // 如果沒有初始數據（例如生產環境首次加載），客戶端重新獲取
   useEffect(() => {
@@ -179,13 +185,83 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                         </div>
                       )}
                     </div>
+                    
+                    {/* 收藏按鈕 */}
+                    <button
+                      onClick={() => toggleFavorite({
+                        id: actress.id,
+                        name_ja: actress.name_ja,
+                        name_cn: actress.name_cn,
+                        avatar_url: actress.avatar_url,
+                      })}
+                      className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-white shadow-lg border-2 border-nadeshiko-light flex items-center justify-center text-2xl hover:scale-110 transition-transform z-20"
+                      title={isFavorite(actress.id) ? '取消收藏' : '加入收藏'}
+                    >
+                      {isFavorite(actress.id) ? '❤️' : '🤍'}
+                    </button>
                   </div>
 
                   {/* Main Info - HIGH CONTRAST TEXT */}
                   <div className="flex-1 text-center md:text-left">
-                    <h1 className="font-japanese text-2xl sm:text-3xl font-bold text-text-primary mb-2">
-                      {actress.name_ja}
-                    </h1>
+                    <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                      <h1 className="font-japanese text-2xl sm:text-3xl font-bold text-text-primary">
+                        {actress.name_ja}
+                      </h1>
+                      
+                      {/* 分享按鈕 */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowShareMenu(!showShareMenu)}
+                          className="w-10 h-10 rounded-full bg-bg-secondary hover:bg-nadeshiko-light/30 flex items-center justify-center text-xl transition-colors"
+                          title="分享"
+                        >
+                          📤
+                        </button>
+                        
+                        {/* 分享選單 */}
+                        {showShareMenu && (
+                          <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-border p-3 z-50 min-w-[180px]">
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(`https://jav-star-data.vercel.app/actress/${actressId}`);
+                                setShowShareMenu(false);
+                                alert('已複製鏈接！');
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-2 hover:bg-bg-secondary rounded-lg text-left transition-colors"
+                            >
+                              <span>📋</span>
+                              <span>複製鏈接</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                const shareUrl = 'https://twitter.com/intent/tweet?url=' + 
+                                  encodeURIComponent(`https://jav-star-data.vercel.app/actress/${actressId}`) +
+                                  '&text=' + encodeURIComponent(`${actress.name_ja} - JAVStar Data`);
+                                window.open(shareUrl, '_blank');
+                                setShowShareMenu(false);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-2 hover:bg-bg-secondary rounded-lg text-left transition-colors"
+                            >
+                              <span>🐦</span>
+                              <span>Twitter</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                const shareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + 
+                                  encodeURIComponent(`https://jav-star-data.vercel.app/actress/${actressId}`);
+                                window.open(shareUrl, '_blank');
+                                setShowShareMenu(false);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-2 hover:bg-bg-secondary rounded-lg text-left transition-colors"
+                            >
+                              <span>📘</span>
+                              <span>Facebook</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
                     {actress.name_cn && (
                       <p className="text-text-secondary text-lg mb-4 font-medium">{actress.name_cn}</p>
                     )}
@@ -373,17 +449,8 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                 </div>
               )}
 
-              {events.length === 0 ? (
-                <div className="fdb-card p-8 text-center">
-                  <p className="text-text-secondary">暫無活動記錄</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {events.map((event) => (
-                    <EventCard key={event.id} {...event} showActress={false} />
-                  ))}
-                </div>
-              )}
+              {/* 活動時間軸 */}
+              <ActivityTimeline events={events} />
             </div>
           </>
         ) : null}
