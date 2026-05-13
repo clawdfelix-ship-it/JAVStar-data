@@ -23,7 +23,7 @@ export function useStats() {
   );
 
   return {
-    stats: data || { actressCount: 0, eventCount: 0, lastUpdate: '' },
+    stats: isLoading ? undefined : (data || { actressCount: 0, eventCount: 0, lastUpdate: '' }),
     loading: isLoading,
     error,
     refresh: mutate,

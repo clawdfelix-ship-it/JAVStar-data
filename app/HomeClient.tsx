@@ -135,8 +135,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
   // Tab config - Froala Design Blocks style
   const tabs = [
-    { id: 'actress' as const, label: '女優排名', icon: '👑', count: stats.actressCount },
-    { id: 'calendar' as const, label: '活動日曆', icon: '📅', count: stats.eventCount },
+    { id: 'actress' as const, label: '女優排名', icon: '👑', count: stats?.actressCount || 0 },
+    { id: 'calendar' as const, label: '活動日曆', icon: '📅', count: stats?.eventCount || 0 },
     { id: 'events' as const, label: '活動列表', icon: '🎫', count: filteredEvents.length },
   ];
 
@@ -186,24 +186,31 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
             {/* Stats Cards - Froala Design Blocks style */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+              {/* 註冊女優 */}
               <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
                 <div className="text-3xl md:text-4xl font-bold text-nadeshiko-dark font-mono mb-1">
-                  {stats.actressCount.toLocaleString()}
+                  {stats?.actressCount ? stats.actressCount.toLocaleString() : <span className="animate-pulse">--</span>}
                 </div>
                 <div className="text-text-secondary text-sm font-medium">註冊女優</div>
               </div>
+              
+              {/* 活動記錄 */}
               <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
                 <div className="text-3xl md:text-4xl font-bold text-emerald-600 font-mono mb-1">
-                  {stats.eventCount.toLocaleString()}
+                  {stats?.eventCount ? stats.eventCount.toLocaleString() : <span className="animate-pulse">--</span>}
                 </div>
                 <div className="text-text-secondary text-sm font-medium">活動記錄</div>
               </div>
+              
+              {/* 年度數據 */}
               <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
                 <div className="text-3xl md:text-4xl font-bold text-amber-600 font-mono mb-1">
                   2026
                 </div>
                 <div className="text-text-secondary text-sm font-medium">年度數據</div>
               </div>
+              
+              {/* 數據更新 */}
               <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
                 <div className="text-3xl md:text-4xl font-bold text-kamenozoki-dark font-mono mb-1">
                   每日更新
@@ -437,7 +444,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             <div>
               <h4 className="font-semibold text-text-primary mb-4">更新時間</h4>
               <p className="text-sm text-text-secondary mb-2">
-                最後更新: {stats.lastUpdate || '--'}
+                最後更新: {stats?.lastUpdate || '--'}
               </p>
               <p className="text-xs text-text-tertiary">
                 數據僅供參考，請以官方公佈為準
