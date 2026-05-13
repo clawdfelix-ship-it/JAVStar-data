@@ -64,6 +64,9 @@ export function useActresses({
   sort = 'final_score',
   search = '',
 }: UseActressesOptions = {}) {
+  // v20260513 = 強制跳過舊 cache，確保用戶見到修復後嘅數據
+  const CACHE_BUSTER = 'v=20260513';
+  
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -72,8 +75,8 @@ export function useActresses({
   });
 
   const key = search || page > 1 || sort !== 'final_score'
-    ? `/api/actresses?${params}`
-    : '/api/actresses'; // 默認請求使用簡潔 key
+    ? `/api/actresses?${params}&${CACHE_BUSTER}`
+    : `/api/actresses?${CACHE_BUSTER}`; // 加 cache-buster 跳過舊數據
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<ActressesResponse>(
     key,
