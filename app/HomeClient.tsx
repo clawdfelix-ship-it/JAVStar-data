@@ -465,6 +465,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           </div>
         </div>
       </footer>
+
+      {/* ==========================================
+          每月新作 - New Releases Section (最底部)
+          ========================================== */}
+      <NewReleasesSection />
     </div>
   );
 }
