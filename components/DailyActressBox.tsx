@@ -101,13 +101,18 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
 
                   {/* 女優資料 */}
                   <div className="p-4 text-center">
+                    {/* 主名 */}
                     <h3 className="font-bold text-text-primary text-lg">
-                      {selectedActress.name_cn || selectedActress.name_ja}
+                      {selectedActress.name_ja}
                     </h3>
-                    {(selectedActress.name_cn && selectedActress.name_ja && selectedActress.name_cn !== selectedActress.name_ja) && (
-                      <p className="text-text-tertiary text-xs mt-1">
-                        {selectedActress.name_ja}
-                      </p>
+                    {/* 其他名稱 / 曾用名 */}
+                    {selectedActress.name_cn && selectedActress.name_cn !== selectedActress.name_ja && (
+                      <div className="mt-2">
+                        <span className="text-[10px] text-text-tertiary">其他名稱：</span>
+                        <span className="text-xs text-text-secondary ml-1">
+                          {selectedActress.name_cn}
+                        </span>
+                      </div>
                     )}
                     <div className="flex justify-center gap-2 mt-2 flex-wrap">
                       {selectedActress.cup && (
