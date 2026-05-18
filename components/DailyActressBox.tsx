@@ -36,19 +36,22 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
 
     setIsSpinning(true);
 
+    // 先打亂整個數組，確保每次抽都有唔同結果
+    const shuffled = [...actresses].sort(() => Math.random() - 0.5);
+
     // 模擬抽獎動畫效果
     let spins = 0;
     const maxSpins = 15;
     const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * actresses.length);
-      setSelectedActress(actresses[randomIndex]);
+      const randomIndex = Math.floor(Math.random() * shuffled.length);
+      setSelectedActress(shuffled[randomIndex]);
       spins++;
 
       if (spins >= maxSpins) {
         clearInterval(interval);
         // 最後一次真正抽獎
-        const finalIndex = Math.floor(Math.random() * actresses.length);
-        setSelectedActress(actresses[finalIndex]);
+        const finalIndex = Math.floor(Math.random() * shuffled.length);
+        setSelectedActress(shuffled[finalIndex]);
         setIsSpinning(false);
       }
     }, 100);

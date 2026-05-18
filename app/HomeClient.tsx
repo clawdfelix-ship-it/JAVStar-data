@@ -87,10 +87,10 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     search: activeTab === 'actress' ? search : '',
   });
 
-  // 盲盒用完整女優列表（不分頁）
+  // 盲盒用完整女優列表（不分頁，隨機排序）
   const { actresses: allActresses } = useActresses({
-    page: 1,
-    limit: 2000, // 取全部
+    page: Math.floor(Math.random() * 10) + 1, // 隨機抽第 1-10 頁
+    limit: 100, // 每次拎 100 個
     sort: 'final_score',
     search: '',
   });
