@@ -8,6 +8,7 @@ import EventCalendar from '@/components/EventCalendar';
 import VirtualList from '@/components/VirtualList';
 import SearchBar from '@/components/SearchBar';
 import NewReleasesSection from '@/components/NewReleasesSection';
+import DailyActressBox from '@/components/DailyActressBox';
 import { highlightText } from '@/hooks/useSearch';
 import { useActresses } from '@/hooks/useActresses';
 import { useEvents } from '@/hooks/useEvents';
@@ -222,6 +223,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           </div>
         </div>
       </section>
+
+      {/* =========================================
+          今日女優盲盒 - Daily Actress Box
+          ========================================= */}
+      <DailyActressBox actresses={actresses || []} />
 
       {/* =========================================
           Tabs Navigation - Froala Design Blocks
