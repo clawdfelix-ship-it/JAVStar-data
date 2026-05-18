@@ -87,6 +87,14 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     search: activeTab === 'actress' ? search : '',
   });
 
+  // 盲盒用完整女優列表（不分頁）
+  const { actresses: allActresses } = useActresses({
+    page: 1,
+    limit: 2000, // 取全部
+    sort: 'final_score',
+    search: '',
+  });
+
   const { events, loading: eventsLoading } = useEvents({
     limit: 2000,
     prefecture: activeTab === 'events' ? filterPrefecture : 'ALL',
@@ -227,7 +235,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       {/* =========================================
           今日女優盲盒 - Daily Actress Box
           ========================================= */}
-      <DailyActressBox actresses={actresses || []} />
+      <DailyActressBox actresses={allActresses || []} />
 
       {/* =========================================
           Tabs Navigation - Froala Design Blocks
