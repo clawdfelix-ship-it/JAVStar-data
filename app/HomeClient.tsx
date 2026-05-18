@@ -420,6 +420,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
         )}
       </main>
 
+      {/* ==========================================
+          每月新作 - New Releases Section (footer 上面)
+          ========================================== */}
+      <NewReleasesSection />
+
       {/* =========================================
           Footer - Froala Design Blocks
           NIPPON COLORS
@@ -465,11 +470,6 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           </div>
         </div>
       </footer>
-
-      {/* ==========================================
-          每月新作 - New Releases Section (最底部)
-          ========================================== */}
-      <NewReleasesSection />
     </div>
   );
 }
