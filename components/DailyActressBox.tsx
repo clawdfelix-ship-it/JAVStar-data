@@ -104,9 +104,11 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                     <h3 className="font-bold text-text-primary text-lg">
                       {selectedActress.name_cn || selectedActress.name_ja}
                     </h3>
-                    <p className="text-text-tertiary text-xs mt-1">
-                      {selectedActress.name_ja}
-                    </p>
+                    {(selectedActress.name_cn && selectedActress.name_ja && selectedActress.name_cn !== selectedActress.name_ja) && (
+                      <p className="text-text-tertiary text-xs mt-1">
+                        {selectedActress.name_ja}
+                      </p>
+                    )}
                     <div className="flex justify-center gap-2 mt-2 flex-wrap">
                       {selectedActress.cup && (
                         <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs">
