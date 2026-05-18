@@ -7,6 +7,7 @@ import EventCard from '@/components/EventCard';
 import EventCalendar from '@/components/EventCalendar';
 import VirtualList from '@/components/VirtualList';
 import SearchBar from '@/components/SearchBar';
+import NewReleasesSection from '@/components/NewReleasesSection';
 import { highlightText } from '@/hooks/useSearch';
 import { useActresses } from '@/hooks/useActresses';
 import { useEvents } from '@/hooks/useEvents';
@@ -221,6 +222,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           </div>
         </div>
       </section>
+
+      {/* =========================================
+          每月新作 - New Releases Section
+          ========================================= */}
+      <NewReleasesSection />
 
       {/* =========================================
           Tabs Navigation - Froala Design Blocks

@@ -50,3 +50,16 @@ export interface ActressEventsCount {
   year_2025_events: number;
   year_2026_events: number;
 }
+
+export interface NewRelease {
+  id: string;
+  video_code: string;           // 影片編號 e.g. VRKM-01790
+  title: string;                // 標題
+  cover_url: string | null;     // 封面
+  detail_url: string | null;    // JavLibrary 詳情頁
+  actresses: string | null;     // 女優名 (comma separated)
+  release_date: string | null;  // 發行日期
+  maker: string | null;         // 製作商
+  created_at: string;
+  updated_at: string;
+}

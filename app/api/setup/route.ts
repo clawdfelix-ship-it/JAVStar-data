@@ -50,6 +50,22 @@ export async function GET() {
       )
     `;
 
+    // Create new_releases table for 每月新作
+    await sql`
+      CREATE TABLE IF NOT EXISTS new_releases (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        video_code TEXT NOT NULL UNIQUE,
+        title TEXT NOT NULL,
+        cover_url TEXT,
+        detail_url TEXT,
+        actresses TEXT,
+        release_date TEXT,
+        maker TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
     return NextResponse.json({
       success: true,
       message: '✅ Tables created successfully!',

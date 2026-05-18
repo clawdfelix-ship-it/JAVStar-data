@@ -15,8 +15,8 @@ interface ScrapedEvent {
 
 async function scrapePage(page: Page, pageNum: number): Promise<ScrapedEvent[]> {
   const url = pageNum === 1
-    ? 'https://www.av-event.jp/search/?begin_date=20260101&end_date=20260630'
-    : `https://www.av-event.jp/search/${pageNum}/?begin_date=20260101&end_date=20260630`;
+    ? 'https://www.av-event.jp/search/?begin_date=20260601&end_date=20260630'
+    : `https://www.av-event.jp/search/${pageNum}/?begin_date=20260601&end_date=20260630`;
 
   console.log(`Scraping page ${pageNum}: ${url}`);
   await page.goto(url); await page.waitForTimeout(3000);

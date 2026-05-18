@@ -1,0 +1,182 @@
+import * as fs from 'fs';
+
+const events6 = JSON.parse(fs.readFileSync('./scraped-events-search.json', 'utf8'));
+
+// 噪音「女優」名 - 需要清理
+const noiseNames = [
+  '由良かな', // 等下檢查係咪真嘅
+  '女優引退', '発売記念オンライン', 'リニューアル記念合同',
+  '大阪', '周年記念', '周年祝い', '引退カウントダウン',
+  '兵庫', 'オンライン', 'リスタープロ所属', '引退ラストリリース',
+];
+
+// V4: 專注處理特殊 pattern
+function extractActressName(eventName: string): string | null {
+  // 特殊 pattern 1: 廠商標籤後跟空格名字「【SODSTAR】柴崎はる」
+  const brandPattern = /[】\]][\s　]*[0-9]*[\/月日（日月火水木金土）()0-9:時分~～]*[\s　]*([\u30A0-\u30FF\u4E00-\u9FFF\u3040-\u309F]{2,8})[\s　]/;
+  const m1 = eventName.match(brandPattern);
+  if (m1) {
+    const name = m1[1].trim();
+    if (!isNoise(name)) return name;
+  }
+
+  // 特殊 pattern 2: 「♡XX♡」/「♡XX」
+  const heartPattern = /♡([\u30A0-\u30FF\u4E00-\u9FFF\u3040-\u309F]{2,10})/;
+  const m2 = eventName.match(heartPattern);
+  if (m2 && !isNoise(m2[1])) return m2[1];
+
+  // 特殊 pattern 3: 開頭名字「楓ふうあ in FUKUOKA」
+  const startNamePattern = /^([\u30A0-\u30FF\u4E00-\u9FFF\u3040-\u309F]{2,8})[\s　]+(?:in|IN|＠|@|『)/;
+  const m3 = eventName.match(startNamePattern);
+  if (m3 && !isNoise(m3[1])) return m3[1];
+
+  // 特殊 pattern 4: 「NXXの」
+  const noPattern = /([\u30A0-\u30FF\u4E00-\u9FFF\u3040-\u309F]{2,8})の(?:誘惑|癒し|秘密|チェキ|サイン|握手)/;
+  const m4 = eventName.match(noPattern);
+  if (m4 && !isNoise(m4[1])) return m4[1];
+
+  // 特殊 pattern 5: 「XXイベント」、「XXちゃん」(配合 noise filter)
+  const generalPattern = /([\u30A0-\u30FF\u4E00-\u9FFF\u3040-\u309F]{2,8})(?:ちゃん|さん|くん|イベント|チェキ会|サイン会)/;
+  const m5 = eventName.match(generalPattern);
+  if (m5 && !isNoise(m5[1])) return m5[1];
+
+  return null;
+}
+
+function isNoise(name: string): boolean {
+  const noise = new Set([
+    'イベント', 'リリース', 'サイン', '撮影', '記念', '発売', '引退',
+    '秋葉原', '兵庫', '岡山', '大阪', '東京', '名古屋', '神戸', '京都', 'FUKUOKA',
+    '専属', '直販', '販売', '上映', '物販', '即売',
+    'AV女優', '女優', 'パラダイス', 'コラボ', '応援', 'アイドル',
+    'ラムタラ', 'エピカリ', 'ムーラン', 'グローリー', 'プラネット',
+    'SODSTAR', 'FALENO', 'プレステージ', 'MAX-A', 'MILK',
+    '予定', '中', 'in', 'IN', 'AT', '店',
+    'バコバコ', 'バスツアー', 'パチンコ', '来店', 'リニューアル', 'カウントダウン',
+    'プロ所属', '合同', '周年', 'オンライン',
+  ]);
+  for (const n of noise) {
+    if (name === n || name.includes(n)) return true;
+  }
+  return false;
+}
+
+function normalizeDate(dateStr: string): string {
+  const clean = dateStr.split('\n')[0].trim();
+  const parts = clean.split('/');
+  if (parts.length === 3) {
+    return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+  }
+  return clean;
+}
+
+async function main() {
+  // 獲取已導入活動 ID
+  const eventsRes = await fetch('https://jav-star-data.vercel.app/api/events?limit=2000');
+  const eventsData = await eventsRes.json();
+  const importedIds = new Set((eventsData.data || []).map((e: any) => e.id));
+  console.log(`已導入活動 ID 數: ${importedIds.size}`);
+
+  // 只處理未導入嘅
+  const remaining = events6.filter((e: any) => !importedIds.has(e.id));
+  console.log(`剩餘需處理: ${remaining.length}\n`);
+
+  const res = await fetch('https://jav-star-data.vercel.app/api/actresses?limit=5500');
+  const data = await res.json();
+  const actressMap = new Map(data.data.map((a: any) => [a.name_ja, a.id]));
+
+  const matchedEvents: any[] = [];
+  const newActresses = new Map<string, string[]>();
+  const failedEvents: any[] = [];
+
+  for (const event of remaining) {
+    const actressName = extractActressName(event.event_name);
+    
+    if (!actressName) {
+      failedEvents.push(event);
+      continue;
+    }
+
+    let actressId = actressMap.get(actressName);
+    if (!actressId) {
+      for (const [name, id] of actressMap.entries()) {
+        if (name.includes(actressName) || actressName.includes(name)) {
+          actressId = id;
+          break;
+        }
+      }
+    }
+
+    if (actressId) {
+      matchedEvents.push({
+        id: event.id,
+        actress_id: actressId,
+        title: event.event_name,
+        venue: event.location || '',
+        prefecture: event.location || '',
+        datetime: normalizeDate(event.event_date),
+        event_type: 'イベント',
+        url: event.url,
+      });
+    } else {
+      if (!newActresses.has(actressName)) newActresses.set(actressName, []);
+      newActresses.get(actressName)!.push(event.id);
+    }
+  }
+
+  console.log(`✅ 匹配現有: ${matchedEvents.length}`);
+  console.log(`🆕 新女優: ${newActresses.size}`);
+  console.log(`❌ 失敗: ${failedEvents.length}\n`);
+
+  console.log('--- 新女優 ---');
+  for (const [name, ids] of newActresses) console.log(`  ${name} (${ids.length})`);
+
+  console.log('\n--- 失敗 (前 15) ---');
+  failedEvents.slice(0, 15).forEach(e => console.log(`  ${e.event_name}`));
+
+  // 新增新女優
+  if (newActresses.size > 0) {
+    const newActressData = [...newActresses.entries()].map(([name]) => ({
+      id: `auto_${Buffer.from(name).toString('base64').replace(/[+/=]/g, '').slice(0, 12)}`,
+      name_ja: name,
+    }));
+
+    const r = await fetch('https://jav-star-data.vercel.app/api/seed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actresses: newActressData })
+    });
+    console.log('\n新女優結果:', JSON.stringify(await r.json()));
+
+    for (const [name, eventIds] of newActresses) {
+      const newId = `auto_${Buffer.from(name).toString('base64').replace(/[+/=]/g, '').slice(0, 12)}`;
+      for (const evId of eventIds) {
+        const ev = events6.find((e: any) => e.id === evId);
+        if (ev) {
+          matchedEvents.push({
+            id: ev.id,
+            actress_id: newId,
+            title: ev.event_name,
+            venue: ev.location || '',
+            prefecture: ev.location || '',
+            datetime: normalizeDate(ev.event_date),
+            event_type: 'イベント',
+            url: ev.url,
+          });
+        }
+      }
+    }
+  }
+
+  console.log(`\n=== 導入 ${matchedEvents.length} 個 ===`);
+  if (matchedEvents.length > 0) {
+    const r2 = await fetch('https://jav-star-data.vercel.app/api/seed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ events: matchedEvents })
+    });
+    console.log('結果:', JSON.stringify(await r2.json()));
+  }
+}
+
+main().catch(console.error);
