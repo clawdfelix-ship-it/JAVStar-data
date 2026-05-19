@@ -70,7 +70,7 @@ export default function DvdRankingSection() {
               </span>
             </h2>
             <p className="text-text-tertiary mt-0.5 text-xs">
-              數據來源：DMM.co.jp 月間銷售排行榜
+              數據來源：DMM.co.jp 月間銷售排行榜（高清封面）
             </p>
           </div>
           <a
@@ -90,7 +90,7 @@ export default function DvdRankingSection() {
           </div>
         )}
 
-        {/* 排行榜網格 - 1排10個，超細封面 */}
+        {/* 排行榜網格 - 1排10個，細封面 */}
         {!isLoading && ranking.length > 0 && (
           <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
             {ranking.map((item) => (
@@ -101,12 +101,12 @@ export default function DvdRankingSection() {
                 rel="noopener noreferrer"
                 className="group block bg-gray-50 rounded overflow-hidden hover:shadow transition-all duration-200"
               >
-                {/* 封面 - 超細尺寸 */}
+                {/* 封面 - 高清渲染優化 */}
                 <div 
-                  className="relative aspect-[2/3] overflow-hidden bg-gray-200 group"
+                  className="relative aspect-[2/3] overflow-hidden bg-gray-200"
                   title={`#${item.rank} ${item.title}${item.actress ? ` | ${item.actress}` : ''}`}
                 >
-                  {/* 排位徽章 - 超細 */}
+                  {/* 排位徽章 */}
                   <div className="absolute top-1 left-1 z-10">
                     <span className={`w-5 h-5 flex items-center justify-center rounded-full font-bold text-[10px] shadow ${getRankStyle(item.rank)}`}>
                       {item.rank}
@@ -126,13 +126,19 @@ export default function DvdRankingSection() {
                       </span>
                     </div>
                   )}
-                  {/* 封面圖 */}
+                  {/* 高清封面圖 - 渲染優化 */}
                   {item.coverUrl ? (
                     <img
                       src={item.coverUrl}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                       loading="lazy"
+                      decoding="async"
+                      style={{
+                        imageRendering: 'auto',
+                        backfaceVisibility: 'hidden',
+                        transform: 'translateZ(0)',
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
@@ -141,12 +147,12 @@ export default function DvdRankingSection() {
                   )}
                 </div>
 
-                {/* 女優名 / 番號 */}
+                {/* 女優名 + 番號 */}
                 <div className="p-1.5 text-center">
                   <p className="text-[8px] font-medium text-text-primary truncate" title={item.actress || item.title}>
                     {item.actress || item.videoCode || '#' + item.rank}
                   </p>
-                  <p className="text-[7px] text-text-tertiary truncate mt-0.5" title={item.title}>
+                  <p className="text-[7px] text-text-tertiary truncate mt-0.5" title={item.videoCode}>
                     {item.videoCode || ''}
                   </p>
                 </div>
@@ -167,7 +173,7 @@ export default function DvdRankingSection() {
         {/* 備註 */}
         <div className="mt-3 text-center">
           <p className="text-[9px] text-text-tertiary">
-            🔄 數據每 4 小時自動更新
+            🔄 數據每 4 小時自動更新 | 🖼️ 高清封面
           </p>
         </div>
       </div>
