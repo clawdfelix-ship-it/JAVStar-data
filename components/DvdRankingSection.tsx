@@ -7,6 +7,7 @@ interface DvdRankingItem {
   title: string;
   actress: string;
   maker: string;
+  videoCode: string;
   coverUrl: string;
   detailUrl: string;
   isNew: boolean;
