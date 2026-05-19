@@ -1,21 +1,12 @@
 import { NextResponse } from 'next/server';
+import sql from '@/lib/db';
 
 // Cache 配置
-const CACHE_DURATION = 60 * 60 * 1000; // 1 小時
+const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
 let cachedData: any = null;
 let lastFetchTime = 0;
 
-interface RankingItem {
-  rank: number;
-  title: string;
-  actress: string;
-  maker: string;
-  coverUrl: string;
-  detailUrl: string;
-  isNew: boolean;
-  rankChange: 'up' | 'down' | 'same' | 'new';
-}
-
+// GET - 拎排行榜數據
 export async function GET() {
   // 檢查 cache
   const now = Date.now();
@@ -28,90 +19,51 @@ export async function GET() {
   }
 
   try {
-    // 爬 DMM 月間排行榜
-    const response = await fetch('https://www.dmm.co.jp/mono/dvd/-/ranking/=/term=monthly/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'ja,en-US;q=0.7,en;q=0.3',
-        'Referer': 'https://www.dmm.co.jp/',
-      },
-      next: { revalidate: 3600 }, // Next.js 自動 cache
-    });
-
-    if (!response.ok) {
-      throw new Error(`DMM 請求失敗: ${response.status}`);
-    }
-
-    const html = await response.text();
-
-    // 解析 HTML（簡單解析，DMM 結構可能變）
-    const ranking: RankingItem[] = [];
+    // 確保表存在
+    await sql`
+      CREATE TABLE IF NOT EXISTS dvd_ranking (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        rank INTEGER NOT NULL,
+        video_code TEXT,
+        title TEXT,
+        actress TEXT,
+        maker TEXT,
+        cover_url TEXT,
+        detail_url TEXT,
+        is_new BOOLEAN DEFAULT 0,
+        rank_change TEXT DEFAULT 'same',
+        source TEXT DEFAULT 'DMM',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
     
-    // 搵每個 ranking item
-    const itemRegex = /<div class="list__area">([\s\S]*?)<\/div>\s*<\/div>/g;
-    let match;
-    let rank = 1;
-
-    while ((match = itemRegex.exec(html)) !== null && rank <= 20) {
-      const itemHtml = match[1];
-      
-      // 提取標題
-      const titleMatch = itemHtml.match(/<h2 class="list__title">([\s\S]*?)<\/h2>/);
-      const title = titleMatch ? titleMatch[1].trim() : '';
-      
-      // 提取女優
-      const actressMatch = itemHtml.match(/<span class="list__author">([\s\S]*?)<\/span>/);
-      const actress = actressMatch ? actressMatch[1].trim() : '';
-      
-      // 提取廠商
-      const makerMatch = itemHtml.match(/<span class="list__maker">([\s\S]*?)<\/span>/);
-      const maker = makerMatch ? makerMatch[1].trim() : '';
-      
-      // 提取封面
-      const coverMatch = itemHtml.match(/<img[^>]*src="([^"]*pics\.dmm\.co\.jp[^"]*)"[^>]*>/);
-      const coverUrl = coverMatch ? coverMatch[1] : '';
-      
-      // 提取詳情鏈接
-      const linkMatch = itemHtml.match(/<a[^>]*href="([^"]*\/detail\/[^"]*)"[^>]*>/);
-      const detailUrl = linkMatch ? linkMatch[1] : '';
-      
-      // 判斷是否新上榜
-      const isNew = itemHtml.includes('icon_new') || itemHtml.includes('class="new"');
-      
-      // 判斷升降（簡單判斷，DMM 有專門的 icon）
-      let rankChange: 'up' | 'down' | 'same' | 'new' = 'same';
-      if (itemHtml.includes('icon_up') || itemHtml.includes('class="up"')) {
-        rankChange = 'up';
-      } else if (itemHtml.includes('icon_down') || itemHtml.includes('class="down"')) {
-        rankChange = 'down';
-      } else if (isNew) {
-        rankChange = 'new';
-      }
-
-      if (title && rank <= 20) {
-        ranking.push({
-          rank,
-          title,
-          actress,
-          maker,
-          coverUrl: coverUrl.replace('pt.', 'ps.'), // 轉成小圖
-          detailUrl,
-          isNew,
-          rankChange,
-        });
-        rank++;
-      }
-    }
-
-    // 如果解析唔到數據，返回 fallback
-    if (ranking.length === 0) {
+    // 從數據庫拎最新數據
+    const rows = await sql`
+      SELECT * FROM dvd_ranking ORDER BY rank ASC LIMIT 20
+    `;
+    
+    if (rows.length === 0) {
+      // 如果冇數據，返回示例數據
       return NextResponse.json({
         success: true,
-        data: getFallbackData(),
-        note: '解析失敗，使用備用數據',
+        data: getSampleData(),
+        note: '使用示例數據',
       });
     }
+
+    // 格式化數據
+    const ranking = rows.map((row: any) => ({
+      rank: row.rank,
+      videoCode: row.video_code,
+      title: row.title || '',
+      actress: row.actress || '',
+      maker: row.maker || '',
+      coverUrl: row.cover_url,
+      detailUrl: row.detail_url,
+      isNew: row.is_new === 1,
+      rankChange: row.rank_change || 'same',
+    }));
 
     // 更新 cache
     cachedData = ranking;
@@ -124,19 +76,144 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('DMM 爬蟲錯誤:', error);
-    // 出錯返回備用數據
+    console.error('獲取排行榜失敗:', error);
     return NextResponse.json({
-      success: true,
-      data: getFallbackData(),
-      note: '爬蟲失敗，使用備用數據',
-    });
+      success: false,
+      error: String(error),
+    }, { status: 500 });
   }
 }
 
-// 備用數據（萬一爬唔到）
-function getFallbackData(): RankingItem[] {
+// POST - 手動更新排行榜
+export async function POST(request: Request) {
+  try {
+    const { ranking, source = 'DMM' } = await request.json();
+    
+    if (!ranking || !Array.isArray(ranking)) {
+      return NextResponse.json({
+        success: false,
+        error: 'ranking array required',
+      }, { status: 400 });
+    }
+
+    // 確保表存在
+    await sql`
+      CREATE TABLE IF NOT EXISTS dvd_ranking (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        rank INTEGER NOT NULL,
+        video_code TEXT,
+        title TEXT,
+        actress TEXT,
+        maker TEXT,
+        cover_url TEXT,
+        detail_url TEXT,
+        is_new BOOLEAN DEFAULT 0,
+        rank_change TEXT DEFAULT 'same',
+        source TEXT DEFAULT 'DMM',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    
+    // 先清空舊數據
+    await sql`DELETE FROM dvd_ranking`;
+    
+    // 插入新數據
+    let insertedCount = 0;
+    for (const item of ranking) {
+      // 從detailUrl提取video code
+      const videoCodeMatch = item.detailUrl?.match(/cid=([^/]+)/);
+      const videoCode = videoCodeMatch ? videoCodeMatch[1] : (item.videoCode || '');
+      
+      await sql`
+        INSERT INTO dvd_ranking 
+        (rank, video_code, title, actress, maker, cover_url, detail_url, is_new, rank_change, source)
+        VALUES (
+          ${item.rank}, 
+          ${videoCode}, 
+          ${item.title || ''}, 
+          ${item.actress || ''}, 
+          ${item.maker || ''}, 
+          ${item.coverUrl || item.cover_url || ''}, 
+          ${item.detailUrl || item.detail_url || ''}, 
+          ${item.isNew || item.is_new ? 1 : 0}, 
+          ${item.rankChange || item.rank_change || 'same'}, 
+          ${source}
+        )
+      `;
+      insertedCount++;
+    }
+
+    // 清除 cache
+    cachedData = null;
+
+    return NextResponse.json({
+      success: true,
+      inserted: insertedCount,
+      message: '排行榜更新成功',
+    });
+
+  } catch (error) {
+    console.error('更新排行榜失敗:', error);
+    return NextResponse.json({
+      success: false,
+      error: String(error),
+    }, { status: 500 });
+  }
+}
+
+// 示例數據
+function getSampleData() {
   return [
-    { rank: 1, title: 'DMM 月間排行榜數據暫時無法獲取', actress: '-', maker: '-', coverUrl: '', detailUrl: '#', isNew: false, rankChange: 'same' },
+    {
+      rank: 1,
+      title: '最強ヒロインと 一緒に終電逃して ホテル泊まって 朝までヤリたい！ 瀬戸環奈',
+      actress: '瀬戸環奈',
+      maker: 'エスワン',
+      coverUrl: '',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=snos183/',
+      isNew: true,
+      rankChange: 'up',
+    },
+    {
+      rank: 2,
+      title: 'シリーズ累計販売数800万部 カラミざかり同窓会編 石川澪',
+      actress: '石川澪',
+      maker: 'ムーディーズ',
+      coverUrl: '',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=mimk267/',
+      isNew: true,
+      rankChange: 'up',
+    },
+    {
+      rank: 3,
+      title: '妊活のため一か月禁欲したのに妻にセックスを拒まれた翌日 JULIA',
+      actress: 'JULIA',
+      maker: 'ワンズファクトリー',
+      coverUrl: '',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=tkwaaa640/',
+      isNew: true,
+      rankChange: 'up',
+    },
+    {
+      rank: 4,
+      title: '乳房が宙に浮くほど エビ反りイク 媚薬オイル漬けエステ 木村愛心',
+      actress: '木村愛心',
+      maker: 'エスワン',
+      coverUrl: '',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=snos212/',
+      isNew: true,
+      rankChange: 'up',
+    },
+    {
+      rank: 5,
+      title: '男たちは誰もが沼るカラダ 長浜みつり',
+      actress: '長浜みつり',
+      maker: 'FAIR＆WAY',
+      coverUrl: '',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=fway094/',
+      isNew: true,
+      rankChange: 'up',
+    },
   ];
 }
