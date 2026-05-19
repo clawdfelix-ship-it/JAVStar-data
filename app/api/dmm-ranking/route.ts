@@ -19,10 +19,10 @@ export async function GET() {
   }
 
   try {
-    // 確保表存在
+    // 確保表存在 (PostgreSQL用SERIAL而非AUTOINCREMENT)
     await sql`
       CREATE TABLE IF NOT EXISTS dvd_ranking (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         rank INTEGER NOT NULL,
         video_code TEXT,
         title TEXT,
@@ -30,11 +30,11 @@ export async function GET() {
         maker TEXT,
         cover_url TEXT,
         detail_url TEXT,
-        is_new BOOLEAN DEFAULT 0,
+        is_new BOOLEAN DEFAULT FALSE,
         rank_change TEXT DEFAULT 'same',
         source TEXT DEFAULT 'DMM',
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
     
@@ -61,7 +61,7 @@ export async function GET() {
       maker: row.maker || '',
       coverUrl: row.cover_url,
       detailUrl: row.detail_url,
-      isNew: row.is_new === 1,
+      isNew: row.is_new === true,
       rankChange: row.rank_change || 'same',
     }));
 
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
     // 確保表存在
     await sql`
       CREATE TABLE IF NOT EXISTS dvd_ranking (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         rank INTEGER NOT NULL,
         video_code TEXT,
         title TEXT,
@@ -107,11 +107,11 @@ export async function POST(request: Request) {
         maker TEXT,
         cover_url TEXT,
         detail_url TEXT,
-        is_new BOOLEAN DEFAULT 0,
+        is_new BOOLEAN DEFAULT FALSE,
         rank_change TEXT DEFAULT 'same',
         source TEXT DEFAULT 'DMM',
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
     
@@ -121,23 +121,19 @@ export async function POST(request: Request) {
     // 插入新數據
     let insertedCount = 0;
     for (const item of ranking) {
-      // 從detailUrl提取video code
-      const videoCodeMatch = item.detailUrl?.match(/cid=([^/]+)/);
-      const videoCode = videoCodeMatch ? videoCodeMatch[1] : (item.videoCode || '');
-      
       await sql`
         INSERT INTO dvd_ranking 
         (rank, video_code, title, actress, maker, cover_url, detail_url, is_new, rank_change, source)
         VALUES (
           ${item.rank}, 
-          ${videoCode}, 
+          ${item.videoCode || ''}, 
           ${item.title || ''}, 
           ${item.actress || ''}, 
           ${item.maker || ''}, 
-          ${item.coverUrl || item.cover_url || ''}, 
-          ${item.detailUrl || item.detail_url || ''}, 
-          ${item.isNew || item.is_new ? 1 : 0}, 
-          ${item.rankChange || item.rank_change || 'same'}, 
+          ${item.coverUrl || ''}, 
+          ${item.detailUrl || ''}, 
+          ${item.isNew ? true : false}, 
+          ${item.rankChange || 'same'}, 
           ${source}
         )
       `;
@@ -170,8 +166,8 @@ function getSampleData() {
       title: '最強ヒロインと 一緒に終電逃して ホテル泊まって 朝までヤリたい！ 瀬戸環奈',
       actress: '瀬戸環奈',
       maker: 'エスワン',
-      coverUrl: '',
-      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=snos183/',
+      coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/k9snos183/k9snos183pt.jpg',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=k9snos183/',
       isNew: true,
       rankChange: 'up',
     },
@@ -180,8 +176,8 @@ function getSampleData() {
       title: 'シリーズ累計販売数800万部 カラミざかり同窓会編 石川澪',
       actress: '石川澪',
       maker: 'ムーディーズ',
-      coverUrl: '',
-      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=mimk267/',
+      coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/dkmimk267/dkmimk267pt.jpg',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=dkmimk267/',
       isNew: true,
       rankChange: 'up',
     },
@@ -190,7 +186,7 @@ function getSampleData() {
       title: '妊活のため一か月禁欲したのに妻にセックスを拒まれた翌日 JULIA',
       actress: 'JULIA',
       maker: 'ワンズファクトリー',
-      coverUrl: '',
+      coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/tkwaaa640/tkwaaa640pt.jpg',
       detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=tkwaaa640/',
       isNew: true,
       rankChange: 'up',
@@ -200,8 +196,8 @@ function getSampleData() {
       title: '乳房が宙に浮くほど エビ反りイク 媚薬オイル漬けエステ 木村愛心',
       actress: '木村愛心',
       maker: 'エスワン',
-      coverUrl: '',
-      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=snos212/',
+      coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/k9snos212/k9snos212pt.jpg',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=k9snos212/',
       isNew: true,
       rankChange: 'up',
     },
@@ -210,8 +206,8 @@ function getSampleData() {
       title: '男たちは誰もが沼るカラダ 長浜みつり',
       actress: '長浜みつり',
       maker: 'FAIR＆WAY',
-      coverUrl: '',
-      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=fway094/',
+      coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/tkfway094/tkfway094pt.jpg',
+      detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=tkfway094/',
       isNew: true,
       rankChange: 'up',
     },

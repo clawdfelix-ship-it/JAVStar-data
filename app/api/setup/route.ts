@@ -69,7 +69,7 @@ export async function GET() {
     // Create dvd_ranking table for 月間排行榜
     await sql`
       CREATE TABLE IF NOT EXISTS dvd_ranking (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         rank INTEGER NOT NULL,
         video_code TEXT NOT NULL,
         title TEXT,
@@ -77,11 +77,11 @@ export async function GET() {
         maker TEXT,
         cover_url TEXT,
         detail_url TEXT,
-        is_new BOOLEAN DEFAULT 0,
+        is_new BOOLEAN DEFAULT FALSE,
         rank_change TEXT DEFAULT 'same',
         source TEXT DEFAULT 'JavLibrary',
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
 
