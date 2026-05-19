@@ -102,7 +102,10 @@ export default function DvdRankingSection() {
                 className="group block bg-gray-50 rounded overflow-hidden hover:shadow transition-all duration-200"
               >
                 {/* 封面 - 超細尺寸 */}
-                <div className="relative aspect-[2/3] overflow-hidden bg-gray-200">
+                <div 
+                  className="relative aspect-[2/3] overflow-hidden bg-gray-200 group"
+                  title={`#${item.rank} ${item.title}${item.actress ? ` | ${item.actress}` : ''}`}
+                >
                   {/* 排位徽章 - 超細 */}
                   <div className="absolute top-1 left-1 z-10">
                     <span className={`w-5 h-5 flex items-center justify-center rounded-full font-bold text-[10px] shadow ${getRankStyle(item.rank)}`}>
@@ -138,10 +141,13 @@ export default function DvdRankingSection() {
                   )}
                 </div>
 
-                {/* 番號 */}
+                {/* 女優名 / 番號 */}
                 <div className="p-1.5 text-center">
-                  <p className="text-[8px] font-medium text-text-primary truncate">
-                    {item.videoCode || item.actress || '# ' + item.rank}
+                  <p className="text-[8px] font-medium text-text-primary truncate" title={item.actress || item.title}>
+                    {item.actress || item.videoCode || '#' + item.rank}
+                  </p>
+                  <p className="text-[7px] text-text-tertiary truncate mt-0.5" title={item.title}>
+                    {item.videoCode || ''}
                   </p>
                 </div>
               </a>
