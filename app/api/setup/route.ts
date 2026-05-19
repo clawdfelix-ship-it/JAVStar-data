@@ -85,6 +85,23 @@ export async function GET() {
       )
     `;
 
+    // Create actress_whitelist table for DMM Top 200 女優白名單
+    await sql`
+      CREATE TABLE IF NOT EXISTS actress_whitelist (
+        id SERIAL PRIMARY KEY,
+        rank INTEGER NOT NULL,
+        actress_name TEXT NOT NULL,
+        dmm_id TEXT,
+        avatar_url TEXT,
+        profile_url TEXT,
+        source TEXT DEFAULT 'DMM Actress Ranking',
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(rank)
+      )
+    `;
+
     return NextResponse.json({
       success: true,
       message: '✅ Tables created successfully!',
