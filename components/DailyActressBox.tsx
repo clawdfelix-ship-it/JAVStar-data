@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Actress {
   id: string;
@@ -41,12 +42,10 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
   // 當白名單或女優列表更新時，過濾出 Top 200
   useEffect(() => {
     if (whitelist.length > 0 && actresses.length > 0) {
-      // 建立名字匹配映射
       const whitelistNames = new Set(
         whitelist.map(w => w.actress_name?.toLowerCase().trim())
       );
       
-      // 過濾出在白名單入面嘅女優
       const filtered = actresses.filter(a => {
         const nameJa = a.name_ja?.toLowerCase().trim();
         const nameCn = a.name_cn?.toLowerCase().trim();
@@ -55,7 +54,6 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
 
       setTop200Actresses(filtered.length > 0 ? filtered : actresses.slice(0, 200));
     } else {
-      // 如果冇白名單，用評分最高嘅頭 200 位女優
       const sorted = [...actresses].sort((a, b) => b.final_score - a.final_score);
       setTop200Actresses(sorted.slice(0, 200));
     }
@@ -78,10 +76,8 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
 
     setIsSpinning(true);
 
-    // 先打亂整個數組，確保每次抽都有唔同結果
     const shuffled = [...top200Actresses].sort(() => Math.random() - 0.5);
 
-    // 模擬抽獎動畫效果
     let spins = 0;
     const maxSpins = 15;
     const interval = setInterval(() => {
@@ -91,7 +87,6 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
 
       if (spins >= maxSpins) {
         clearInterval(interval);
-        // 最後一次真正抽獎
         const finalIndex = Math.floor(Math.random() * shuffled.length);
         setSelectedActress(shuffled[finalIndex]);
         setIsSpinning(false);
@@ -130,7 +125,10 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
           {/* 右邊：結果顯示 */}
           <div className="min-w-[200px]">
             {selectedActress ? (
-              <div className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 ${isSpinning ? 'border-pink-400 animate-pulse' : 'border-transparent'} transition-all duration-300`}>
+              <Link 
+                href={`/actress/${selectedActress.id}`}
+                className={`block bg-white rounded-xl shadow-lg overflow-hidden border-2 ${isSpinning ? 'border-pink-400 animate-pulse' : 'border-transparent hover:border-pink-300'} transition-all duration-300 cursor-pointer hover:shadow-xl`}
+              >
                 <div className="relative">
                   {/* 女優頭像 */}
                   <div className="aspect-square w-40 mx-auto overflow-hidden bg-gray-100">
@@ -149,13 +147,14 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
 
                   {/* 女優資料 */}
                   <div className="p-4 text-center">
-                    {/* 主名 */}
-                    <h3 className="font-bold text-text-primary text-lg">
+                    {/* 主名（可點擊） */}
+                    <h3 className="font-bold text-text-primary text-lg hover:text-pink-500 transition-colors">
                       {selectedActress.name_ja}
                     </h3>
+                    <p className="text-[10px] text-pink-400 mt-1">👆 點擊查看詳情</p>
                     {/* 其他名稱 / 曾用名 */}
                     {selectedActress.name_cn && selectedActress.name_cn !== selectedActress.name_ja && (
-                      <div className="mt-2">
+                      <div className="mt-1">
                         <span className="text-[10px] text-text-tertiary">其他名稱：</span>
                         <span className="text-xs text-text-secondary ml-1">
                           {selectedActress.name_cn}
@@ -181,7 +180,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ) : (
               <div className="bg-white/50 rounded-xl border-2 border-dashed border-gray-300 w-40 h-52 flex flex-col items-center justify-center">
                 <span className="text-4xl mb-2">❓</span>
