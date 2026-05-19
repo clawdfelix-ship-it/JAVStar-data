@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface DvdRankingItem {
   rank: number;
@@ -13,92 +13,27 @@ interface DvdRankingItem {
   rankChange: 'up' | 'down' | 'same' | 'new';
 }
 
-// 模擬數據（真實數據需要後端爬蟲）
-const mockRanking: DvdRankingItem[] = [
-  {
-    rank: 1,
-    title: '初めての真正中出し解禁 河北彩花',
-    actress: '河北彩花',
-    maker: 'S1 NO.1 STYLE',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/ssis00001/ssis00001ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=ssis00001/',
-    isNew: true,
-    rankChange: 'new',
-  },
-  {
-    rank: 2,
-    title: '新人NO.1 STYLE 渚ことみ AVデビュー',
-    actress: '渚ことみ',
-    maker: 'S1 NO.1 STYLE',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/ssis00002/ssis00002ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=ssis00002/',
-    isNew: true,
-    rankChange: 'up',
-  },
-  {
-    rank: 3,
-    title: '100万円プレステージ 神木キャンペーン',
-    actress: '神木キャンペーン',
-    maker: 'PRESTIGE',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/abp00001/abp00001ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=abp00001/',
-    isNew: false,
-    rankChange: 'same',
-  },
-  {
-    rank: 4,
-    title: '絶対的美少女、最高のセックス 三上悠亜',
-    actress: '三上悠亜',
-    maker: 'S1 NO.1 STYLE',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/ssis00003/ssis00003ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=ssis00003/',
-    isNew: false,
-    rankChange: 'down',
-  },
-  {
-    rank: 5,
-    title: '初撮り 本物素人 20歳 女子大生',
-    actress: '素人',
-    maker: 'ナンパJAPAN',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/nnpj00001/nnpj00001ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=nnpj00001/',
-    isNew: true,
-    rankChange: 'new',
-  },
-  {
-    rank: 6,
-    title: '専属NO.1 STYLE 明里つむぎ',
-    actress: '明里つむぎ',
-    maker: 'IPZZ',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/ipzz00001/ipzz00001ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=ipzz00001/',
-    isNew: false,
-    rankChange: 'up',
-  },
-  {
-    rank: 7,
-    title: '超人気女優の最高級ソープ 桃乃木かな',
-    actress: '桃乃木かな',
-    maker: 'MOODYZ',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/mide00001/mide00001ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=mide00001/',
-    isNew: false,
-    rankChange: 'same',
-  },
-  {
-    rank: 8,
-    title: '最高の美女と、最高のセックス。 深田えいみ',
-    actress: '深田えいみ',
-    maker: 'MAXING',
-    coverUrl: 'https://pics.dmm.co.jp/mono/movie/adult/mxgs00001/mxgs00001ps.jpg',
-    detailUrl: 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=mxgs00001/',
-    isNew: false,
-    rankChange: 'down',
-  },
-];
-
 export default function DvdRankingSection() {
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [ranking, setRanking] = useState<DvdRankingItem[]>([]);
+
+  useEffect(() => {
+    fetchRanking();
+  }, []);
+
+  const fetchRanking = async () => {
+    try {
+      const res = await fetch('/api/dmm-ranking');
+      const data = await res.json();
+      if (data.success && data.data) {
+        setRanking(data.data.slice(0, 8)); // 淨係顯示頭 8 位
+      }
+    } catch (error) {
+      console.error('獲取排行榜失敗:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getRankChangeIcon = (change: DvdRankingItem['rankChange']) => {
     switch (change) {
@@ -134,7 +69,8 @@ export default function DvdRankingSection() {
               </span>
             </h2>
             <p className="text-text-tertiary mt-1 text-sm">
-              數據來源：DMM.co.jp 月間銷售排行榜</p>
+              數據來源：DMM.co.jp 月間銷售排行榜
+            </p>
           </div>
           <a
             href="https://www.dmm.co.jp/mono/dvd/-/ranking/=/term=monthly/"
@@ -154,12 +90,12 @@ export default function DvdRankingSection() {
         )}
 
         {/* 排行榜網格 */}
-        {!isLoading && (
+        {!isLoading && ranking.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {mockRanking.map((item) => (
+            {ranking.map((item) => (
               <a
                 key={item.rank}
-                href={item.detailUrl}
+                href={item.detailUrl || 'https://www.dmm.co.jp/mono/dvd/-/ranking/=/term=monthly/'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group block bg-gray-50 rounded-lg overflow-hidden hover:shadow-md transition-all duration-300 hover:-translate-y-1"
@@ -186,10 +122,19 @@ export default function DvdRankingSection() {
                       </span>
                     </div>
                   )}
-                  {/* 封面圖（暫時用占位符，真實數據需要爬蟲 */}
-                  <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <span className="text-4xl text-gray-400">🎬</span>
-                  </div>
+                  {/* 封面圖 */}
+                  {item.coverUrl ? (
+                    <img
+                      src={item.coverUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                      <span className="text-4xl text-gray-400">🎬</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* 資訊 */}
@@ -197,22 +142,35 @@ export default function DvdRankingSection() {
                   <h3 className="text-xs font-medium text-text-primary line-clamp-2 leading-tight">
                     {item.title}
                   </h3>
-                  <p className="text-[10px] text-pink-600 mt-1 font-medium">
-                    {item.actress}
-                  </p>
-                  <p className="text-[9px] text-text-tertiary mt-0.5">
-                    {item.maker}
-                  </p>
+                  {item.actress && (
+                    <p className="text-[10px] text-pink-600 mt-1 font-medium">
+                      {item.actress}
+                    </p>
+                  )}
+                  {item.maker && (
+                    <p className="text-[9px] text-text-tertiary mt-0.5">
+                      {item.maker}
+                    </p>
+                  )}
                 </div>
               </a>
             ))}
           </div>
         )}
 
+        {/* 沒有數據 */}
+        {!isLoading && ranking.length === 0 && (
+          <div className="text-center py-12">
+            <span className="text-4xl mb-3 block">📦</span>
+            <p className="text-text-secondary text-sm">暫時無法獲取排行榜數據</p>
+            <p className="text-text-tertiary text-xs mt-1">請稍後再試，或直接去 DMM 網站睇</p>
+          </div>
+        )}
+
         {/* 備註 */}
         <div className="mt-4 text-center">
           <p className="text-[10px] text-text-tertiary">
-            ⚠️ 目前顯示為模擬數據，真實數據需要後台爬蟲功能
+            🔄 數據每 1 小時自動更新
           </p>
         </div>
       </div>
