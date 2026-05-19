@@ -31,52 +31,50 @@ interface DailyActressBoxProps {
 export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
   const [selectedActress, setSelectedActress] = useState<Actress | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [whitelist, setWhitelist] = useState<any[]>([]);
-  const [top200Actresses, setTop200Actresses] = useState<Actress[]>([]);
+  const [futureActresses, setFutureActresses] = useState<Actress[]>([]);
 
-  // 獲取 DMM Top 200 女優白名單
+  // 獲取未來有活動的女優
   useEffect(() => {
-    fetchWhitelist();
-  }, []);
+    fetchFutureActresses();
+  }, [actresses]);
 
-  // 當白名單或女優列表更新時，過濾出 Top 200
-  useEffect(() => {
-    if (whitelist.length > 0 && actresses.length > 0) {
-      const whitelistNames = new Set(
-        whitelist.map(w => w.actress_name?.toLowerCase().trim())
-      );
-      
-      const filtered = actresses.filter(a => {
-        const nameJa = a.name_ja?.toLowerCase().trim();
-        const nameCn = a.name_cn?.toLowerCase().trim();
-        return whitelistNames.has(nameJa) || (nameCn && whitelistNames.has(nameCn));
-      });
-
-      setTop200Actresses(filtered.length > 0 ? filtered : actresses.slice(0, 200));
-    } else {
-      const sorted = [...actresses].sort((a, b) => b.final_score - a.final_score);
-      setTop200Actresses(sorted.slice(0, 200));
-    }
-  }, [whitelist, actresses]);
-
-  const fetchWhitelist = async () => {
+  const fetchFutureActresses = async () => {
     try {
-      const res = await fetch('/api/actress-whitelist');
+      const res = await fetch('/api/events');
       const data = await res.json();
-      if (data.success && data.data) {
-        setWhitelist(data.data);
+      if (data.data && data.data.length > 0) {
+        // 、過濾未來有活動的女優
+        const now = new Date();
+        const uniqueActressIds = new Set<string>();
+        
+        data.data.forEach((e: any) => {
+          const eventDate = new Date(e.datetime);
+          if (eventDate > now) {
+            uniqueActressIds.add(e.actress_id);
+          }
+        });
+
+        // 過濾出演技列表入面有未來活動的
+        const filtered = actresses.filter(a => 
+          uniqueActressIds.has(a.id) && a.year_2026_events > 0
+        );
+
+        setFutureActresses(filtered.length > 0 ? filtered : actresses.slice(0, 50));
       }
     } catch (error) {
-      console.error('獲取白名單失敗:', error);
+      console.error('獲取未來活動失敗:', error);
+      // 如果失敗，默認用評分最高的50個
+      const sorted = [...actresses].sort((a, b) => b.final_score - a.final_score);
+      setFutureActresses(sorted.slice(0, 50));
     }
   };
 
   const handleRandomPick = () => {
-    if (top200Actresses.length === 0 || isSpinning) return;
+    if (futureActresses.length === 0 || isSpinning) return;
 
     setIsSpinning(true);
 
-    const shuffled = [...top200Actresses].sort(() => Math.random() - 0.5);
+    const shuffled = [...futureActresses].sort(() => Math.random() - 0.5);
 
     let spins = 0;
     const maxSpins = 15;
@@ -108,14 +106,14 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
               </span>
             </h2>
             <p className="text-text-tertiary mt-1 text-sm">
-              隨機抽取 DMM Top 200 人氣女優，睇下今日嘅運氣！
+              隨機抽取未來有活動的人氣女優，睇下今日嘅運氣！
             </p>
             <p className="text-[10px] text-text-tertiary mt-1">
-              白名單人數：{top200Actresses.length} 位
+              未來活動人數：{futureActresses.length} 位
             </p>
             <button
               onClick={handleRandomPick}
-              disabled={top200Actresses.length === 0 || isSpinning}
+              disabled={futureActresses.length === 0 || isSpinning}
               className="mt-4 px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:from-pink-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               {isSpinning ? '🎰 抽取中...' : '🎲 立即抽取'}
@@ -172,9 +170,9 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                           {selectedActress.age} 歲
                         </span>
                       )}
-                      {selectedActress.event_count > 0 && (
+                      {selectedActress.year_2026_events > 0 && (
                         <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
-                          {selectedActress.event_count} 場活動
+                          {selectedActress.year_2026_events} 場活動
                         </span>
                       )}
                     </div>
