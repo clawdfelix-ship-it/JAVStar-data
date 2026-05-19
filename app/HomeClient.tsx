@@ -8,6 +8,7 @@ import EventCalendar from '@/components/EventCalendar';
 import VirtualList from '@/components/VirtualList';
 import SearchBar from '@/components/SearchBar';
 import NewReleasesSection from '@/components/NewReleasesSection';
+import DvdRankingSection from '@/components/DvdRankingSection';
 import DailyActressBox from '@/components/DailyActressBox';
 import { highlightText } from '@/hooks/useSearch';
 import { useActresses } from '@/hooks/useActresses';
@@ -428,6 +429,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           </div>
         )}
       </main>
+
+      {/* ==========================================
+          月間DVD排行榜 - DMM Ranking
+          ========================================== */}
+      <DvdRankingSection />
 
       {/* ==========================================
           每月新作 - New Releases Section (footer 上面)
