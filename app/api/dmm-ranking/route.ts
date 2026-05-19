@@ -41,7 +41,7 @@ export async function GET() {
     // 從數據庫拎最新數據
     const rows = await sql`
       SELECT * FROM dvd_ranking ORDER BY rank ASC LIMIT 20
-    `;
+    ` as any[];
     
     if (rows.length === 0) {
       // 如果冇數據，返回示例數據
