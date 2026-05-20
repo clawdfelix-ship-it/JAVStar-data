@@ -16,15 +16,29 @@ export async function GET() {
       sql`SELECT COUNT(*) as count FROM votes`
     ]);
 
-    // 取得最後更新時間 - 只查 actresses 表 (events 可能冇 updated_at 字段)
-    const actressMaxUpdate = await sql`SELECT MAX(created_at) as max_update FROM actresses LIMIT 1`;
+    // 取得最後更新時間 - 讀取所有表的最新時間
+    const [eventMaxUpdate, actressMaxUpdate, dvdRankingMaxUpdate, newReleasesMaxUpdate] = await Promise.all([
+      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM events`,
+      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM actresses`,
+      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM dvd_ranking`,
+      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM new_releases`
+    ]);
     
-    const actressLastUpdate = (actressMaxUpdate as any[])[0]?.max_update;
+    const getDate = (result: any) => {
+      return Array.isArray(result) && result.length > 0 
+        ? (result[0] as any)?.last_update 
+        : null;
+    };
     
-    // 安全處理：如果冇數據就用而家時間
-    const lastUpdate = actressLastUpdate 
-      ? new Date(actressLastUpdate).toISOString() 
-      : new Date().toISOString();
+    const dates = [
+      new Date(getDate(eventMaxUpdate) || 0),
+      new Date(getDate(actressMaxUpdate) || 0),
+      new Date(getDate(dvdRankingMaxUpdate) || 0),
+      new Date(getDate(newReleasesMaxUpdate) || 0),
+      new Date()
+    ];
+    
+    const lastUpdate = new Date(Math.max(...dates.map(d => d.getTime()))).toISOString();
 
     const actressCountNum = Number((actressCount as any[])[0]?.count || 0);
     const eventCountNum = Number((eventCount as any[])[0]?.count || 0);

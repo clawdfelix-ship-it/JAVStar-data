@@ -3,7 +3,7 @@
 # Morning run at 6:00 AM + Afternoon run at 3:00 PM via launchd
 # Logs to logs/scraper-YYYYMMDD.log
 
-PROJECT_DIR="/Users/chansiulungfelix/Projects/av-intelligence"
+PROJECT_DIR="/Users/chansiulungfelix/.openclaw/workspace-coding-qwen/JAVStar-data"
 LOG_FILE="$PROJECT_DIR/logs/scraper-$(date +%Y%m%d).log"
 
 mkdir -p "$PROJECT_DIR/logs"
