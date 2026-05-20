@@ -1,71 +1,62 @@
 import { NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { neon } from '@neondatabase/serverless';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 300; // 缓存 5 分钟
+export const revalidate = 0; // 禁用所有緩存
 
-// 輕量級統計 API - 只返回數量，0.1秒內返回
 export async function GET() {
   const startTime = Date.now();
   
   try {
-    // 並行查詢 3 個計數 - 數據庫級別 COUNT，比拉出所有數據快 100x
-    const [actressCount, eventCount, voteCount] = await Promise.all([
-      sql`SELECT COUNT(*) as count FROM actresses`,
-      sql`SELECT COUNT(*) as count FROM events`,
-      sql`SELECT COUNT(*) as count FROM votes`
-    ]);
-
-    // 取得最後更新時間 - 讀取所有表的最新時間
-    const [eventMaxUpdate, actressMaxUpdate, dvdRankingMaxUpdate, newReleasesMaxUpdate] = await Promise.all([
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM events`,
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM actresses`,
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM dvd_ranking`,
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM new_releases`
-    ]);
+    // 直接用 neon 客戶端，唔經任何包裝
+    const url =
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.POSTGRES_URL_NON_POOLING ||
+      '';
     
-    const getDate = (result: any) => {
-      return Array.isArray(result) && result.length > 0 
-        ? (result[0] as any)?.last_update 
-        : null;
-    };
+    if (!url) {
+      return NextResponse.json({ 
+        error: true, 
+        message: 'No database URL found' 
+      }, { status: 500 });
+    }
     
-    const dates = [
-      new Date(getDate(eventMaxUpdate) || 0),
-      new Date(getDate(actressMaxUpdate) || 0),
-      new Date(getDate(dvdRankingMaxUpdate) || 0),
-      new Date(getDate(newReleasesMaxUpdate) || 0),
-      new Date()
-    ];
+    const sql = neon(url);
     
-    const lastUpdate = new Date(Math.max(...dates.map(d => d.getTime()))).toISOString();
-
-    const actressCountNum = Number((actressCount as any[])[0]?.count || 0);
-    const eventCountNum = Number((eventCount as any[])[0]?.count || 0);
-    const voteCountNum = Number((voteCount as any[])[0]?.count || 0);
-    // lastUpdate 已經係上面處理好嘅 ISO string
-
+    // 簡單查詢
+    const actressResult = await sql`SELECT COUNT(*) as count FROM actresses`;
+    const eventResult = await sql`SELECT COUNT(*) as count FROM events`;
+    const voteResult = await sql`SELECT COUNT(*) as count FROM votes`;
+    
+    // 最後更新時間
+    const lastUpdateResult = await sql`SELECT NOW() as last_update`;
+    
+    const actressCount = Number(actressResult[0]?.count || 0);
+    const eventCount = Number(eventResult[0]?.count || 0);
+    const voteCount = Number(voteResult[0]?.count || 0);
+    const lastUpdate = lastUpdateResult[0]?.last_update || new Date().toISOString();
+    
     const duration = Date.now() - startTime;
-
-    return NextResponse.json({
-      actressCount: actressCountNum,
-      eventCount: eventCountNum,
-      voteCount: voteCountNum,
-      lastUpdate: lastUpdate,
-      queryTimeMs: duration,
-      cached: false
-    });
-
-  } catch (error) {
-    console.error('[stats] DB error:', error);
     
-    // 出錯時返回緩存的默認值，保證頁面一定能顯示
+    return NextResponse.json({
+      actressCount,
+      eventCount,
+      voteCount,
+      lastUpdate,
+      queryDurationMs: duration,
+      success: true
+    });
+    
+  } catch (error: any) {
     return NextResponse.json({
       actressCount: 0,
       eventCount: 0,
       voteCount: 0,
       lastUpdate: new Date().toISOString(),
-      error: true
-    });
+      error: true,
+      message: error.message,
+      stack: error.stack?.substring(0, 300)
+    }, { status: 500 });
   }
 }
