@@ -149,11 +149,11 @@ export default function DvdRankingSection() {
                 </div>
 
                 {/* 女優名 + 番號 */}
-                <div className="p-1.5 text-center">
-                  <p className="text-[8px] font-medium text-text-primary truncate" title={item.actress || item.title}>
+                <div className="p-2 text-center">
+                  <p className="text-xs font-medium text-text-primary truncate" title={item.actress || item.title}>
                     {item.actress || item.videoCode || '#' + item.rank}
                   </p>
-                  <p className="text-[7px] text-text-tertiary truncate mt-0.5" title={item.videoCode}>
+                  <p className="text-[10px] text-text-tertiary truncate mt-0.5" title={item.videoCode}>
                     {item.videoCode || ''}
                   </p>
                 </div>
