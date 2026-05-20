@@ -104,7 +104,7 @@ export default function DvdRankingSection() {
                 {/* 封面 - 高清渲染優化 */}
                 <div 
                   className="relative overflow-hidden bg-gray-200"
-                  style={{ aspectRatio: '3/4' }}
+                  style={{ aspectRatio: '800/438' }}
                   title={`#${item.rank} ${item.title}${item.actress ? ` | ${item.actress}` : ''}`}
                 >
                   {/* 排位徽章 */}
