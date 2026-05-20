@@ -470,7 +470,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             <div>
               <h4 className="font-semibold text-text-primary mb-4">更新時間</h4>
               <p className="text-sm text-text-secondary mb-2">
-                最後更新: {stats?.lastUpdate || '--'}
+                最後更新: {stats?.lastUpdate ? new Date(new Date(stats.lastUpdate).getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, 16).replace('T', ' ') : '--'} (香港時間)
               </p>
               <p className="text-xs text-text-tertiary">
                 數據僅供參考，請以官方公佈為準
