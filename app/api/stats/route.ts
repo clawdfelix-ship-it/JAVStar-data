@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import sql from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 300; // 缓存 5 分钟
