@@ -103,7 +103,7 @@ export default function DvdRankingSection() {
               >
                 {/* 封面 - 高清渲染優化 */}
                 <div 
-                  className="relative aspect-[2/3] overflow-hidden bg-gray-200"
+                  className="relative aspect-[3/4] overflow-hidden bg-gray-200"
                   title={`#${item.rank} ${item.title}${item.actress ? ` | ${item.actress}` : ''}`}
                 >
                   {/* 排位徽章 */}
