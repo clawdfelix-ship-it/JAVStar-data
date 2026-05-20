@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import sql from '@/lib/db';
+import { sql } from '@/lib/db';
 
 // Cache 配置
 const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
