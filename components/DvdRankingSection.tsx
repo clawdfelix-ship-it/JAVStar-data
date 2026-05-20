@@ -39,13 +39,13 @@ export default function DvdRankingSection() {
   const getRankChangeIcon = (change: DvdRankingItem['rankChange']) => {
     switch (change) {
       case 'up':
-        return <span className="text-green-500 text-[8px]">↑</span>;
+        return <span className="text-green-500 text-sm">↑</span>;
       case 'down':
-        return <span className="text-red-500 text-[8px]">↓</span>;
+        return <span className="text-red-500 text-sm">↓</span>;
       case 'new':
-        return <span className="text-pink-500 text-[8px]">NEW</span>;
+        return <span className="text-pink-500 text-xs">NEW</span>;
       default:
-        return <span className="text-gray-400 text-[8px]">→</span>;
+        return <span className="text-gray-400 text-sm">→</span>;
     }
   };
 
@@ -90,9 +90,9 @@ export default function DvdRankingSection() {
           </div>
         )}
 
-        {/* 排行榜網格 - 1排10個，淨封面 */}
+        {/* 排行榜網格 - 1排5個，純封面 */}
         {!isLoading && ranking.length > 0 && (
-          <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
             {ranking.map((item) => (
               <a
                 key={item.rank}
@@ -108,21 +108,21 @@ export default function DvdRankingSection() {
                   title={`#${item.rank} ${item.title}${item.actress ? ` | ${item.actress}` : ''}`}
                 >
                   {/* 排位徽章 */}
-                  <div className="absolute top-1 left-1 z-10">
-                    <span className={`w-5 h-5 flex items-center justify-center rounded-full font-bold text-[10px] shadow ${getRankStyle(item.rank)}`}>
+                  <div className="absolute top-2 left-2 z-10">
+                    <span className={`w-7 h-7 flex items-center justify-center rounded-full font-bold text-sm shadow ${getRankStyle(item.rank)}`}>
                       {item.rank}
                     </span>
                   </div>
                   {/* 升降徽章 */}
-                  <div className="absolute top-1 right-1 z-10">
-                    <span className="px-1 py-0.5 bg-white/90 rounded">
+                  <div className="absolute top-2 right-2 z-10">
+                    <span className="px-1.5 py-0.5 bg-white/90 rounded">
                       {getRankChangeIcon(item.rankChange)}
                     </span>
                   </div>
                   {/* NEW標籤 */}
                   {item.isNew && (
-                    <div className="absolute bottom-1 left-1 z-10">
-                      <span className="px-1.5 py-0.5 bg-pink-500 text-white rounded text-[8px] font-bold">
+                    <div className="absolute bottom-2 left-2 z-10">
+                      <span className="px-2 py-1 bg-pink-500 text-white rounded text-xs font-bold">
                         NEW
                       </span>
                     </div>
