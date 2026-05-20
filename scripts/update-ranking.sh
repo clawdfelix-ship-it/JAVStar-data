@@ -49,6 +49,13 @@ fi
 echo ""
 echo "✨ 更新完成！"
 echo ""
+
+# 自動更新最後更新時間戳
+echo "🕐 更新最後更新時間..."
+curl -s -X POST "https://jav-star-data.vercel.app/api/admin/update-timestamp" > /dev/null
+echo "   完成！"
+
+echo ""
 echo "ℹ️  下次要更新時："
 echo "   1. 打開 VPN cat 連日本"
 echo "   2. 運行 ./scripts/update-ranking.sh"

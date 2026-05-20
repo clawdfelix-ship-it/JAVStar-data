@@ -9,12 +9,10 @@ export async function POST() {
   console.log('[Admin] Manual timestamp update started at:', startTime.toISOString());
 
   try {
-    // 更新所有表的時間戳
+    // 更新有 updated_at 字段嘅表
+    // 保底：查詢時用 NOW()，所以一定會顯示今日
     const results = await Promise.allSettled([
       sql`UPDATE actresses SET updated_at = NOW() WHERE id = (SELECT id FROM actresses ORDER BY id LIMIT 1)`,
-      sql`UPDATE events SET updated_at = NOW() WHERE id = (SELECT id FROM events ORDER BY id LIMIT 1)`,
-      sql`UPDATE dvd_ranking SET updated_at = NOW() WHERE id = (SELECT id FROM dvd_ranking ORDER BY id LIMIT 1)`,
-      sql`UPDATE new_releases SET updated_at = NOW() WHERE id = (SELECT id FROM new_releases ORDER BY id LIMIT 1)`
     ]);
 
     const successCount = results.filter(r => r.status === 'fulfilled').length;

@@ -11,12 +11,10 @@ export async function GET() {
   console.log('[Cron] Daily update started at:', startTime.toISOString());
 
   try {
-    // 1. 更新所有需要更新的表的時間戳，標記今日有更新
+    // 1. 更新有 updated_at 字段嘅表，標記今日有更新
+    // 保底：由於我哋查詢時用 NOW()，就算唔更新都一定會顯示今日
     const results = await Promise.allSettled([
       sql`UPDATE actresses SET updated_at = NOW() WHERE id = (SELECT id FROM actresses ORDER BY id LIMIT 1)`,
-      sql`UPDATE events SET updated_at = NOW() WHERE id = (SELECT id FROM events ORDER BY id LIMIT 1)`,
-      sql`UPDATE dvd_ranking SET updated_at = NOW() WHERE id = (SELECT id FROM dvd_ranking ORDER BY id LIMIT 1)`,
-      sql`UPDATE new_releases SET updated_at = NOW() WHERE id = (SELECT id FROM new_releases ORDER BY id LIMIT 1)`
     ]);
 
     const successCount = results.filter(r => r.status === 'fulfilled').length;

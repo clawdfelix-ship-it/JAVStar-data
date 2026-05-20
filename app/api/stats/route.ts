@@ -18,10 +18,10 @@ export async function GET() {
 
     // 取得最後更新時間 - 讀取所有表的最新時間
     const [eventMaxUpdate, actressMaxUpdate, dvdRankingMaxUpdate, newReleasesMaxUpdate] = await Promise.all([
-      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM events`,
-      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM actresses`,
-      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM dvd_ranking`,
-      sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) as last_update FROM new_releases`
+      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM events`,
+      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM actresses`,
+      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM dvd_ranking`,
+      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM new_releases`
     ]);
     
     const getDate = (result: any) => {
