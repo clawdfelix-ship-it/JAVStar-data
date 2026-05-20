@@ -59,7 +59,12 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
           uniqueActressIds.has(a.id) && a.year_2026_events > 0
         );
 
-        setFutureActresses(filtered.length > 0 ? filtered : actresses.slice(0, 50));
+        // 按人氣評分排序，只取頭 50 名
+        const sortedByScore = filtered.length > 0 
+          ? [...filtered].sort((a, b) => b.final_score - a.final_score).slice(0, 50)
+          : [...actresses].sort((a, b) => b.final_score - a.final_score).slice(0, 50);
+
+        setFutureActresses(sortedByScore);
       }
     } catch (error) {
       console.error('獲取未來活動失敗:', error);
@@ -106,7 +111,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
               </span>
             </h2>
             <p className="text-text-tertiary mt-1 text-sm">
-              隨機抽取未來有活動的人氣女優，睇下今日嘅運氣！
+              隨機抽取未來有活動嘅 Top 50 人氣女優，睇下今日嘅運氣！
             </p>
             <p className="text-[10px] text-text-tertiary mt-1">
               未來活動人數：{futureActresses.length} 位
