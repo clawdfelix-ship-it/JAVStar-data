@@ -17,17 +17,21 @@ export async function GET() {
     
     // 2. 測試 sql function
     const result = await sql`SELECT 1 as test`;
+    const testValue = Array.isArray(result) && result.length > 0 ? (result[0] as any)?.test : null;
     
     // 3. 測試 count
     const actressCount = await sql`SELECT COUNT(*) as count FROM actresses`;
     const eventCount = await sql`SELECT COUNT(*) as count FROM events`;
     
+    const actressCountNum = Array.isArray(actressCount) && actressCount.length > 0 ? Number((actressCount[0] as any)?.count || 0) : 0;
+    const eventCountNum = Array.isArray(eventCount) && eventCount.length > 0 ? Number((eventCount[0] as any)?.count || 0) : 0;
+    
     return NextResponse.json({
       hasDatabaseUrl: hasUrl,
       urlLength: url.length,
-      testQuery: result[0]?.test,
-      actressCount: Number(actressCount[0]?.count || 0),
-      eventCount: Number(eventCount[0]?.count || 0),
+      testQuery: testValue,
+      actressCount: actressCountNum,
+      eventCount: eventCountNum,
       success: true
     });
     
