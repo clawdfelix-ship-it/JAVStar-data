@@ -291,7 +291,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                     </div>
 
                     {/* Stats Grid - WHITE CARDS with DARK TEXT */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-5 gap-3">
                       <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-4 text-center border border-pink-200">
                         <div className="font-mono text-2xl sm:text-3xl font-bold text-pink-700">{actress.stats.total_events}</div>
                         <div className="text-text-secondary text-sm mt-1 font-medium">📊 總活動</div>
