@@ -42,33 +42,46 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
     try {
       const res = await fetch('/api/events');
       const data = await res.json();
-      if (data.data && data.data.length > 0) {
-        // 、過濾未來有活動的女優
-        const now = new Date();
-        const uniqueActressIds = new Set<string>();
-        
+      
+      // 過濾未來有活動的女優
+      const now = new Date();
+      const uniqueActressIds = new Set<string>();
+      
+      if (data.data && Array.isArray(data.data)) {
         data.data.forEach((e: any) => {
+          // 檢查活動日期是否為未來
           const eventDate = new Date(e.datetime);
-          if (eventDate > now) {
+          if (eventDate > now && e.actress_id) {
             uniqueActressIds.add(e.actress_id);
           }
         });
-
-        // 過濾出演技列表入面有未來活動的
-        const filtered = actresses.filter(a => 
-          uniqueActressIds.has(a.id) && a.year_2026_events > 0
-        );
-
-        // 按人氣評分排序，只取頭 50 名
-        const sortedByScore = filtered.length > 0 
-          ? [...filtered].sort((a, b) => b.final_score - a.final_score).slice(0, 50)
-          : [...actresses].sort((a, b) => b.final_score - a.final_score).slice(0, 50);
-
-        setFutureActresses(sortedByScore);
       }
+      
+      console.log('未來活動女優 ID 數量:', uniqueActressIds.size);
+      console.log('女優列表總數:', actresses.length);
+      
+      // 過濾出女優列表入面有未來活動的
+      let filtered = actresses.filter(a => {
+        const hasFutureEvent = uniqueActressIds.has(a.id);
+        const has2026Events = a.year_2026_events > 0;
+        return hasFutureEvent || has2026Events; // 任一條件符合即可
+      });
+      
+      console.log('過濾後女優數量:', filtered.length);
+      
+      // 如果過濾後太少，就用評分最高的 50 個
+      if (filtered.length < 5) {
+        console.log('過濾後數量太少，使用評分排序');
+        filtered = [...actresses].sort((a, b) => b.final_score - a.final_score).slice(0, 50);
+      }
+      
+      // 按人氣評分排序，只取頭 50 名
+      const sortedByScore = filtered.sort((a, b) => b.final_score - a.final_score).slice(0, 50);
+      
+      setFutureActresses(sortedByScore);
     } catch (error) {
       console.error('獲取未來活動失敗:', error);
-      // 如果失敗，默認用評分最高的50個
+      // 如果失敗，默認用評分最高的 50 個
       const sorted = [...actresses].sort((a, b) => b.final_score - a.final_score);
       setFutureActresses(sorted.slice(0, 50));
     }
