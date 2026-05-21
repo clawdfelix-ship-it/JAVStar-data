@@ -8,20 +8,32 @@ export async function GET() {
   const startTime = Date.now();
   
   try {
-    // 直接用 neon 客戶端，唔經任何包裝
-    const url =
-      process.env.DATABASE_URL ||
-      process.env.POSTGRES_URL ||
-      process.env.POSTGRES_URL_NON_POOLING ||
-      '';
+    // 檢查所有可能嘅環境變量
+    const dbUrl = process.env.DATABASE_URL;
+    const postgresUrl = process.env.POSTGRES_URL;
+    const postgresUrlNonPooling = process.env.POSTGRES_URL_NON_POOLING;
+    
+    console.log('Env check:', {
+      has_DATABASE_URL: !!dbUrl,
+      has_POSTGRES_URL: !!postgresUrl,
+      has_POSTGRES_URL_NON_POOLING: !!postgresUrlNonPooling,
+      DATABASE_URL_prefix: dbUrl ? dbUrl.substring(0, 15) + '...' : 'N/A',
+    });
+    
+    const url = dbUrl || postgresUrl || postgresUrlNonPooling || '';
     
     if (!url) {
+      console.error('No database URL found in environment variables');
       return NextResponse.json({ 
         error: true, 
-        message: 'No database URL found' 
+        message: 'No database URL found',
+        has_DATABASE_URL: !!dbUrl,
+        has_POSTGRES_URL: !!postgresUrl,
+        has_POSTGRES_URL_NON_POOLING: !!postgresUrlNonPooling,
       }, { status: 500 });
     }
     
+    // 直接用 neon 客戶端，唔經任何包裝
     const sql = neon(url);
     
     // 簡單查詢
@@ -49,6 +61,13 @@ export async function GET() {
     });
     
   } catch (error: any) {
+    console.error('Stats API Error:', {
+      message: error.message,
+      stack: error.stack,
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      hasPostgresUrl: !!process.env.POSTGRES_URL,
+    });
+    
     return NextResponse.json({
       actressCount: 0,
       eventCount: 0,
@@ -56,7 +75,8 @@ export async function GET() {
       lastUpdate: new Date().toISOString(),
       error: true,
       message: error.message,
-      stack: error.stack?.substring(0, 300)
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      hasPostgresUrl: !!process.env.POSTGRES_URL,
     }, { status: 500 });
   }
 }
