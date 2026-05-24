@@ -18,6 +18,7 @@ interface Event {
 
 export default function EventsClient() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [holidays, setHolidays] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [prefecture, setPrefecture] = useState('');
@@ -26,6 +27,20 @@ export default function EventsClient() {
   useEffect(() => {
     fetchEvents();
   }, [prefecture, eventType]);
+
+  // Fetch HK public holidays once (1-day cache server-side)
+  useEffect(() => {
+    fetch('/api/holidays')
+      .then(r => r.json())
+      .then(d => {
+        const map: Record<string, string> = {};
+        (d.holidays || []).forEach((h: { date: string; name: string }) => {
+          map[h.date] = h.name;
+        });
+        setHolidays(map);
+      })
+      .catch(() => {});
+  }, []);
 
   async function fetchEvents() {
     setLoading(true);
@@ -155,9 +170,14 @@ export default function EventsClient() {
           <div className="space-y-8">
             {Object.entries(grouped).sort().map(([dateKey, dayEvents]) => (
               <div key={dateKey}>
-                <h2 className="text-sm font-bold text-[#a0a0a0] mb-3 flex items-center gap-2">
+                <h2 className="text-sm font-bold text-[#a0a0a0] mb-3 flex items-center gap-2 flex-wrap">
                   <span className={`w-2 h-2 rounded-full ${dayEvents.some(e => isToday(e.datetime)) ? 'bg-[#e94560]' : 'bg-[#2a2a4a]'}`} />
                   {new Date(dateKey + 'T00:00:00').toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'long' })}
+                  {holidays[dateKey] && (
+                    <span className="text-xs px-2 py-0.5 bg-[#dc143c]/20 text-[#ff6b8a] border border-[#dc143c]/40 rounded font-medium">
+                      🇭🇰 {holidays[dateKey]}
+                    </span>
+                  )}
                 </h2>
                 <div className="space-y-2">
                   {dayEvents.map(ev => (
