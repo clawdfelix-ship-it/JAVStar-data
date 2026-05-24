@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import VoteButton from '@/components/VoteButton';
 import EventCard from '@/components/EventCard';
 import ActivityTimeline from '@/components/ActivityTimeline';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -307,6 +308,9 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                       <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
                         <div className="font-mono text-2xl sm:text-3xl font-bold text-blue-700">{actress.vote_count}</div>
                         <div className="text-text-secondary text-sm mt-1 font-medium">❤️ 投票</div>
+                        <div className="mt-2 flex justify-center">
+                          <VoteButton actressId={actress.id} initialCount={actress.vote_count} size="md" />
+                        </div>
                       </div>
                     </div>
                   </div>
