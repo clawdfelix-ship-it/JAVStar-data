@@ -131,8 +131,32 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
     "description": `${actress.name_ja} - 日本 AV 女優，${actress.stats?.total_events || 0}個活動記錄`,
   };
 
+  // Cross-sell: check if actress has upcoming event
+  const crossSellActresses: Record<string, string> = {
+    'NIA': '/collections/nia',
+    '小島南': '/collections/%E5%B0%8F%E5%B3%B6%E5%8D%97',
+  };
+  const crossSellUrl = crossSellActresses[actress.name_ja] || crossSellActresses[actress.name_cn || ''] || null;
+
   return (
     <div className="min-h-screen bg-bg-secondary">
+      {/* Cross-sell Banner - NIPPON COLORS */}
+      {crossSellUrl && (
+        <div className="w-full py-2.5 text-center text-sm font-medium" style={{ backgroundColor: '#1a1a2e' }}>
+          <span className="text-white">📸 </span>
+          <span style={{ color: '#ff6b9d' }}>{actress.name_ja}</span>
+          <span className="text-white"> 香港見面會 — </span>
+          <a
+            href={`https://javstarmeet.com${crossSellUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:opacity-80 transition-opacity"
+            style={{ color: '#ff6b9d' }}
+          >
+            購票 →
+          </a>
+        </div>
+      )}
       {/* JSON-LD 結構化數據 (SEO) */}
       <script
         type="application/ld+json"

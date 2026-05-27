@@ -88,6 +88,69 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     search: activeTab === 'actress' ? search : '',
   });
 
+  // Email signup state
+  const [email, setEmail] = useState('');
+  const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [subscribeMessage, setSubscribeMessage] = useState('');
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) {
+      setSubscribeStatus('error');
+      setSubscribeMessage('請輸入有效 email');
+      return;
+    }
+    setSubscribeStatus('loading');
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'homepage' }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubscribeStatus('success');
+        setSubscribeMessage(data.message || '已訂閱！');
+        setEmail('');
+      } else {
+        setSubscribeStatus('error');
+        setSubscribeMessage(data.error || '訂閱失敗');
+      }
+    } catch {
+      setSubscribeStatus('error');
+      setSubscribeMessage('網絡錯誤，請重試');
+    }
+  };
+
+  // Email Signup Form component
+  function EmailSignupForm() {
+    return subscribeStatus === 'success' ? (
+      <div className="text-center py-3">
+        <span className="text-lg">✅ </span>
+        <span className="text-white font-medium">{subscribeMessage}</span>
+      </div>
+    ) : (
+      <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="email"
+          placeholder="your@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-gray-500 focus:outline-none focus:border-pink-400"
+          disabled={subscribeStatus === 'loading'}
+        />
+        <button
+          type="submit"
+          disabled={subscribeStatus === 'loading'}
+          className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: '#ff6b9d', color: '#1a1a2e' }}
+        >
+          {subscribeStatus === 'loading' ? '訂閱中...' : '立即訂閱'}
+        </button>
+      </form>
+    );
+  }
+
   // 盲盒用完整女優列表（不分頁，隨機排序）
   const { actresses: allActresses } = useActresses({
     page: Math.floor(Math.random() * 10) + 1, // 隨機抽第 1-10 頁
@@ -227,6 +290,21 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   每日更新
                 </div>
                 <div className="text-text-secondary text-sm font-medium">數據更新</div>
+              </div>
+            </div>
+
+            {/* Email Signup Section - NIPPON COLORS dark theme */}
+            <div className="mt-8 max-w-xl mx-auto">
+              <div className="rounded-2xl p-5 md:p-6 border" style={{ backgroundColor: '#1a1a2e', borderColor: '#2d2d4a' }}>
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-bold text-white mb-1">
+                    📸 女優嚟香港見面會？第一個知道！
+                  </h3>
+                  <p className="text-sm" style={{ color: '#a0a0b0' }}>
+                    留低 email，新活動優先通知
+                  </p>
+                </div>
+                <EmailSignupForm />
               </div>
             </div>
           </div>

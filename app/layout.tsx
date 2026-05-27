@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import EventBanner from '@/components/EventBanner';
 
 export const metadata: Metadata = {
   title: 'AV Intelligence｜日本 AV 女優情報平台 🇭🇰',
@@ -26,6 +27,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="antialiased font-japanese bg-bg-secondary">
+        <EventBanner />
         {children}
       </body>
     </html>
