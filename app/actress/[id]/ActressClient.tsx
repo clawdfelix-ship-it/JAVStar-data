@@ -164,7 +164,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
       />
 
       {/* Header - High Contrast */}
-      <header className="sticky top-0 z-50 border-b shadow-sm" style={{backgroundColor:'var(--dark-header)', borderColor:'var(--dark-border)'}}>
+      <header className="sticky top-0 z-50 border-b shadow-sm bg-white border-border-dark">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-primary-dark hover:text-pink-700 font-semibold transition-colors">
@@ -219,7 +219,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                         name_cn: actress.name_cn,
                         avatar_url: actress.avatar_url,
                       })}
-                      className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full shadow-lg border-2 flex items-center justify-center text-2xl hover:scale-110 transition-transform z-20" style={{backgroundColor:'var(--dark-card)', borderColor:'var(--dark-accent)', color:'var(--dark-text)'}}
+                      className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full shadow-lg border-2 flex items-center justify-center text-2xl hover:scale-110 transition-transform z-20 bg-white border-primary-dark"
                       title={isFavorite(actress.id) ? '取消收藏' : '加入收藏'}
                     >
                       {isFavorite(actress.id) ? '❤️' : '🤍'}
@@ -245,7 +245,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                         
                         {/* 分享選單 */}
                         {showShareMenu && (
-                          <div className="absolute top-full left-0 mt-2 rounded-xl shadow-xl border p-3 z-50 min-w-[180px]" style={{backgroundColor:'var(--dark-card)', borderColor:'var(--dark-border)'}}>
+                          <div className="absolute top-full left-0 mt-2 rounded-xl shadow-xl border p-3 z-50 min-w-[180px] bg-white border-border">
                             <button
                               onClick={() => {
                                 navigator.clipboard.writeText(`https://jav-star-data.vercel.app/actress/${actressId}`);

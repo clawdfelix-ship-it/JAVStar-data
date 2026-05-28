@@ -59,17 +59,17 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
   }
 
   return (
-    <div className="bg-[#16213e] border border-[#2a2a4a] rounded-xl p-4">
+    <div className="bg-white border border-border rounded-xl p-4">
       {/* Header: month navigation */}
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={prevMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1a1a2e] hover:bg-[#2a2a4a] text-white transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg bg-sakura-gray hover:bg-sakura-gray/60 text-text-primary transition-colors"
         >
           ←
         </button>
         <div className="text-center">
-          <div className="text-white font-bold">{MONTHS[month]} {year}</div>
+          <div className="text-text-primary font-bold">{MONTHS[month]} {year}</div>
         </div>
         <button
           onClick={nextMonth}
@@ -82,7 +82,7 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
       {/* Weekday labels */}
       <div className="grid grid-cols-7 mb-1">
         {WEEKDAYS.map((d, i) => (
-          <div key={d} className={`text-center text-xs py-1 font-medium ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-[#6c6c8a]'}`}>
+          <div key={d} className={`text-center text-xs py-1 font-medium ${i === 0 ? 'text-red-500' : i === 6 ? 'text-blue-500' : 'text-text-tertiary'}`}>
             {d}
           </div>
         ))}
@@ -113,13 +113,13 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
               className={`
                 relative h-10 rounded-lg flex flex-col items-center justify-center text-xs transition-all
                 ${dayEvents.length === 0 ? 'opacity-30 cursor-default' : 'hover:bg-[#2a2a4a] cursor-pointer'}
-                ${isToday ? 'ring-1 ring-[#e94560]' : ''}
-                ${isSelectedDay ? 'bg-[#e94560] text-white' : 'bg-[#1a1a2e] text-white'}
+                ${isToday ? 'ring-1 ring-primary' : ''}
+                ${isSelectedDay ? 'bg-primary-dark text-white' : 'bg-sakura text-text-primary'}
                 ${isPast && !isToday && !isSelectedDay ? 'opacity-50' : ''}
               `}
               title={dayEvents.length > 0 ? `${dayEvents.length}個活動` : ''}
             >
-              <span className={`font-medium ${isSelectedDay ? 'text-white' : dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-[#c0c0d0]'}`}>
+              <span className={`font-medium ${isSelectedDay ? 'text-white' : dayOfWeek === 0 ? 'text-red-500' : dayOfWeek === 6 ? 'text-blue-500' : 'text-text-primary'}`}>
                 {day}
               </span>
               {dayEvents.length > 0 && (
@@ -130,7 +130,7 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
                       className={`w-1 h-1 rounded-full ${isSelectedDay ? 'bg-white' : typeColors[ev.event_type] || 'bg-[#e94560]'}`}
                     />
                   ))}
-                  {dayEvents.length > 3 && <span className="text-[8px] text-[#6c6c8a]">+</span>}
+                  {dayEvents.length > 3 && <span className="text-[10px] text-text-tertiary">+</span>}
                 </div>
               )}
             </button>
@@ -139,11 +139,11 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[#2a2a4a]">
-        <span className="text-xs text-[#6c6c8a]">活動類型：</span>
+      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border">
+        <span className="text-xs text-text-tertiary">活動類型：</span>
         {Object.entries({ sign: '簽名', debut: '出道', live: '直播', event: '實體', online: '線上' }).map(([k, v]) => (
-          <span key={k} className="flex items-center gap-1 text-xs text-[#6c6c8a]">
-            <span className={`w-2 h-2 rounded-full ${typeColors[k] || 'bg-gray-500'}`} />
+          <span key={k} className="flex items-center gap-1 text-xs text-text-tertiary">
+            <span className={`w-2 h-2 rounded-full ${typeColors[k] || 'bg-gray-400'}`} />
             {v}
           </span>
         ))}

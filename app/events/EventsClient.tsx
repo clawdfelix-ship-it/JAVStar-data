@@ -114,19 +114,19 @@ export default function EventsClient() {
   const calendarEvents = events.filter(e => new Date(e.datetime) > new Date());
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] text-[#eaeaea]">
+    <div className="min-h-screen bg-white text-text-primary">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#1a1a2e] border-b border-[#2a2a4a] px-4 py-4">
+      <header className="sticky top-0 z-50 bg-white border-b border-border px-4 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/" className="text-[#e94560] hover:text-[#ff6b8a] text-sm">← 返回</Link>
-              <h1 className="text-lg font-bold text-white">活動列表</h1>
+              <Link href="/" className="text-primary-dark hover:text-pink-700 text-sm">← 返回</Link>
+              <h1 className="text-lg font-bold text-text-primary">活動列表</h1>
             </div>
             {selectedDate && (
               <button
                 onClick={() => setSelectedDate(null)}
-                className="text-xs px-3 py-1 bg-[#e94560] text-white rounded-lg hover:bg-[#ff6b8a] transition-colors"
+                className="text-xs px-3 py-1 bg-primary-dark text-white rounded-lg hover:opacity-90 transition-colors"
               >
                 顯示全部日期
               </button>
@@ -154,7 +154,7 @@ export default function EventsClient() {
             <select
               value={prefecture}
               onChange={e => setPrefecture(e.target.value)}
-              className="bg-[#16213e] border border-[#2a2a4a] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#e94560]"
+              className="bg-white border border-border text-text-primary text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-primary"
             >
               <option value="">全部地區</option>
               {prefectures.map(p => <option key={p} value={p}>{p}</option>)}
@@ -162,7 +162,7 @@ export default function EventsClient() {
             <select
               value={eventType}
               onChange={e => setEventType(e.target.value)}
-              className="bg-[#16213e] border border-[#2a2a4a] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#e94560]"
+              className="bg-white border border-border text-text-primary text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-primary"
             >
               <option value="">全部類型</option>
               {eventTypes.map(t => <option key={t} value={t}>{getEventTypeLabel(t)}</option>)}
@@ -177,7 +177,7 @@ export default function EventsClient() {
             )}
 
             {/* Event count badge */}
-            <div className="w-full text-sm text-[#6c6c8a]">
+            <div className="w-full text-sm text-text-tertiary">
               {loading ? '載入中...' : `${events.length} 個活動`}
               {selectedDate && ` · ${grouped[selectedDate]?.length || 0} 個活動喺 ${selectedDate}`}
             </div>
@@ -186,11 +186,11 @@ export default function EventsClient() {
 
         {/* Events list */}
         {loading ? (
-          <div className="text-center py-20 text-[#6c6c8a]">載入中...</div>
+          <div className="text-center py-20 text-text-secondary">載入中...</div>
         ) : error ? (
-          <div className="text-center py-20 text-[#e94560]">{error}</div>
+          <div className="text-center py-20 text-primary-dark">{error}</div>
         ) : events.length === 0 ? (
-          <div className="text-center py-20 text-[#6c6c8a]">
+          <div className="text-center py-20 text-text-secondary">
             <div className="text-4xl mb-4">📅</div>
             <p>短期內沒有活動</p>
           </div>
@@ -198,16 +198,16 @@ export default function EventsClient() {
           <div className="space-y-8">
             {Object.entries(displayGrouped).sort().map(([dateKey, dayEvents]) => (
               <div key={dateKey}>
-                <h2 className="text-sm font-bold text-[#a0a0a0] mb-3 flex items-center gap-2 flex-wrap">
-                  <span className={`w-2 h-2 rounded-full ${dayEvents.some(e => isToday(e.datetime)) ? 'bg-[#e94560]' : 'bg-[#2a2a4a]'}`} />
+                <h2 className="text-sm font-bold text-text-secondary mb-3 flex items-center gap-2 flex-wrap">
+                  <span className={`w-2 h-2 rounded-full ${dayEvents.some(e => isToday(e.datetime)) ? 'bg-primary-dark' : 'bg-sakura-gray'}`} />
                   {new Date(dateKey + 'T00:00:00').toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'long' })}
                   {holidays[dateKey] && (
-                    <span className="text-xs px-2 py-0.5 bg-[#dc143c]/20 text-[#ff6b8a] border border-[#dc143c]/40 rounded font-medium">
+                    <span className="text-xs px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 rounded font-medium">
                       🇭🇰 {holidays[dateKey]}
                     </span>
                   )}
                   {selectedDate === dateKey && (
-                    <span className="text-xs px-2 py-0.5 bg-[#e94560] text-white rounded font-bold">已選擇</span>
+                    <span className="text-xs px-2 py-0.5 bg-primary-dark text-white rounded font-bold">已選擇</span>
                   )}
                 </h2>
                 <div className="space-y-2">
@@ -217,11 +217,11 @@ export default function EventsClient() {
                       href={ev.url || `https://www.av-event.jp/event/${ev.id}/`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-4 bg-[#16213e] border border-[#2a2a4a] rounded-xl p-4 hover:border-[#e94560] transition-colors group"
+                      className="flex items-center gap-4 bg-white border border-border rounded-xl p-4 hover:border-primary transition-colors group"
                     >
                       {/* Time */}
                       <div className="text-center min-w-[60px]">
-                        <div className="text-[#e94560] font-bold text-sm">
+                        <div className="text-primary-dark font-bold text-sm">
                           {new Date(ev.datetime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
@@ -235,14 +235,14 @@ export default function EventsClient() {
                             <span className="text-xs px-2 py-0.5 bg-[#e94560] text-white rounded font-bold">今日</span>
                           )}
                         </div>
-                        <div className="font-bold text-white text-sm truncate group-hover:text-[#e94560] transition-colors">{ev.title}</div>
+                        <div className="font-bold text-text-primary text-sm truncate group-hover:text-primary-dark transition-colors">{ev.title}</div>
                         {ev.actress_name && (
-                          <div className="text-xs text-[#6c6c8a] mt-0.5">{ev.actress_name}</div>
+                          <div className="text-xs text-text-tertiary mt-0.5">{ev.actress_name}</div>
                         )}
-                        <div className="text-xs text-[#4a4a6a] mt-1">📍 {ev.venue} · {ev.prefecture}</div>
+                        <div className="text-xs text-text-tertiary mt-1">📍 {ev.venue} · {ev.prefecture}</div>
                       </div>
                       {/* External link icon */}
-                      <div className="text-[#4a4a6a] group-hover:text-[#e94560] transition-colors">
+                      <div className="text-text-tertiary group-hover:text-primary-dark transition-colors">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
