@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import CalendarMonth from './CalendarMonth';
 
 interface Event {
   id: string;
@@ -23,12 +23,13 @@ export default function EventsClient() {
   const [error, setError] = useState<string | null>(null);
   const [prefecture, setPrefecture] = useState('');
   const [eventType, setEventType] = useState('');
+  const [currentMonth, setCurrentMonth] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEvents();
   }, [prefecture, eventType]);
 
-  // Fetch HK public holidays once (1-day cache server-side)
   useEffect(() => {
     fetch('/api/holidays')
       .then(r => r.json())
@@ -93,10 +94,6 @@ export default function EventsClient() {
     return date.toDateString() === now.toDateString();
   }
 
-  function isUpcoming(d: string) {
-    return new Date(d) > new Date();
-  }
-
   // Group events by date
   const grouped: Record<string, Event[]> = {};
   events.forEach(ev => {
@@ -105,58 +102,89 @@ export default function EventsClient() {
     grouped[dateKey].push(ev);
   });
 
+  // Filtered grouped events (if date selected, only show that date)
+  const displayGrouped = selectedDate
+    ? { [selectedDate]: grouped[selectedDate] || [] }
+    : grouped;
+
   const prefectures = [...new Set(events.map(e => e.prefecture).filter(Boolean))].sort();
   const eventTypes = [...new Set(events.map(e => e.event_type).filter(Boolean))].sort();
+
+  // Events for calendar (only future events)
+  const calendarEvents = events.filter(e => new Date(e.datetime) > new Date());
 
   return (
     <div className="min-h-screen bg-[#0f0f1a] text-[#eaeaea]">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#1a1a2e] border-b border-[#2a2a4a] px-4 py-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/" className="text-[#e94560] hover:text-[#ff6b8a] text-sm">← 返回</Link>
               <h1 className="text-lg font-bold text-white">活動列表</h1>
             </div>
+            {selectedDate && (
+              <button
+                onClick={() => setSelectedDate(null)}
+                className="text-xs px-3 py-1 bg-[#e94560] text-white rounded-lg hover:bg-[#ff6b8a] transition-colors"
+              >
+                顯示全部日期
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6">
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <select
-            value={prefecture}
-            onChange={e => setPrefecture(e.target.value)}
-            className="bg-[#16213e] border border-[#2a2a4a] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#e94560]"
-          >
-            <option value="">全部地區</option>
-            {prefectures.map(p => <option key={p} value={p}>{p}</option>)}
-          </select>
-          <select
-            value={eventType}
-            onChange={e => setEventType(e.target.value)}
-            className="bg-[#16213e] border border-[#2a2a4a] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#e94560]"
-          >
-            <option value="">全部類型</option>
-            {eventTypes.map(t => <option key={t} value={t}>{getEventTypeLabel(t)}</option>)}
-          </select>
-          {(prefecture || eventType) && (
-            <button
-              onClick={() => { setPrefecture(''); setEventType(''); }}
-              className="text-xs text-[#e94560] hover:underline px-2 py-2"
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* Calendar + Filters row */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+          {/* Calendar */}
+          <div className="lg:col-span-1">
+            <CalendarMonth
+              events={calendarEvents}
+              currentMonth={currentMonth}
+              onMonthChange={setCurrentMonth}
+              selectedDate={selectedDate}
+              onDateSelect={setSelectedDate}
+            />
+          </div>
+
+          {/* Filters (right side) */}
+          <div className="lg:col-span-3 flex flex-wrap gap-3 content-start">
+            <select
+              value={prefecture}
+              onChange={e => setPrefecture(e.target.value)}
+              className="bg-[#16213e] border border-[#2a2a4a] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#e94560]"
             >
-              清除篩選
-            </button>
-          )}
+              <option value="">全部地區</option>
+              {prefectures.map(p => <option key={p} value={p}>{p}</option>)}
+            </select>
+            <select
+              value={eventType}
+              onChange={e => setEventType(e.target.value)}
+              className="bg-[#16213e] border border-[#2a2a4a] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#e94560]"
+            >
+              <option value="">全部類型</option>
+              {eventTypes.map(t => <option key={t} value={t}>{getEventTypeLabel(t)}</option>)}
+            </select>
+            {(prefecture || eventType) && (
+              <button
+                onClick={() => { setPrefecture(''); setEventType(''); }}
+                className="text-xs text-[#e94560] hover:underline px-2 py-2"
+              >
+                清除篩選
+              </button>
+            )}
+
+            {/* Event count badge */}
+            <div className="w-full text-sm text-[#6c6c8a]">
+              {loading ? '載入中...' : `${events.length} 個活動`}
+              {selectedDate && ` · ${grouped[selectedDate]?.length || 0} 個活動喺 ${selectedDate}`}
+            </div>
+          </div>
         </div>
 
-        {/* Results count */}
-        <div className="text-sm text-[#6c6c8a] mb-4">
-          {loading ? '載入中...' : `${events.length} 個活動`}
-        </div>
-
-        {/* Events */}
+        {/* Events list */}
         {loading ? (
           <div className="text-center py-20 text-[#6c6c8a]">載入中...</div>
         ) : error ? (
@@ -168,7 +196,7 @@ export default function EventsClient() {
           </div>
         ) : (
           <div className="space-y-8">
-            {Object.entries(grouped).sort().map(([dateKey, dayEvents]) => (
+            {Object.entries(displayGrouped).sort().map(([dateKey, dayEvents]) => (
               <div key={dateKey}>
                 <h2 className="text-sm font-bold text-[#a0a0a0] mb-3 flex items-center gap-2 flex-wrap">
                   <span className={`w-2 h-2 rounded-full ${dayEvents.some(e => isToday(e.datetime)) ? 'bg-[#e94560]' : 'bg-[#2a2a4a]'}`} />
@@ -177,6 +205,9 @@ export default function EventsClient() {
                     <span className="text-xs px-2 py-0.5 bg-[#dc143c]/20 text-[#ff6b8a] border border-[#dc143c]/40 rounded font-medium">
                       🇭🇰 {holidays[dateKey]}
                     </span>
+                  )}
+                  {selectedDate === dateKey && (
+                    <span className="text-xs px-2 py-0.5 bg-[#e94560] text-white rounded font-bold">已選擇</span>
                   )}
                 </h2>
                 <div className="space-y-2">
