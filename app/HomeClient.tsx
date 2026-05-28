@@ -143,7 +143,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           type="submit"
           disabled={subscribeStatus === 'loading'}
           className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
-          style={{ backgroundColor: '#ff6b9d', color: '#1a1a2e' }}
+          style={{ backgroundColor: 'rgb(var(--color-nadeshiko))', color: 'white' }}
         >
           {subscribeStatus === 'loading' ? '訂閱中...' : '立即訂閱'}
         </button>
@@ -293,14 +293,14 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
             </div>
 
-            {/* Email Signup Section - NIPPON COLORS dark theme */}
+            {/* Email Signup Section - NIPPON COLORS */}
             <div className="mt-8 max-w-xl mx-auto">
-              <div className="rounded-2xl p-5 md:p-6 border" style={{ backgroundColor: '#1a1a2e', borderColor: '#2d2d4a' }}>
+                <div className="rounded-2xl p-5 md:p-6 border bg-white" style={{borderColor:'rgba(var(--color-sakura-gray),0.6)'}}>
                 <div className="text-center mb-4">
-                  <h3 className="text-lg font-bold text-white mb-1">
+                  <h3 className="text-lg font-bold mb-1" style={{color:'rgb(var(--color-umenezumi))'}}>
                     📸 女優嚟香港見面會？第一個知道！
                   </h3>
-                  <p className="text-sm" style={{ color: '#a0a0b0' }}>
+                  <p className="text-sm" style={{color:'rgb(var(--color-umenezumi-light)'}}>
                     留低 email，新活動優先通知
                   </p>
                 </div>

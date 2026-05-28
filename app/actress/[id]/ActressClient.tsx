@@ -142,7 +142,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
     <div className="min-h-screen bg-bg-secondary">
       {/* Cross-sell Banner - NIPPON COLORS */}
       {crossSellUrl && (
-        <div className="w-full py-2.5 text-center text-sm font-medium" style={{ backgroundColor: '#1a1a2e' }}>
+        <div className="w-full py-2.5 text-center text-sm font-medium bg-[rgb(var(--color-kamenozoki))] text-white">
           <span className="text-white">📸 </span>
           <span style={{ color: '#ff6b9d' }}>{actress.name_ja}</span>
           <span className="text-white"> 香港見面會 — </span>
@@ -163,8 +163,8 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Header - High Contrast */}
-      <header className="sticky top-0 z-50 border-b shadow-sm bg-white border-border-dark">
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b shadow-sm bg-white" style={{borderColor:'rgba(var(--color-sakura-gray),0.6)'}}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-primary-dark hover:text-pink-700 font-semibold transition-colors">

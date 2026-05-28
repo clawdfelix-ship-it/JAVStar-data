@@ -39,7 +39,7 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
 
   // Event type colors
   const typeColors: Record<string, string> = {
-    sign: 'bg-[#e94560]',
+    sign: 'bg-[rgb(var(--color-nadeshiko))]',
     debut: 'bg-amber-500',
     live: 'bg-blue-500',
     event: 'bg-purple-500',
@@ -73,7 +73,7 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
         </div>
         <button
           onClick={nextMonth}
-          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#1a1a2e] hover:bg-[#2a2a4a] text-white transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg bg-sakura hover:bg-sakura-gray text-text-primary transition-colors"
         >
           →
         </button>
@@ -112,7 +112,7 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
               disabled={dayEvents.length === 0}
               className={`
                 relative h-10 rounded-lg flex flex-col items-center justify-center text-xs transition-all
-                ${dayEvents.length === 0 ? 'opacity-30 cursor-default' : 'hover:bg-[#2a2a4a] cursor-pointer'}
+                ${dayEvents.length === 0 ? 'opacity-30 cursor-default' : 'hover:bg-sakura-gray cursor-pointer'}
                 ${isToday ? 'ring-1 ring-primary' : ''}
                 ${isSelectedDay ? 'bg-primary-dark text-white' : 'bg-sakura text-text-primary'}
                 ${isPast && !isToday && !isSelectedDay ? 'opacity-50' : ''}
@@ -127,7 +127,7 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
                   {dayEvents.slice(0, 3).map((ev, ei) => (
                     <span
                       key={ev.id}
-                      className={`w-1 h-1 rounded-full ${isSelectedDay ? 'bg-white' : typeColors[ev.event_type] || 'bg-[#e94560]'}`}
+                      className={`w-1 h-1 rounded-full ${isSelectedDay ? 'bg-white' : typeColors[ev.event_type] || 'bg-[rgb(var(--color-nadeshiko))]'}`}
                     />
                   ))}
                   {dayEvents.length > 3 && <span className="text-[10px] text-text-tertiary">+</span>}

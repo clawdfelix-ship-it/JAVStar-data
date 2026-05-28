@@ -79,13 +79,13 @@ export default function EventsClient() {
 
   function getEventTypeColor(t: string) {
     const map: Record<string, string> = {
-      sign: 'text-[#ff6b8a] bg-[rgba(233,69,96,0.15)] border-[rgba(233,69,96,0.3)]',
+      sign: 'text-[rgb(var(--color-nadeshiko-dark))] bg-[rgba(var(--color-sakura-gray),0.4)] border-[rgba(var(--color-nadeshiko),0.3)]',
       debut: 'text-amber-400 bg-[rgba(251,191,36,0.15)] border-[rgba(251,191,36,0.3)]',
       live: 'text-blue-400 bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.3)]',
       event: 'text-purple-400 bg-[rgba(168,85,247,0.15)] border-[rgba(168,85,247,0.3)]',
       online: 'text-teal-400 bg-[rgba(20,184,166,0.15)] border-[rgba(20,184,166,0.3)]',
     };
-    return map[t] || 'text-[#a0a0a0] bg-[#1a1a2e] border-[#2a2a4a]';
+    return map[t] || 'text-[rgb(var(--color-umenezumi))] bg-[rgba(var(--color-sakura-gray),0.3)] border-[rgba(var(--color-sakura-gray),0.5)]';
   }
 
   function isToday(d: string) {
@@ -170,7 +170,7 @@ export default function EventsClient() {
             {(prefecture || eventType) && (
               <button
                 onClick={() => { setPrefecture(''); setEventType(''); }}
-                className="text-xs text-[#e94560] hover:underline px-2 py-2"
+                className="text-xs text-[rgb(var(--color-nadeshiko-dark))] hover:underline px-2 py-2"
               >
                 清除篩選
               </button>
@@ -232,7 +232,7 @@ export default function EventsClient() {
                             {getEventTypeLabel(ev.event_type)}
                           </span>
                           {isToday(ev.datetime) && (
-                            <span className="text-xs px-2 py-0.5 bg-[#e94560] text-white rounded font-bold">今日</span>
+                            <span className="text-xs px-2 py-0.5 rounded border font-bold" style={{backgroundColor:'rgb(var(--color-nadeshiko-dark))', color:'white'}}>今日</span>
                           )}
                         </div>
                         <div className="font-bold text-text-primary text-sm truncate group-hover:text-primary-dark transition-colors">{ev.title}</div>
