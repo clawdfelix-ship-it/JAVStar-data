@@ -144,14 +144,14 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
       {crossSellUrl && (
         <div className="w-full py-2.5 text-center text-sm font-medium bg-[rgb(var(--color-kamenozoki))] text-white">
           <span className="text-white">📸 </span>
-          <span style={{ color: '#ff6b9d' }}>{actress.name_ja}</span>
+          <span style={{ color: 'rgb(var(--color-nadeshiko))' }}>{actress.name_ja}</span>
           <span className="text-white"> 香港見面會 — </span>
           <a
             href={`https://javstarmeet.com${crossSellUrl}`}
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:opacity-80 transition-opacity"
-            style={{ color: '#ff6b9d' }}
+            style={{ color: 'rgb(var(--color-nadeshiko))' }}
           >
             購票 →
           </a>

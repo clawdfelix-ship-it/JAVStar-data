@@ -112,7 +112,7 @@ export default function EventBanner() {
   return (
     <div
       className="sticky top-0 z-50 w-full"
-      style={{ backgroundColor: '#1a1a2e' }}
+      style={{ backgroundColor: 'rgb(var(--color-sakura))' }}
     >
       <div className="relative max-w-7xl mx-auto px-4 py-2.5">
         <div className="flex items-center justify-between gap-3">
@@ -126,7 +126,7 @@ export default function EventBanner() {
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className="font-bold text-white text-sm md:text-base"
-                  style={{ color: '#ff6b9d' }}
+                  style={{ color: 'rgb(var(--color-nadeshiko))' }}
                 >
                   【{current.actress}】
                 </span>
@@ -140,7 +140,7 @@ export default function EventBanner() {
                 </span>
                 <span
                   className="text-xs md:text-sm font-bold px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: '#ff6b9d', color: '#1a1a2e' }}
+                  style={{ backgroundColor: 'rgb(var(--color-nadeshiko))', color: 'white' }}
                 >
                   {daysLeft > 0 ? `⏰ ${daysLeft}日後` : '🔥 今日'}
                 </span>
@@ -158,7 +158,7 @@ export default function EventBanner() {
                     key={i}
                     className="w-1.5 h-1.5 rounded-full transition-all"
                     style={{
-                      backgroundColor: i === currentIndex ? '#ff6b9d' : '#4a4a6a',
+                      backgroundColor: i === currentIndex ? 'rgb(var(--color-nadeshiko))' : 'rgb(var(--color-umenezumi-light))',
                     }}
                   />
                 ))}
@@ -171,7 +171,7 @@ export default function EventBanner() {
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:inline-flex items-center gap-1 px-4 py-2 rounded-lg font-bold text-sm transition-all hover:opacity-90"
-              style={{ backgroundColor: '#ff6b9d', color: '#1a1a2e' }}
+              style={{ backgroundColor: 'rgb(var(--color-nadeshiko))', color: 'white' }}
             >
               購票 →
             </a>
@@ -182,9 +182,9 @@ export default function EventBanner() {
               target="_blank"
               rel="noopener noreferrer"
               className="sm:hidden flex items-center justify-center w-8 h-8 rounded-lg"
-              style={{ backgroundColor: '#ff6b9d' }}
+              style={{ backgroundColor: 'rgb(var(--color-nadeshiko))' }}
             >
-              <span className="text-sm" style={{ color: '#1a1a2e' }}>🎫</span>
+              <span className="text-sm" style={{ color: 'rgb(var(--color-umenezumi))' }}>🎫</span>
             </a>
 
             {/* Dismiss button */}

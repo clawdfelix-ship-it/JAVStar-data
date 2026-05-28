@@ -51,7 +51,7 @@ export default function ActressCard({
   };
 
   return (
-    <div className="relative bg-[#16213e] rounded-xl border border-[#2a2a4a] shadow-md overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+    <div className="relative bg-white rounded-xl border border-[rgba(var(--color-sakura-gray),0.6)] shadow-md overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
       {/* Rank Badge */}
       <div className={`absolute top-2 left-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold z-10 shadow-lg ${getRankClass(rank)}`}>
         {rank}
@@ -76,10 +76,10 @@ export default function ActressCard({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div className="text-5xl font-bold text-[#2a2a4a]">{name_ja[0]}</div>
+              <div className="text-5xl font-bold text-[rgba(var(--color-sakura-gray),0.8)]">{name_ja[0]}</div>
             </div>
           )}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0f0f1a] to-transparent p-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[rgba(var(--color-sakura),0.9)] to-transparent p-2">
             <div className="flex items-center justify-center gap-1.5 text-white text-[10px]">
               {age && <span className="bg-white/10 backdrop-blur-sm px-1.5 py-0.5 rounded">{age}歳</span>}
               {cup && <span className="bg-white/10 backdrop-blur-sm px-1.5 py-0.5 rounded">C{cup}</span>}
@@ -93,33 +93,33 @@ export default function ActressCard({
       <div className="p-3">
         <div className="mb-2.5">
           <Link href={`/actress/${id}`}>
-            <h3 className="font-bold text-[#eaeaea] text-base truncate group-hover:text-[#e94560] transition-colors" style={{fontFamily: 'Noto Sans JP, sans-serif'}}>
+            <h3 className="font-bold text-[rgb(var(--color-umenezumi))] text-base truncate group-hover:text-[rgb(var(--color-nadeshiko-dark))] transition-colors" style={{fontFamily: 'Noto Sans JP, sans-serif'}}>
               {name_ja}
             </h3>
           </Link>
-          {name_cn && <p className="text-[#6c6c8a] text-xs truncate mt-0.5">{name_cn}</p>}
+          {name_cn && <p className="text-[rgb(var(--color-umenezumi-light))] text-xs truncate mt-0.5">{name_cn}</p>}
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-1.5 mb-2.5">
-          <div className="text-center p-1.5 rounded-lg bg-[#0f0f1a] border border-[#2a2a4a]">
-            <div className="text-base font-bold text-[#e94560]">{event_count}</div>
-            <div className="text-[9px] text-[#6c6c8a] uppercase tracking-wider">活動</div>
+          <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
+            <div className="text-base font-bold text-[rgb(var(--color-nadeshiko-dark))]">{event_count}</div>
+            <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">活動</div>
           </div>
-          <div className="text-center p-1.5 rounded-lg bg-[#0f0f1a] border border-[#2a2a4a]">
+          <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
             <div className="text-base font-bold text-[#4ade80]">{year_2026_events}</div>
-            <div className="text-[9px] text-[#6c6c8a] uppercase tracking-wider">2026</div>
+            <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">2026</div>
           </div>
-          <div className="text-center p-1.5 rounded-lg bg-[#0f0f1a] border border-[#2a2a4a]">
+          <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
             <div className="text-base font-bold text-[#fbbf24]">{vote_count}</div>
-            <div className="text-[9px] text-[#6c6c8a] uppercase tracking-wider">投票</div>
+            <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">投票</div>
           </div>
         </div>
 
         {/* Vote + CTA Row */}
         <div className="flex items-center gap-2">
           <VoteButton actressId={id} initialCount={vote_count} size="sm" className="flex-1 justify-center" />
-          <Link href={`/actress/${id}`} className="flex-1 py-1.5 bg-[#e94560] hover:bg-[#c73a52] text-white rounded-lg font-medium text-xs text-center transition-colors shadow-md">
+          <Link href={`/actress/${id}`} className="flex-1 py-1.5 bg-[rgb(var(--color-nadeshiko-dark))] hover:bg-[rgb(var(--color-nadeshiko))] text-white rounded-lg font-medium text-xs text-center transition-colors shadow-md">
             詳情 →
           </Link>
         </div>

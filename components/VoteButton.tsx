@@ -64,7 +64,7 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
 
   if (checking) {
     return (
-      <button className={`flex items-center ${sizeClasses} rounded-full border border-[#2a2a4a] text-[#6c6c8a] bg-[#16213e] cursor-wait ${className}`} disabled>
+      <button className={`flex items-center ${sizeClasses} rounded-full border border-[rgba(var(--color-sakura-gray),0.6)] text-[rgb(var(--color-umenezumi-light))] bg-white cursor-wait ${className}`} disabled>
         <span className="animate-pulse">♡</span>
         <span>{voteCount}</span>
       </button>
@@ -77,8 +77,8 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
       disabled={loading}
       className={`flex items-center ${sizeClasses} rounded-full transition-all duration-200 ${
         hasVoted
-          ? 'bg-[#e94560] text-white border border-[#e94560] hover:bg-[#c73a52]'
-          : 'bg-[#16213e] text-[#a0a0a0] border border-[#2a2a4a] hover:border-[#e94560] hover:text-[#e94560]'
+          ? 'bg-[rgb(var(--color-nadeshiko-dark))] text-white border border-[rgb(var(--color-nadeshiko-dark))] hover:bg-[rgb(var(--color-nadeshiko))]'
+          : 'bg-white text-[rgb(var(--color-umenezumi-light))] border border-[rgba(var(--color-sakura-gray),0.6)] hover:border-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-nadeshiko-dark))]'
       } ${loading ? 'opacity-50 cursor-wait' : ''} ${className}`}
     >
       <span className={`text-base leading-none ${hasVoted ? 'scale-110' : ''} transition-transform`}>
