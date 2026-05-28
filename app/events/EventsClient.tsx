@@ -79,13 +79,13 @@ export default function EventsClient() {
 
   function getEventTypeColor(t: string) {
     const map: Record<string, string> = {
-      sign: 'text-pink-600 bg-pink-50 border-pink-200',
-      debut: 'text-amber-600 bg-amber-50 border-amber-200',
-      live: 'text-blue-600 bg-blue-50 border-blue-200',
-      event: 'text-purple-600 bg-purple-50 border-purple-200',
-      online: 'text-teal-600 bg-teal-50 border-teal-200',
+      sign: 'text-[#ff6b8a] bg-[rgba(233,69,96,0.15)] border-[rgba(233,69,96,0.3)]',
+      debut: 'text-amber-400 bg-[rgba(251,191,36,0.15)] border-[rgba(251,191,36,0.3)]',
+      live: 'text-blue-400 bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.3)]',
+      event: 'text-purple-400 bg-[rgba(168,85,247,0.15)] border-[rgba(168,85,247,0.3)]',
+      online: 'text-teal-400 bg-[rgba(20,184,166,0.15)] border-[rgba(20,184,166,0.3)]',
     };
-    return map[t] || 'text-gray-600 bg-gray-50 border-gray-200';
+    return map[t] || 'text-[#a0a0a0] bg-[#1a1a2e] border-[#2a2a4a]';
   }
 
   function isToday(d: string) {

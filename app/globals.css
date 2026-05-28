@@ -28,6 +28,15 @@
   --color-umenezumi-lighter: 168, 152, 160;
   /* 純白背景 */
   --color-shiro: 255, 255, 255;
+  /* Dark theme */
+  --dark-bg: 15, 15, 26;
+  --dark-card: 22, 33, 62;
+  --dark-header: 26, 26, 46;
+  --dark-border: 42, 42, 74;
+  --dark-accent: 233, 69, 96;
+  --dark-accent-hover: 255, 107, 138;
+  --dark-text: 234, 234, 234;
+  --dark-muted: 108, 108, 138;
 }
 
 /* =========================================
@@ -47,11 +56,14 @@ body {
 
 /* ---- Card Components ---- */
 .fdb-card {
-  @apply bg-white rounded-2xl border border-[rgba(var(--color-sakura-gray),0.6)] shadow-sm transition-all duration-300;
+  @apply rounded-2xl border shadow-sm transition-all duration-300;
+  background-color: var(--dark-card);
+  border-color: var(--dark-border);
 }
 
 .fdb-card:hover {
-  @apply shadow-md shadow-pink-100/50 translate-y-[-2px];
+  @apply shadow-md translate-y-[-2px];
+  box-shadow: 0 8px 30px rgba(233, 69, 96, 0.15);
 }
 
 /* ---- Badge Components ---- */
@@ -86,7 +98,16 @@ body {
 
 /* ---- Form Inputs ---- */
 .fdb-input {
-  @apply w-full px-4 py-3 bg-white border-2 border-[rgba(var(--color-sakura-gray),0.6)] rounded-xl text-[rgb(var(--color-umenezumi))] placeholder-[rgb(var(--color-umenezumi-lighter))] focus:border-[rgb(var(--color-nadeshiko))] focus:ring-4 focus:ring-pink-100 focus:outline-none transition-all text-sm;
+  @apply w-full px-4 py-3 border-2 rounded-xl text-sm transition-all;
+  background-color: var(--dark-header);
+  border-color: var(--dark-border);
+  color: var(--dark-text);
+}
+.fdb-input::placeholder {
+  color: var(--dark-muted);
+}
+.fdb-input:focus {
+  border-color: var(--dark-accent);
 }
 
 /* ---- Section Dividers ---- */

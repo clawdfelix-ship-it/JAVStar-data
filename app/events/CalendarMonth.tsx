@@ -39,7 +39,7 @@ export default function CalendarMonth({ events, currentMonth, onMonthChange, sel
 
   // Event type colors
   const typeColors: Record<string, string> = {
-    sign: 'bg-pink-500',
+    sign: 'bg-[#e94560]',
     debut: 'bg-amber-500',
     live: 'bg-blue-500',
     event: 'bg-purple-500',

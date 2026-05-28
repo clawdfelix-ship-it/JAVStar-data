@@ -319,7 +319,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       {/* =========================================
           Tabs Navigation - Froala Design Blocks
           ========================================= */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-border shadow-sm">
+      <div className="sticky top-0 z-40 border-b shadow-sm" style={{backgroundColor:'rgba(26,26,46,0.95)', backdropFilter:'blur(12px)', borderColor:'var(--dark-border)'}}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-center gap-2 py-3">
             {tabs.map((tab) => (
@@ -355,7 +355,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="px-4 py-2 bg-white border border-border rounded-xl text-sm font-medium focus:outline-none focus:border-nadeshiko"
+                  className="px-4 py-2 border rounded-xl text-sm font-medium focus:outline-none" style={{backgroundColor:'var(--dark-card)', borderColor:'var(--dark-border)', color:'var(--dark-text)'}}
                 >
                   <option value="final_score">🏆 綜合評分</option>
                   <option value="event_count">📊 活動數量</option>
@@ -445,7 +445,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               <select
                 value={filterPrefecture}
                 onChange={(e) => setFilterPrefecture(e.target.value)}
-                className="px-4 py-2 bg-white border border-border rounded-xl text-sm font-medium focus:outline-none focus:border-nadeshiko"
+                className="px-4 py-2 border rounded-xl text-sm font-medium focus:outline-none"
+                style={{backgroundColor:'var(--dark-card)', borderColor:'var(--dark-border)', color:'var(--dark-text)'}}
               >
                 {prefectures.map((p) => (
                   <option key={p} value={p}>{p === 'ALL' ? '📍 全部地區' : `📍 ${p}`}</option>
@@ -455,7 +456,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="px-4 py-2 bg-white border border-border rounded-xl text-sm font-medium focus:outline-none focus:border-nadeshiko"
+                className="px-4 py-2 border rounded-xl text-sm font-medium focus:outline-none"
+                style={{backgroundColor:'var(--dark-card)', borderColor:'var(--dark-border)', color:'var(--dark-text)'}}
               >
                 {eventTypes.map((t) => (
                   <option key={t} value={t}>{t === 'ALL' ? '🎪 全部類型' : `🎪 ${t}`}</option>
@@ -494,7 +496,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   containerHeight={700}
                   overscan={6}
                   getItemKey={(item) => item.id}
-                  className="rounded-2xl border border-border bg-white"
+                  className="rounded-2xl border bg-[#16213e] border-[#2a2a4a]"
                   emptyMessage="搵唔到符合條件嘅活動"
                   renderItem={(event, index) => (
                     <div className="px-4 py-2">
@@ -522,7 +524,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           Footer - Froala Design Blocks
           NIPPON COLORS
           ========================================= */}
-      <footer className="bg-white border-t border-border mt-16">
+      <footer className="border-t mt-16" style={{backgroundColor:'var(--dark-header)', borderColor:'var(--dark-border)'}}>
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
