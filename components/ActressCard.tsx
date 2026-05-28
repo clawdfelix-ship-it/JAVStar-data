@@ -107,7 +107,7 @@ export default function ActressCard({
             <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">活動</div>
           </div>
           <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
-            <div className="text-base font-bold text-[#4ade80]">{year_2026_events}</div>
+            <div className="text-base font-bold text-green-500">{year_2026_events}</div>
             <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">2026</div>
           </div>
           <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
