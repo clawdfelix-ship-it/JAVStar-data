@@ -86,49 +86,49 @@ export default function CompareClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f1a] text-[#eaeaea]">
+    <div className="min-h-screen bg-white text-[rgb(var(--color-umenezumi))]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#1a1a2e] border-b border-[#2a2a4a] px-4 py-4">
+      <header className="sticky top-0 z-50 bg-[rgba(var(--color-sakura),0.5)] border-b border-[rgba(var(--color-sakura-gray),0.6)] px-4 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
-          <Link href="/" className="text-[#e94560] hover:text-[#ff6b8a] text-sm">← 返回</Link>
-          <h1 className="text-lg font-bold text-white">女優比較</h1>
+          <Link href="/" className="text-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-nadeshiko))] text-sm">← 返回</Link>
+          <h1 className="text-lg font-bold text-[rgb(var(--color-umenezumi))]">女優比較</h1>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
         {loading ? (
-          <div className="text-center py-20 text-[#a0a0a0]">載入中...</div>
+          <div className="text-center py-20 text-[rgb(var(--color-umenezumi-light))]">載入中...</div>
         ) : (
           <>
             {/* Selectors */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               {/* Selector 1 */}
-              <div className="bg-[#16213e] rounded-xl p-4 border border-[#2a2a4a]">
-                <div className="text-xs text-[#a0a0a0] mb-2">女優 A</div>
+              <div className="bg-white rounded-xl p-4 border border-[rgba(var(--color-sakura-gray),0.6)]">
+                <div className="text-xs text-[rgb(var(--color-umenezumi-light))] mb-2">女優 A</div>
                 {sel1 ? (
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#e94560]/20 flex items-center justify-center text-[#e94560] font-bold text-lg">{sel1.name_ja[0]}</div>
+                    <div className="w-10 h-10 rounded-full bg-[rgba(var(--color-nadeshiko-dark),0.2)] flex items-center justify-center text-[rgb(var(--color-nadeshiko-dark))] font-bold text-lg">{sel1.name_ja[0]}</div>
                     <div>
-                      <div className="text-white font-medium">{sel1.name_ja}</div>
-                      {sel1.name_cn && <div className="text-[#6c6c8a] text-xs">{sel1.name_cn}</div>}
+                      <div className="text-[rgb(var(--color-umenezumi))] font-medium">{sel1.name_ja}</div>
+                      {sel1.name_cn && <div className="text-[rgb(var(--color-umenezumi-light))] text-xs">{sel1.name_cn}</div>}
                     </div>
-                    <button onClick={() => setSel1(null)} className="ml-auto text-xs text-[#e94560] hover:underline">移除</button>
+                    <button onClick={() => setSel1(null)} className="ml-auto text-xs text-[rgb(var(--color-nadeshiko-dark))] hover:underline">移除</button>
                   </div>
                 ) : (
                   <input
                     type="text" placeholder="搜尋..." value={s1}
                     onChange={e => { setS1(e.target.value); setSel1(null); }}
-                    className="w-full bg-[#0f0f1a] border border-[#2a2a4a] rounded-lg px-3 py-2 text-sm text-white placeholder-[#6c6c8a] focus:outline-none focus:border-[#e94560]"
+                    className="w-full bg-white border border-[rgba(var(--color-sakura-gray),0.6)] rounded-lg px-3 py-2 text-sm text-[rgb(var(--color-umenezumi))] placeholder-[rgb(var(--color-umenezumi-light))] focus:outline-none focus:border-[rgb(var(--color-nadeshiko-dark))]"
                   />
                 )}
                 {s1 && !sel1 && (
                   <div className="mt-1 space-y-1 max-h-48 overflow-y-auto">
                     {f1.map(a => (
                       <button key={a.id} onClick={() => { setSel1(a); setS1(''); }}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a2744] text-sm flex items-center gap-2 transition-colors">
-                        <span className="text-[#e94560] font-bold">{a.name_ja[0]}</span>
-                        <span className="text-white">{a.name_ja}</span>
-                        {a.name_cn && <span className="text-[#6c6c8a] text-xs">{a.name_cn}</span>}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-[rgba(var(--color-sakura-gray),0.4)] text-sm flex items-center gap-2 transition-colors">
+                        <span className="text-[rgb(var(--color-nadeshiko-dark))] font-bold">{a.name_ja[0]}</span>
+                        <span className="text-[rgb(var(--color-umenezumi))]">{a.name_ja}</span>
+                        {a.name_cn && <span className="text-[rgb(var(--color-umenezumi-light))] text-xs">{a.name_cn}</span>}
                       </button>
                     ))}
                   </div>
@@ -136,32 +136,32 @@ export default function CompareClient() {
               </div>
 
               {/* Selector 2 */}
-              <div className="bg-[#16213e] rounded-xl p-4 border border-[#2a2a4a]">
-                <div className="text-xs text-[#a0a0a0] mb-2">女優 B</div>
+              <div className="bg-white rounded-xl p-4 border border-[rgba(var(--color-sakura-gray),0.6)]">
+                <div className="text-xs text-[rgb(var(--color-umenezumi-light))] mb-2">女優 B</div>
                 {sel2 ? (
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#60a5fa]/20 flex items-center justify-center text-[#60a5fa] font-bold text-lg">{sel2.name_ja[0]}</div>
+                    <div className="w-10 h-10 rounded-full bg-[rgba(var(--color-kamenozoki-dark),0.2)] flex items-center justify-center text-[rgb(var(--color-kamenozoki-dark))] font-bold text-lg">{sel2.name_ja[0]}</div>
                     <div>
-                      <div className="text-white font-medium">{sel2.name_ja}</div>
-                      {sel2.name_cn && <div className="text-[#6c6c8a] text-xs">{sel2.name_cn}</div>}
+                      <div className="text-[rgb(var(--color-umenezumi))] font-medium">{sel2.name_ja}</div>
+                      {sel2.name_cn && <div className="text-[rgb(var(--color-umenezumi-light))] text-xs">{sel2.name_cn}</div>}
                     </div>
-                    <button onClick={() => setSel2(null)} className="ml-auto text-xs text-[#60a5fa] hover:underline">移除</button>
+                    <button onClick={() => setSel2(null)} className="ml-auto text-xs text-[rgb(var(--color-kamenozoki-dark))] hover:underline">移除</button>
                   </div>
                 ) : (
                   <input
                     type="text" placeholder="搜尋..." value={s2}
                     onChange={e => { setS2(e.target.value); setSel2(null); }}
-                    className="w-full bg-[#0f0f1a] border border-[#2a2a4a] rounded-lg px-3 py-2 text-sm text-white placeholder-[#6c6c8a] focus:outline-none focus:border-[#60a5fa]"
+                    className="w-full bg-white border border-[rgba(var(--color-sakura-gray),0.6)] rounded-lg px-3 py-2 text-sm text-[rgb(var(--color-umenezumi))] placeholder-[rgb(var(--color-umenezumi-light))] focus:outline-none focus:border-[rgb(var(--color-kamenozoki-dark))]"
                   />
                 )}
                 {s2 && !sel2 && (
                   <div className="mt-1 space-y-1 max-h-48 overflow-y-auto">
                     {f2.map(a => (
                       <button key={a.id} onClick={() => { setSel2(a); setS2(''); }}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a2744] text-sm flex items-center gap-2 transition-colors">
-                        <span className="text-[#60a5fa] font-bold">{a.name_ja[0]}</span>
-                        <span className="text-white">{a.name_ja}</span>
-                        {a.name_cn && <span className="text-[#6c6c8a] text-xs">{a.name_cn}</span>}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-[rgba(var(--color-sakura-gray),0.4)] text-sm flex items-center gap-2 transition-colors">
+                        <span className="text-[rgb(var(--color-kamenozoki-dark))] font-bold">{a.name_ja[0]}</span>
+                        <span className="text-[rgb(var(--color-umenezumi))]">{a.name_ja}</span>
+                        {a.name_cn && <span className="text-[rgb(var(--color-umenezumi-light))] text-xs">{a.name_cn}</span>}
                       </button>
                     ))}
                   </div>
@@ -171,23 +171,23 @@ export default function CompareClient() {
 
             {/* Comparison Table */}
             {sel1 && sel2 && (
-              <div className="bg-[#16213e] rounded-xl border border-[#2a2a4a] overflow-hidden">
-                <div className="grid grid-cols-3 border-b border-[#2a2a4a] bg-[#1a1a2e]">
-                  <div className="p-3 text-xs text-[#6c6c8a]">屬性</div>
+              <div className="bg-white rounded-xl border border-[rgba(var(--color-sakura-gray),0.6)] overflow-hidden">
+                <div className="grid grid-cols-3 border-b border-[rgba(var(--color-sakura-gray),0.6)] bg-[rgba(var(--color-sakura),0.5)]">
+                  <div className="p-3 text-xs text-[rgb(var(--color-umenezumi-light))]">屬性</div>
                   <div className="p-3 text-center">
-                    <div className="text-[#e94560] font-bold truncate">{sel1.name_ja}</div>
+                    <div className="text-[rgb(var(--color-nadeshiko-dark))] font-bold truncate">{sel1.name_ja}</div>
                   </div>
                   <div className="p-3 text-center">
-                    <div className="text-[#60a5fa] font-bold truncate">{sel2.name_ja}</div>
+                    <div className="text-[rgb(var(--color-kamenozoki-dark))] font-bold truncate">{sel2.name_ja}</div>
                   </div>
                 </div>
                 {rows.map((row, i) => (
-                  <div key={i} className={`grid grid-cols-3 border-b border-[#2a2a4a] last:border-0 ${i % 2 === 0 ? 'bg-[#0f0f1a]/30' : ''}`}>
-                    <div className="p-3 text-[#6c6c8a] text-sm">{row.label}</div>
-                    <div className={`p-3 text-center text-sm font-medium ${row.best === 'a' ? 'text-[#4ade80]' : 'text-[#eaeaea]'}`}>
+                  <div key={i} className={`grid grid-cols-3 border-b border-[rgba(var(--color-sakura-gray),0.6)] last:border-0 ${i % 2 === 0 ? 'bg-white/30' : ''}`}>
+                    <div className="p-3 text-[rgb(var(--color-umenezumi-light))] text-sm">{row.label}</div>
+                    <div className={`p-3 text-center text-sm font-medium ${row.best === 'a' ? 'text-green-500' : 'text-[rgb(var(--color-umenezumi))]'}`}>
                       {row.v1}<WinnerDot best={row.best} who="a" />
                     </div>
-                    <div className={`p-3 text-center text-sm font-medium ${row.best === 'b' ? 'text-[#60a5fa]' : 'text-[#eaeaea]'}`}>
+                    <div className={`p-3 text-center text-sm font-medium ${row.best === 'b' ? 'text-[rgb(var(--color-kamenozoki-dark))]' : 'text-[rgb(var(--color-umenezumi))]'}`}>
                       {row.v2}<WinnerDot best={row.best} who="b" />
                     </div>
                   </div>
@@ -196,7 +196,7 @@ export default function CompareClient() {
             )}
 
             {(!sel1 || !sel2) && (
-              <div className="text-center py-16 text-[#4a4a6a]">
+              <div className="text-center py-16 text-[rgb(var(--color-umenezumi))]">
                 <div className="text-4xl mb-4">⚖️</div>
                 <p>選擇兩位女優比較</p>
               </div>
