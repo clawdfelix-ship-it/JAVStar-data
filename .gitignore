@@ -1,13 +1,20 @@
 node_modules/
-.env
-.env.local
-.env.*.local
 .next/
 out/
 dist/
 build/
+coverage/
 *.log
 .DS_Store
-coverage/
+
+# Vercel / secrets
 .vercel
+.env
+.env.local
+.env.*.local
+
+# Local database (dev SQLite; production uses Neon Postgres)
 data/
+
+# Legacy imports & one-off scripts kept for reference but not part of the build
+archive/
