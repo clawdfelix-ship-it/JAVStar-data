@@ -1,6 +1,6 @@
 # 000 — Introduce shared easing & duration tokens
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: HIGH (foundation — every other plan depends on it)
 - **Category**: Cohesion & tokens

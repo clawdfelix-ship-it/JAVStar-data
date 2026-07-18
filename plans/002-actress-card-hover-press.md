@@ -1,6 +1,6 @@
 # 002 — ActressCard: replace hover-only with hover + press, kill `transition-all`
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: HIGH (12 cards on every homepage render, hit constantly)
 - **Category**: Easing & duration + Performance + Accessibility

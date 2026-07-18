@@ -1,6 +1,6 @@
 # 001 — VoteButton: press feedback + heart pop on toggle
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: HIGH (primary CTA, "does this site have care?" moment)
 - **Category**: Physicality & origin + Missed opportunities

@@ -1,6 +1,6 @@
 # 004 — Tab underline + content crossfade
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: MEDIUM (spatial-consistency gap, hit every session)
 - **Category**: Physicality & origin + Missed opportunities

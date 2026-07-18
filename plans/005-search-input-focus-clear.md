@@ -1,6 +1,6 @@
 # 005 — Search input: focus expansion + clear button
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: LOW (polish; secondary CTA)
 - **Category**: Missed opportunities + Physicality

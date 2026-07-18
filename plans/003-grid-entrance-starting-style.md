@@ -1,6 +1,6 @@
 # 003 — Grid entrance: replace `slide-up` keyframe with `@starting-style` transition
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: MEDIUM (feel + interruptibility bug — every page/tab change replays)
 - **Category**: Interruptibility + Cohesion

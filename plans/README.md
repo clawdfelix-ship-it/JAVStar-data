@@ -10,14 +10,14 @@ Plan `000` is a **hard prerequisite** for every subsequent plan — it introduce
 
 | # | Title | Severity | Files | Depends on | Status |
 |---|---|---|---|---|---|
-| 000 | Introduce shared easing & duration tokens | HIGH | globals.css, tailwind.config.js | — | TODO |
-| 001 | VoteButton: press feedback + heart pop on toggle | HIGH | VoteButton.tsx, globals.css | 000 | TODO |
-| 002 | ActressCard: replace hover-only with hover + press, kill `transition-all` | HIGH | ActressCard.tsx | 000 | TODO |
-| 003 | Grid entrance: replace `slide-up` keyframe with `@starting-style` transition | MEDIUM | HomeClient.tsx, globals.css | 000 | TODO |
-| 004 | Tab underline + content crossfade | MEDIUM | HomeClient.tsx, globals.css | 000 | TODO |
-| 005 | Search input: focus expansion + clear button | LOW | HomeClient.tsx, globals.css | 000 | TODO |
-| 006 | Email subscribe: delight moment on success | LOW | HomeClient.tsx, globals.css | 000 | TODO |
-| 007 | Kill decorative hover on stats cards (data-first) | MEDIUM | HomeClient.tsx | — | TODO |
+| 000 | Introduce shared easing & duration tokens | HIGH | globals.css, tailwind.config.js | — | DONE |
+| 001 | VoteButton: press feedback + heart pop on toggle | HIGH | VoteButton.tsx, globals.css | 000 | DONE |
+| 002 | ActressCard: replace hover-only with hover + press, kill `transition-all` | HIGH | ActressCard.tsx | 000 | DONE |
+| 003 | Grid entrance: replace `slide-up` keyframe with `@starting-style` transition | MEDIUM | HomeClient.tsx, globals.css | 000 | DONE |
+| 004 | Tab underline + content crossfade | MEDIUM | HomeClient.tsx, globals.css | 000 | DONE |
+| 005 | Search input: focus expansion + clear button | LOW | HomeClient.tsx, globals.css | 000 | DONE |
+| 006 | Email subscribe: delight moment on success | LOW | HomeClient.tsx, globals.css | 000 | DONE |
+| 007 | Kill decorative hover on stats cards (data-first) | MEDIUM | HomeClient.tsx | — | DONE |
 
 ## Recommended sequencing
 

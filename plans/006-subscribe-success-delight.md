@@ -1,6 +1,6 @@
 # 006 — Email subscribe: delight moment on success
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: LOW (rare, first-time — earned delight)
 - **Category**: Missed opportunities

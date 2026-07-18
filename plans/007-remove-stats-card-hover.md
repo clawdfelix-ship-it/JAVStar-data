@@ -1,6 +1,6 @@
 # 007 — Kill decorative hover on stats cards (data-first)
 
-- **Status**: TODO
+- **Status**: DONE (commit 98dab2e)
 - **Commit**: d51a29a
 - **Severity**: MEDIUM (correctness — hover moves numbers the user is reading)
 - **Category**: Purpose & frequency
