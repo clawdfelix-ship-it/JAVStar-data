@@ -25,10 +25,10 @@ interface ScrapedEvent {
   url: string;
 }
 
-async function scrapePage(page: Page, pageNum: number): Promise<ScrapedEvent[]> {
+async function scrapePage(page: Page, pageNum: number, dateRange: string): Promise<ScrapedEvent[]> {
   const url = pageNum === 1
-    ? 'https://www.av-event.jp/search/?begin_date=20260101&end_date=20260630'
-    : `https://www.av-event.jp/search/${pageNum}/?begin_date=20260101&end_date=20260630`;
+    ? `https://www.av-event.jp/search/?${dateRange}`
+    : `https://www.av-event.jp/search/${pageNum}/?${dateRange}`;
 
   await page.goto(url);
   await page.waitForTimeout(3000);
@@ -86,7 +86,16 @@ async function scrapePage(page: Page, pageNum: number): Promise<ScrapedEvent[]> 
 
 async function scrapeEvents(): Promise<number> {
   console.log('[EVENTS] Starting av-event.jp scraper...');
-  
+
+  // Dynamic date range: from 60 days ago through +365 days (covers recent past + full upcoming year)
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const now = new Date();
+  const past = new Date(now); past.setDate(now.getDate() - 60);
+  const future = new Date(now); future.setDate(now.getDate() + 365);
+  const dateRange = `begin_date=${fmt(past)}&end_date=${fmt(future)}`;
+  console.log(`[EVENTS] Date range: ${dateRange}`);
+
   const before = await sql`SELECT COUNT(*) as cnt FROM events`;
   const beforeCount = Number(before[0].cnt);
   console.log(`[EVENTS] Events before: ${beforeCount}`);
@@ -95,7 +104,7 @@ async function scrapeEvents(): Promise<number> {
   const page = await browser.newPage();
   
   // Get total pages
-  await page.goto('https://www.av-event.jp/search/?begin_date=20260101&end_date=20260630');
+  await page.goto(`https://www.av-event.jp/search/?${dateRange}`);
   await page.waitForTimeout(3000);
   
   const lastPage = await page.evaluate(() => {
@@ -116,7 +125,7 @@ async function scrapeEvents(): Promise<number> {
   // Scrape all pages
   let totalEvents = 0;
   for (let p = 1; p <= lastPage; p++) {
-    const events = await scrapePage(page, p);
+    const events = await scrapePage(page, p, dateRange);
     totalEvents += events.length;
     
     // Directly upsert to database
