@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
@@ -124,12 +124,15 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
   // Email Signup Form component
   function EmailSignupForm() {
-    return subscribeStatus === 'success' ? (
-      <div className="text-center py-3">
-        <span className="text-lg">✅ </span>
-        <span className="text-white font-medium">{subscribeMessage}</span>
-      </div>
-    ) : (
+    if (subscribeStatus === 'success') {
+      return (
+        <div className="text-center py-3 subscribe-success">
+          <span className="text-2xl subscribe-check">✅</span>
+          <span className="text-white font-medium ml-2 subscribe-message">{subscribeMessage}</span>
+        </div>
+      );
+    }
+    return (
       <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3">
         <input
           type="email"
@@ -214,6 +217,19 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     { id: 'events' as const, label: '活動列表', icon: '🎫', count: filteredEvents.length },
   ];
 
+  // Tab underline slide (plan 004) — measure active tab position
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const [underline, setUnderline] = useState({ left: 0, width: 0 });
+  useLayoutEffect(() => {
+    const container = tabsContainerRef.current;
+    if (!container) return;
+    const active = container.querySelector<HTMLButtonElement>(`[data-tab-id="${activeTab}"]`);
+    if (!active) return;
+    const cRect = container.getBoundingClientRect();
+    const aRect = active.getBoundingClientRect();
+    setUnderline({ left: aRect.left - cRect.left, width: aRect.width });
+  }, [activeTab, stats?.actressCount, stats?.eventCount, filteredEvents.length]);
+
   return (
     <div className="min-h-screen bg-bg-secondary">
       {/* =========================================
@@ -253,15 +269,25 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   placeholder="搜尋女優名、活動名稱、場地..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 text-lg bg-white border-2 border-border rounded-2xl shadow-froala focus:border-nadeshiko focus:ring-4 focus:ring-nadeshiko-light/30 focus:outline-none transition-all placeholder:text-text-tertiary"
+                  className="w-full pl-12 pr-12 py-4 text-lg bg-white border-2 border-border rounded-2xl shadow-froala focus:border-nadeshiko focus:ring-4 focus:ring-nadeshiko-light/30 focus:outline-none transition-[border-color,box-shadow] duration-base ease-out placeholder:text-text-tertiary"
                 />
+                {search.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch('')}
+                    aria-label="清除搜尋"
+                    className="search-clear absolute inset-y-0 right-0 pr-4 flex items-center text-text-tertiary hover:text-nadeshiko-dark active:scale-90 transition-transform duration-fast ease-out"
+                  >
+                    <span className="text-xl leading-none">✕</span>
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Stats Cards - Froala Design Blocks style */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {/* 註冊女優 */}
-              <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
+              <div className="fdb-card p-5 text-center">
                 <div className="text-3xl md:text-4xl font-bold text-nadeshiko-dark font-mono mb-1">
                   {stats?.actressCount ? stats.actressCount.toLocaleString() : <span className="animate-pulse">--</span>}
                 </div>
@@ -269,7 +295,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
               
               {/* 活動記錄 */}
-              <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
+              <div className="fdb-card p-5 text-center">
                 <div className="text-3xl md:text-4xl font-bold text-emerald-600 font-mono mb-1">
                   {stats?.eventCount ? stats.eventCount.toLocaleString() : <span className="animate-pulse">--</span>}
                 </div>
@@ -277,7 +303,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
               
               {/* 年度數據 */}
-              <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
+              <div className="fdb-card p-5 text-center">
                 <div className="text-3xl md:text-4xl font-bold text-amber-600 font-mono mb-1">
                   2026
                 </div>
@@ -285,7 +311,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
               
               {/* 數據更新 */}
-              <div className="fdb-card p-5 text-center hover:-translate-y-1 transition-transform">
+              <div className="fdb-card p-5 text-center">
                 <div className="text-3xl md:text-4xl font-bold text-kamenozoki-dark font-mono mb-1">
                   每日更新
                 </div>
@@ -321,10 +347,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           ========================================= */}
       <div className="sticky top-0 z-40 border-b shadow-sm bg-white border-border">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-center gap-2 py-3">
+          <div ref={tabsContainerRef} className="relative flex items-center justify-center gap-2 py-3">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
+                data-tab-id={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`fdb-tab ${activeTab === tab.id ? 'active' : ''}`}
               >
@@ -333,6 +360,14 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 <span className="fdb-badge">{tab.count}</span>
               </button>
             ))}
+            <span
+              aria-hidden
+              className="tab-underline"
+              style={{
+                transform: `translateX(${underline.left}px)`,
+                width: underline.width,
+              }}
+            />
           </div>
         </div>
       </div>
@@ -340,7 +375,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       {/* =========================================
           Main Content
           ========================================= */}
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+      <main key={activeTab} className="tab-panel max-w-7xl mx-auto px-4 md:px-6 py-8">
         {/* Actress Ranking Tab */}
         {activeTab === 'actress' && (
           <div>
@@ -383,7 +418,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {actresses.map((actress, index) => (
-                  <div key={actress.id} className="slide-up" style={{ animationDelay: `${index * 50}ms` }}>
+                  <div
+                    key={actress.id}
+                    className="grid-item-enter"
+                    style={{ transitionDelay: `${Math.min(index * 30, 240)}ms` }}
+                  >
                     <ActressCard {...actress} rank={index + 1 + (page - 1) * 12} />
                   </div>
                 ))}

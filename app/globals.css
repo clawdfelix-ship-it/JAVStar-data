@@ -120,7 +120,7 @@ body {
 
 /* Slide Up */
 .slide-up {
-  animation: slideUp 0.5s ease-out forwards;
+  animation: slideUp var(--duration-slow) var(--ease-out) forwards;
   opacity: 0;
   transform: translateY(20px);
 }
@@ -134,7 +134,7 @@ body {
 
 /* Fade In */
 .fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+  animation: fadeIn var(--duration-slow) var(--ease-out) forwards;
   opacity: 0;
 }
 
@@ -162,6 +162,125 @@ body {
   animation: marquee 25s linear infinite;
 }
 
+/* ---- VoteButton (plan 001) ---- */
+@keyframes vote-heart-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); }
+  100% { transform: scale(1.1); }
+}
+.vote-heart-bump {
+  animation: vote-heart-bump 400ms var(--ease-out);
+  animation-fill-mode: forwards;
+  transform-origin: center;
+}
+
+@keyframes vote-count-slide {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.vote-count {
+  display: inline-block;
+  animation: vote-count-slide var(--duration-base) var(--ease-out);
+}
+
+/* ---- Grid item enter (plan 003) ---- */
+.grid-item-enter {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--duration-slow) var(--ease-out),
+              transform var(--duration-slow) var(--ease-out);
+}
+@starting-style {
+  .grid-item-enter {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---- Tabs (plan 004) ---- */
+.tab-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: rgb(var(--color-nadeshiko-dark));
+  border-radius: 2px;
+  transition: transform var(--duration-slow) var(--ease-drawer),
+              width var(--duration-slow) var(--ease-drawer);
+  pointer-events: none;
+  will-change: transform, width;
+}
+.tab-panel {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--duration-base) var(--ease-out),
+              transform var(--duration-base) var(--ease-out);
+}
+@starting-style {
+  .tab-panel { opacity: 0; transform: translateY(4px); }
+}
+
+/* ---- Search clear (plan 005) ---- */
+.search-clear {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity var(--duration-base) var(--ease-out),
+              transform var(--duration-base) var(--ease-out);
+}
+@starting-style {
+  .search-clear { opacity: 0; transform: scale(0.85); }
+}
+
+/* ---- Subscribe success (plan 006) ---- */
+.subscribe-success {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--duration-slow) var(--ease-out),
+              transform var(--duration-slow) var(--ease-out);
+}
+@starting-style {
+  .subscribe-success { opacity: 0; transform: translateY(12px); }
+}
+@keyframes subscribe-check-pop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  55%  { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+.subscribe-check {
+  animation: subscribe-check-pop 500ms var(--ease-out) 100ms both;
+  transform-origin: center;
+  display: inline-block;
+}
+@keyframes subscribe-message-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.subscribe-message {
+  animation: subscribe-message-in var(--duration-slow) var(--ease-out) 250ms both;
+  display: inline-block;
+}
+
+/* ---- Reduced motion overrides ---- */
+@media (prefers-reduced-motion: reduce) {
+  .vote-heart-bump,
+  .vote-count,
+  .subscribe-check,
+  .subscribe-message { animation: none; }
+  .subscribe-success,
+  .grid-item-enter,
+  .tab-underline,
+  .tab-panel,
+  .search-clear {
+    transition: opacity 200ms var(--ease-out);
+  }
+  @starting-style {
+    .grid-item-enter { transform: none; }
+    .tab-panel { transform: none; }
+    .search-clear { transform: scale(1); }
+    .subscribe-success { transform: none; }
+  }
+}
+
 /* =========================================
    Tailwind Overrides - Nippon Colors
    ========================================= */
@@ -180,6 +299,14 @@ body {
     --muted-foreground: var(--color-umenezumi-lighter);
     --card: var(--color-shiro);
     --card-foreground: var(--color-umenezumi);
+
+    /* Motion tokens (emilkowalski/skills apple-design) */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);        /* strong ease-out for UI enter/exit */
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);    /* on-screen morph / reposition */
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);     /* iOS-style drawer / sheet */
+    --duration-fast: 160ms;   /* press feedback */
+    --duration-base: 200ms;   /* dropdowns, hover */
+    --duration-slow: 300ms;   /* enter/exit, stagger */
   }
 }
 

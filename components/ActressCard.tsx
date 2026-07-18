@@ -51,7 +51,7 @@ export default function ActressCard({
   };
 
   return (
-    <div className="relative bg-white rounded-xl border border-[rgba(var(--color-sakura-gray),0.6)] shadow-md overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+    <div className="relative bg-white rounded-xl border border-[rgba(var(--color-sakura-gray),0.6)] shadow-md overflow-hidden transition-[transform,box-shadow] duration-base ease-out active:scale-[0.98] active:-translate-y-0.5 md:hover:shadow-xl md:hover:-translate-y-1 group">
       {/* Rank Badge */}
       <div className={`absolute top-2 left-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold z-10 shadow-lg ${getRankClass(rank)}`}>
         {rank}
@@ -69,7 +69,7 @@ export default function ActressCard({
             <img
               src={avatar_url}
               alt={name_ja}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover transition-transform duration-slow ease-out md:group-hover:scale-105"
               loading="eager"
               decoding="async"
               fetchPriority="high"

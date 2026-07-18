@@ -71,7 +71,15 @@ module.exports = {
         'froala-lg': '0 8px 30px rgba(236, 72, 153, 0.15)',
       },
       transitionTimingFunction: {
+        'out': 'cubic-bezier(0.23, 1, 0.32, 1)',
+        'in-out': 'cubic-bezier(0.77, 0, 0.175, 1)',
+        'drawer': 'cubic-bezier(0.32, 0.72, 0, 1)',
         'froala': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      },
+      transitionDuration: {
+        'fast': '160ms',
+        'base': '200ms',
+        'slow': '300ms',
       },
     },
   },

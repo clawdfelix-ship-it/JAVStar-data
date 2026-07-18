@@ -17,5 +17,5 @@
     "paths": { "@/*": ["./*"] }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "scrapers", "scripts", "data", "test-minnano.ts", "test-minnano.js", "analyze-events.ts", "analyze-events.js", "check-calendar-events.ts", "clean-events.ts", "check-events.ts", "count-events.ts", "debug-sql.ts", "fix-events.ts", "import-new-events.ts", "import-scraped-events.ts", "list-failed.ts", "merge-and-prepare.sql.js", "scrape-av-event-search.ts", "scraper-av-event.ts", "temp-scrape-3b.ts", "temp-scrape-5.ts"]
+  "exclude": ["node_modules", "archive", "scrapers", "scripts", "data", "test-minnano.ts", "test-minnano.js", "analyze-events.ts", "analyze-events.js", "check-calendar-events.ts", "clean-events.ts", "check-events.ts", "count-events.ts", "debug-sql.ts", "fix-events.ts", "import-new-events.ts", "import-scraped-events.ts", "list-failed.ts", "merge-and-prepare.sql.js", "scrape-av-event-search.ts", "scraper-av-event.ts", "temp-scrape-3b.ts", "temp-scrape-5.ts"]
 }
