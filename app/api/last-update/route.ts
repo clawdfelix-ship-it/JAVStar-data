@@ -3,39 +3,52 @@ import { sql } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+// 每張表對應嘅時間戳欄位（events 只有 created_at，其餘有齊 created_at + updated_at）
+async function maxTs(table: 'events' | 'actresses' | 'dvd_ranking' | 'new_releases'): Promise<string | null> {
+  try {
+    let result: any;
+    if (table === 'events') {
+      // events 冇 updated_at
+      result = await sql`SELECT MAX(created_at) AS last_update FROM events`;
+    } else if (table === 'actresses') {
+      result = await sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) AS last_update FROM actresses`;
+    } else if (table === 'dvd_ranking') {
+      result = await sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) AS last_update FROM dvd_ranking`;
+    } else {
+      result = await sql`SELECT GREATEST(MAX(created_at), MAX(updated_at)) AS last_update FROM new_releases`;
+    }
+    return Array.isArray(result) && result.length > 0 ? (result[0] as any)?.last_update ?? null : null;
+  } catch (e) {
+    // 某張表唔存在 / 冇該欄位都唔應該打殘成個 endpoint
+    console.error(`[last-update] table ${table} query failed:`, e);
+    return null;
+  }
+}
+
 export async function GET() {
   try {
-    // 取所有表的最新時間 - 如果冇 updated_at 就用 created_at
-    const [eventResult, actressResult, dvdRankingResult, newReleasesResult] = await Promise.all([
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM events`,
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM actresses`,
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM dvd_ranking`,
-      sql`SELECT COALESCE(GREATEST(MAX(created_at), MAX(updated_at)), MAX(created_at), NOW()) as last_update FROM new_releases`
+    const [eventTs, actressTs, dvdTs, releasesTs] = await Promise.all([
+      maxTs('events'),
+      maxTs('actresses'),
+      maxTs('dvd_ranking'),
+      maxTs('new_releases'),
     ]);
-    
-    const getDate = (result: any) => {
-      return Array.isArray(result) && result.length > 0 
-        ? (result[0] as any)?.last_update 
-        : null;
-    };
-    
-    const dates = [
-      new Date(getDate(eventResult) || 0),
-      new Date(getDate(actressResult) || 0),
-      new Date(getDate(dvdRankingResult) || 0),
-      new Date(getDate(newReleasesResult) || 0),
-      new Date() // 保底：而家時間
-    ];
-    
-    const lastUpdate = new Date(Math.max(...dates.map(d => d.getTime())));
-    
+
+    const parsedDates = [eventTs, actressTs, dvdTs, releasesTs]
+      .map(t => (t ? new Date(t).getTime() : NaN))
+      .filter(t => Number.isFinite(t));
+
+    const lastUpdate = parsedDates.length > 0
+      ? new Date(Math.max(...parsedDates))
+      : new Date();
+
     return NextResponse.json({
       last_update: lastUpdate.toISOString(),
       timezone: 'UTC',
-      event_last_update: getDate(eventResult),
-      actress_last_update: getDate(actressResult),
-      dvd_ranking_last_update: getDate(dvdRankingResult),
-      new_releases_last_update: getDate(newReleasesResult)
+      event_last_update: eventTs,
+      actress_last_update: actressTs,
+      dvd_ranking_last_update: dvdTs,
+      new_releases_last_update: releasesTs,
     });
   } catch (error) {
     console.error('[last-update] DB error:', error);
