@@ -380,7 +380,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       <main key={activeTab} className="tab-panel max-w-7xl mx-auto px-4 md:px-6 py-8">
         {/* Actress Ranking Tab */}
         {activeTab === 'actress' && (
-          <div>
+          <div id="actress-grid-top">
             {/* Sort Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <h2 className="text-2xl font-bold text-text-primary font-japanese flex items-center gap-2">
@@ -452,7 +452,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 <button
                   onClick={() => {
                     setPage(p => Math.max(1, p - 1));
-                    tabsContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (typeof window !== 'undefined') {
+                      const target = document.getElementById('actress-grid-top');
+                      const y = (target?.getBoundingClientRect().top ?? 0) + window.scrollY - 80;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
                   }}
                   disabled={page === 1}
                   className="fdb-btn fdb-btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
@@ -465,7 +469,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 <button
                   onClick={() => {
                     setPage(p => Math.min(pagination.totalPages || 1, p + 1));
-                    tabsContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (typeof window !== 'undefined') {
+                      const target = document.getElementById('actress-grid-top');
+                      const y = (target?.getBoundingClientRect().top ?? 0) + window.scrollY - 80;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
                   }}
                   disabled={page === pagination.totalPages}
                   className="fdb-btn fdb-btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
