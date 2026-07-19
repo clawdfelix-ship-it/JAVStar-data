@@ -450,7 +450,10 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             {pagination && pagination.totalPages && pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-8">
                 <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  onClick={() => {
+                    setPage(p => Math.max(1, p - 1));
+                    tabsContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
                   disabled={page === 1}
                   className="fdb-btn fdb-btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -460,7 +463,10 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   第 {page} 頁 / 共 {pagination.totalPages} 頁
                 </span>
                 <button
-                  onClick={() => setPage(p => Math.min(pagination.totalPages || 1, p + 1))}
+                  onClick={() => {
+                    setPage(p => Math.min(pagination.totalPages || 1, p + 1));
+                    tabsContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
                   disabled={page === pagination.totalPages}
                   className="fdb-btn fdb-btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
