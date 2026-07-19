@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const search = searchParams.get('search') || '';
     const sortBy = searchParams.get('sort') || 'final_score';
+    const hasUpcoming = searchParams.get('has_upcoming') === '1';
     const offset = (page - 1) * limit;
 
     // Sort whitelist
@@ -24,25 +25,30 @@ export async function GET(request: NextRequest) {
       event_count: { col: 'year_2026_events',  dir: 'DESC' },
       age:         { col: 'age',              dir: 'DESC' },
       name_ja:     { col: 'name_ja',           dir: 'ASC'  },
+      upcoming:    { col: 'next_event_date',   dir: 'ASC'  },
     };
     const sort = sortMap[sortBy] ?? null;
 
     const sql = getSql();
 
-    // Count query
-    const countRows = search
-      ? await sql`SELECT COUNT(*)::int as cnt FROM actresses WHERE name_ja ILIKE ${'%' + search + '%'} OR name_cn ILIKE ${'%' + search + '%'}`
-      : await sql`SELECT COUNT(*)::int as cnt FROM actresses`;
-    const total = (countRows as any)[0].cnt;
+    // WHERE conditions
+    const whereParts: string[] = [];
+    if (search) {
+      const safe = search.replace(/'/g, "''");
+      whereParts.push(`(a.name_ja ILIKE '%${safe}%' OR a.name_cn ILIKE '%${safe}%')`);
+    }
+    if (hasUpcoming) {
+      whereParts.push(`ne.datetime IS NOT NULL`);
+    }
+    const whereClause = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
 
     // ORDER BY
-    const orderByClause = sort
-      ? `"${sort.col}" ${sort.dir} NULLS LAST`
-      : `(COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v.cnt, 0) * 0.3) DESC`;
-
-    const searchCondition = search
-      ? `WHERE a.name_ja ILIKE '%${search.replace(/'/g, "''")}%' OR a.name_cn ILIKE '%${search.replace(/'/g, "''")}%'`
-      : '';
+    // For 'upcoming' sort, put NULLs last so actresses with events surface first
+    const orderByClause = sortBy === 'upcoming'
+      ? `ne.datetime ASC NULLS LAST`
+      : sort
+        ? `"${sort.col}" ${sort.dir} NULLS LAST`
+        : `(COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v.cnt, 0) * 0.3) DESC`;
 
     // Main query — uses pre-aggregated actress_events_count + indexed votes lookup
     const nowStr = new Date().toISOString().slice(0, 10);
@@ -69,10 +75,23 @@ export async function GET(request: NextRequest) {
         WHERE events.actress_id = a.id AND events.datetime >= '${nowStr}'
         ORDER BY events.datetime ASC LIMIT 1
       ) ne ON true
-      ${searchCondition}
+      ${whereClause}
       ORDER BY ${orderByClause}
       LIMIT ${limit} OFFSET ${offset}
     `;
+
+    // Count query — same WHERE
+    const countQuery = `
+      SELECT COUNT(*)::int as cnt FROM actresses a
+      LEFT JOIN LATERAL (
+        SELECT datetime FROM events
+        WHERE events.actress_id = a.id AND events.datetime >= '${nowStr}'
+        ORDER BY events.datetime ASC LIMIT 1
+      ) ne ON true
+      ${whereClause}
+    `;
+    const countRows = await sql.query(countQuery);
+    const total = (countRows as any)[0].cnt;
 
     const rows = await sql.query(query);
 

@@ -23,6 +23,8 @@ interface Actress {
   year_2026_events: number;
   vote_count: number;
   final_score: number;
+  next_event_date?: string | null;
+  next_event_title?: string | null;
 }
 
 interface Event {
@@ -52,6 +54,7 @@ interface UseActressesOptions {
   limit?: number;
   sort?: string;
   search?: string;
+  hasUpcoming?: boolean;
 }
 
 /**
@@ -63,20 +66,20 @@ export function useActresses({
   limit = 12,
   sort = 'final_score',
   search = '',
+  hasUpcoming = false,
 }: UseActressesOptions = {}) {
-  // v20260513 = 強制跳過舊 cache，確保用戶見到修復後嘅數據
-  const CACHE_BUSTER = 'v=20260513';
-  
+  // v20260719 = post-agency mapping backfill
+  const CACHE_BUSTER = 'v=20260719';
+
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
     sort,
     search,
   });
+  if (hasUpcoming) params.set('has_upcoming', '1');
 
-  const key = search || page > 1 || sort !== 'final_score'
-    ? `/api/actresses?${params}&${CACHE_BUSTER}`
-    : `/api/actresses?${CACHE_BUSTER}`; // 加 cache-buster 跳過舊數據
+  const key = `/api/actresses?${params}&${CACHE_BUSTER}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<ActressesResponse>(
     key,

@@ -76,6 +76,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState('final_score');
+  const [hasUpcoming, setHasUpcoming] = useState(false);
   const [filterPrefecture, setFilterPrefecture] = useState('ALL');
   const [filterType, setFilterType] = useState('ALL');
   const [activeTab, setActiveTab] = useState<'actress' | 'calendar' | 'events'>('actress');
@@ -86,6 +87,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     limit: 12,
     sort,
     search: activeTab === 'actress' ? search : '',
+    hasUpcoming,
   });
 
   // Email signup state
@@ -385,14 +387,29 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 <span className="text-nadeshiko-dark">👑</span>
                 女優排名
               </h2>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-text-tertiary">排序:</span>
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* 有活動 toggle — surfaces the 13 actresses with upcoming events */}
+                <button
+                  type="button"
+                  onClick={() => { setHasUpcoming(!hasUpcoming); setPage(1); }}
+                  aria-pressed={hasUpcoming}
+                  className={`inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-xl text-sm font-medium transition-[background-color,color] duration-base ease-out ${
+                    hasUpcoming
+                      ? 'bg-nadeshiko-dark text-white shadow-md'
+                      : 'bg-white border border-border text-text-primary hover:bg-[rgba(var(--color-sakura-gray),0.25)]'
+                  }`}
+                >
+                  <span aria-hidden>📅</span>
+                  <span>只顯示有活動</span>
+                </button>
+                <span className="text-sm text-text-secondary">排序:</span>
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="px-4 py-2 border rounded-xl text-sm font-medium focus:outline-none bg-white border-border text-text-primary"
+                  className="min-h-[44px] px-4 border rounded-xl text-sm font-medium focus:outline-none bg-white border-border text-text-primary"
                 >
                   <option value="final_score">🏆 綜合評分</option>
+                  <option value="upcoming">📅 最近活動</option>
                   <option value="event_count">📊 活動數量</option>
                   <option value="year_2026_events">📅 2026年活動</option>
                   <option value="vote_count">❤️ 投票數</option>
