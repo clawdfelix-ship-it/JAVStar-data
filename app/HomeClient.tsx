@@ -284,38 +284,38 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
             </div>
 
-            {/* Stats Cards - Froala Design Blocks style */}
+            {/* Stats Cards - unified color, semantic hierarchy (P0 #3) */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-              {/* 註冊女優 */}
+              {/* 註冊女優 — PRIMARY */}
               <div className="fdb-card p-5 text-center">
                 <div className="text-3xl md:text-4xl font-bold text-nadeshiko-dark font-mono mb-1">
                   {stats?.actressCount ? stats.actressCount.toLocaleString() : <span className="animate-pulse">--</span>}
                 </div>
-                <div className="text-text-secondary text-sm font-medium">註冊女優</div>
+                <div className="text-text-primary text-sm font-medium">註冊女優</div>
               </div>
-              
-              {/* 活動記錄 */}
+
+              {/* 活動記錄 — PRIMARY */}
               <div className="fdb-card p-5 text-center">
-                <div className="text-3xl md:text-4xl font-bold text-emerald-600 font-mono mb-1">
+                <div className="text-3xl md:text-4xl font-bold text-nadeshiko-dark font-mono mb-1">
                   {stats?.eventCount ? stats.eventCount.toLocaleString() : <span className="animate-pulse">--</span>}
                 </div>
-                <div className="text-text-secondary text-sm font-medium">活動記錄</div>
+                <div className="text-text-primary text-sm font-medium">活動記錄</div>
               </div>
-              
-              {/* 年度數據 */}
+
+              {/* 年度數據 — secondary (context) */}
               <div className="fdb-card p-5 text-center">
-                <div className="text-3xl md:text-4xl font-bold text-amber-600 font-mono mb-1">
+                <div className="text-3xl md:text-4xl font-bold text-text-primary font-mono mb-1">
                   2026
                 </div>
-                <div className="text-text-secondary text-sm font-medium">年度數據</div>
+                <div className="text-text-primary text-sm font-medium">數據年度</div>
               </div>
-              
-              {/* 數據更新 */}
+
+              {/* 數據更新 — secondary */}
               <div className="fdb-card p-5 text-center">
-                <div className="text-3xl md:text-4xl font-bold text-kamenozoki-dark font-mono mb-1">
+                <div className="text-xl md:text-2xl font-semibold text-text-primary font-mono mb-1 leading-tight pt-1">
                   每日更新
                 </div>
-                <div className="text-text-secondary text-sm font-medium">數據更新</div>
+                <div className="text-text-primary text-sm font-medium">數據新鮮度</div>
               </div>
             </div>
 
@@ -514,8 +514,19 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 ))}
               </div>
             ) : filteredEvents.length === 0 ? (
-              <div className="fdb-card p-12 text-center">
-                <p className="text-text-secondary text-lg">搵唔到符合條件嘅活動</p>
+              <div className="fdb-card p-10 md:p-14 text-center max-w-md mx-auto">
+                <div className="text-5xl mb-4" aria-hidden>🌸</div>
+                <p className="text-lg font-semibold text-text-primary mb-2">暫時搵唔到符合條件嘅活動</p>
+                <p className="text-sm text-text-secondary mb-6">
+                  日本 av-event.jp 通常提前 1-2 個月公布新活動，訂閱後有新場即通知你
+                </p>
+                <a
+                  href="#top"
+                  onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="inline-flex min-h-[44px] px-5 items-center justify-center rounded-xl bg-nadeshiko-dark text-white font-medium text-sm active:scale-[0.98] transition-transform duration-base ease-out shadow-md"
+                >
+                  ⬆ 返回訂閱通知
+                </a>
               </div>
             ) : (
               <div className="space-y-4">

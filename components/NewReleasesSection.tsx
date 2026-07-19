@@ -75,7 +75,7 @@ export default function NewReleasesSection() {
 
         {/* 影片網格 - 細尺寸 */}
         {releases.length > 0 && (
-          <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-2">
+          <div className="grid grid-cols-3 md:grid-cols-8 lg:grid-cols-12 gap-2">
             {releases.map((release: NewRelease) => (
               <a
                 key={release.id}

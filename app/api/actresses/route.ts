@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
       : '';
 
     // Main query — uses pre-aggregated actress_events_count + indexed votes lookup
+    const nowStr = new Date().toISOString().slice(0, 10);
     const query = `
       SELECT
         a.id, a.name_ja, a.name_cn, a.avatar_url,
@@ -55,12 +56,19 @@ export async function GET(request: NextRequest) {
         COALESCE(ec.year_2026_events, 0)::int AS year_2026_events,
         COALESCE(ec.year_2025_events, 0)::int AS year_2025_events,
         COALESCE(v.cnt, 0)::int               AS vote_count,
+        ne.datetime                           AS next_event_date,
+        ne.title                              AS next_event_title,
         (COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v.cnt, 0) * 0.3) AS final_score
       FROM actresses a
       LEFT JOIN actress_events_count ec ON ec.actress_id = a.id
       LEFT JOIN LATERAL (
         SELECT COUNT(*) AS cnt FROM votes WHERE votes.actress_id = a.id
       ) v ON true
+      LEFT JOIN LATERAL (
+        SELECT datetime, title FROM events
+        WHERE events.actress_id = a.id AND events.datetime >= '${nowStr}'
+        ORDER BY events.datetime ASC LIMIT 1
+      ) ne ON true
       ${searchCondition}
       ORDER BY ${orderByClause}
       LIMIT ${limit} OFFSET ${offset}

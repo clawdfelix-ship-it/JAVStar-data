@@ -106,6 +106,31 @@ body {
   @apply h-px bg-gradient-to-r from-transparent via-[rgba(var(--color-sakura-gray),0.6)] to-transparent my-8;
 }
 
+/* ---- Tabs (P1 #7) ---- */
+.fdb-tab {
+  @apply relative inline-flex items-center gap-2 px-4 md:px-5 rounded-xl font-medium text-sm md:text-base
+         transition-[background-color,color] duration-base ease-out cursor-pointer;
+  min-height: 44px;
+  color: rgb(var(--color-umenezumi));
+}
+.fdb-tab:hover {
+  background: rgba(var(--color-sakura-gray), 0.25);
+}
+.fdb-tab.active {
+  @apply font-semibold;
+  color: rgb(var(--color-nadeshiko-dark));
+  background: rgba(var(--color-nadeshiko), 0.10);
+}
+.fdb-badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold;
+  background: rgba(var(--color-sakura-gray), 0.35);
+  color: rgb(var(--color-umenezumi));
+}
+.fdb-tab.active .fdb-badge {
+  background: rgba(var(--color-nadeshiko-dark), 0.15);
+  color: rgb(var(--color-nadeshiko-dark));
+}
+
 /* ---- Hero Gradients ---- */
 .fdb-hero-gradient {
   background: linear-gradient(135deg, 
@@ -320,11 +345,13 @@ body {
   }
   
   .text-text-secondary {
-    color: rgb(var(--color-umenezumi-light));
+    /* P1 #6: raised from 168 (light) to 128 (mid) for WCAG AA on sakura background */
+    color: rgb(128, 108, 118);
   }
-  
+
   .text-text-tertiary {
-    color: rgb(var(--color-umenezumi-lighter));
+    /* P1 #6: tertiary lifted so placeholders/hints remain legible */
+    color: rgb(150, 130, 140);
   }
   
   .border-border {

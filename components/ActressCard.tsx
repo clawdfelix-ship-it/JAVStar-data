@@ -23,6 +23,8 @@ interface ActressCardProps {
   year_2026_events: number;
   vote_count: number;
   final_score: number;
+  next_event_date?: string | null;
+  next_event_title?: string | null;
 }
 
 export default function ActressCard({
@@ -41,6 +43,8 @@ export default function ActressCard({
   year_2026_events,
   vote_count,
   final_score,
+  next_event_date,
+  next_event_title,
 }: ActressCardProps) {
 
   const getRankClass = (r: number) => {
@@ -49,6 +53,17 @@ export default function ActressCard({
     if (r === 3) return 'bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-lg shadow-orange-200';
     return 'bg-gradient-to-br from-pink-400 to-pink-500 text-white shadow-lg shadow-pink-200';
   };
+
+  // Format upcoming event: "8/9 週六" or "8/9" if no day-of-week
+  const nextEventLabel = (() => {
+    if (!next_event_date) return null;
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(next_event_date));
+    if (!m) return null;
+    const d = new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return null;
+    const wd = ['日','一','二','三','四','五','六'][d.getDay()];
+    return `${parseInt(m[2])}/${parseInt(m[3])} 週${wd}`;
+  })();
 
   return (
     <div className="relative bg-white rounded-xl border border-[rgba(var(--color-sakura-gray),0.6)] shadow-md overflow-hidden transition-[transform,box-shadow] duration-base ease-out active:scale-[0.98] active:-translate-y-0.5 md:hover:shadow-xl md:hover:-translate-y-1 group">
@@ -91,7 +106,7 @@ export default function ActressCard({
 
       {/* Info */}
       <div className="p-3">
-        <div className="mb-2.5">
+        <div className="mb-2">
           <Link href={`/actress/${id}`}>
             <h3 className="font-bold text-[rgb(var(--color-umenezumi))] text-base truncate group-hover:text-[rgb(var(--color-nadeshiko-dark))] transition-colors" style={{fontFamily: 'Noto Sans JP, sans-serif'}}>
               {name_ja}
@@ -100,26 +115,42 @@ export default function ActressCard({
           {name_cn && <p className="text-[rgb(var(--color-umenezumi-light))] text-xs truncate mt-0.5">{name_cn}</p>}
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-1.5 mb-2.5">
+        {/* Next event pill — primary CTA info per apple-design "purpose driven" */}
+        {nextEventLabel ? (
+          <Link
+            href={`/actress/${id}`}
+            title={next_event_title || ''}
+            className="mb-2.5 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[rgba(var(--color-nadeshiko),0.12)] border border-[rgba(var(--color-nadeshiko-dark),0.35)] text-[rgb(var(--color-nadeshiko-dark))] text-xs font-semibold hover:bg-[rgba(var(--color-nadeshiko),0.22)] transition-colors"
+          >
+            <span aria-hidden>📅</span>
+            <span className="truncate">下場 {nextEventLabel}</span>
+          </Link>
+        ) : (
+          <div className="mb-2.5 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[rgba(var(--color-sakura-gray),0.15)] text-[rgb(var(--color-umenezumi-light))] text-xs">
+            <span aria-hidden>🌙</span>
+            <span className="truncate">暫無公開活動</span>
+          </div>
+        )}
+
+        {/* Stats — condensed 2-col: 活動場數 + 得票 */}
+        <div className="grid grid-cols-2 gap-1.5 mb-2.5">
           <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
             <div className="text-base font-bold text-[rgb(var(--color-nadeshiko-dark))]">{event_count}</div>
-            <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">活動</div>
+            <div className="text-[9px] text-[rgb(var(--color-umenezumi))] uppercase tracking-wider">總活動</div>
           </div>
           <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
-            <div className="text-base font-bold text-green-500">{year_2026_events}</div>
-            <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">2026</div>
-          </div>
-          <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
-            <div className="text-base font-bold text-[rgb(var(--color-nadeshiko-dark))]">{vote_count}</div>
-            <div className="text-[9px] text-[rgb(var(--color-umenezumi-light))] uppercase tracking-wider">投票</div>
+            <div className="text-base font-bold text-[rgb(var(--color-nadeshiko-dark))]">{year_2026_events}</div>
+            <div className="text-[9px] text-[rgb(var(--color-umenezumi))] uppercase tracking-wider">2026</div>
           </div>
         </div>
 
-        {/* Vote + CTA Row */}
+        {/* Vote + CTA Row — bumped touch target to 44px min height */}
         <div className="flex items-center gap-2">
-          <VoteButton actressId={id} initialCount={vote_count} size="sm" className="flex-1 justify-center" />
-          <Link href={`/actress/${id}`} className="flex-1 py-1.5 bg-[rgb(var(--color-nadeshiko-dark))] hover:bg-[rgb(var(--color-nadeshiko))] text-white rounded-lg font-medium text-xs text-center transition-colors shadow-md">
+          <VoteButton actressId={id} initialCount={vote_count} size="sm" className="flex-1 justify-center min-h-[44px]" />
+          <Link
+            href={`/actress/${id}`}
+            className="flex-1 min-h-[44px] flex items-center justify-center bg-[rgb(var(--color-nadeshiko-dark))] hover:bg-[rgb(var(--color-nadeshiko))] active:scale-[0.98] text-white rounded-lg font-medium text-xs text-center transition-[background-color,transform] duration-base ease-out shadow-md"
+          >
             詳情 →
           </Link>
         </div>
