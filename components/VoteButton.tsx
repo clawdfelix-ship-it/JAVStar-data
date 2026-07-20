@@ -47,6 +47,10 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
         if (res.ok) {
           setHasVoted(true);
           setVoteCount(d.vote_count ?? voteCount + 1);
+        } else if (d.voted) {
+          // Already voted this IP — sync state
+          setHasVoted(true);
+          alert(d.error || '你已投過票');
         } else {
           alert(d.error || '投票失敗');
         }

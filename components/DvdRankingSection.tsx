@@ -90,9 +90,9 @@ export default function DvdRankingSection() {
           </div>
         )}
 
-        {/* 排行榜網格 - 1排5個，純封面 */}
+        {/* 排行榜網格 - desktop 更多 col，仿新作片直立版 */}
         {!isLoading && ranking.length > 0 && (
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
             {ranking.map((item) => (
               <a
                 key={item.rank}
@@ -100,52 +100,34 @@ export default function DvdRankingSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group block bg-gray-50 rounded overflow-hidden hover:shadow transition-all duration-200"
+                title={`#${item.rank} ${item.title}${item.actress ? ` | ${item.actress}` : ''}`}
               >
-                {/* 封面 - 高清渲染優化 */}
-                <div 
-                  className="relative overflow-hidden bg-gray-200"
-                  style={{ aspectRatio: '800/438' }}
-                  title={`#${item.rank} ${item.title}${item.actress ? ` | ${item.actress}` : ''}`}
-                >
-                  {/* 排位徽章 */}
-                  <div className="absolute top-2 left-2 z-10">
-                    <span className={`w-7 h-7 flex items-center justify-center rounded-full font-bold text-sm shadow ${getRankStyle(item.rank)}`}>
+                {/* 封面 - 直立版 (跟 DMM pl.jpg 原比例 800x538 ~ 3:2 但 cover-crop 佔滿) */}
+                <div className="relative aspect-[2/3] overflow-hidden bg-gray-200">
+                  {/* 排位徽章 — 只保留一個，右上角小 pill */}
+                  <div className="absolute top-1 left-1 z-10">
+                    <span className={`w-6 h-6 flex items-center justify-center rounded-full font-bold text-xs shadow ${getRankStyle(item.rank)}`}>
                       {item.rank}
                     </span>
                   </div>
-                  {/* 升降徽章 */}
-                  <div className="absolute top-2 right-2 z-10">
-                    <span className="px-1.5 py-0.5 bg-white/90 rounded">
-                      {getRankChangeIcon(item.rankChange)}
-                    </span>
-                  </div>
-                  {/* NEW標籤 */}
-                  {item.isNew && (
-                    <div className="absolute bottom-2 left-2 z-10">
-                      <span className="px-2 py-1 bg-pink-500 text-white rounded text-xs font-bold">
-                        NEW
-                      </span>
-                    </div>
-                  )}
-                  {/* 高清封面圖 - 渲染優化 */}
+                  {/* 高清封面圖 - cover crop 令直立 slot 填滿 */}
                   {item.coverUrl ? (
                     <img
                       src={item.coverUrl}
                       alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
                       loading="lazy"
                       decoding="async"
-                      style={{
-                        imageRendering: 'auto',
-                        backfaceVisibility: 'hidden',
-                        transform: 'translateZ(0)',
-                      }}
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                       <span className="text-xl text-gray-400">🎬</span>
                     </div>
                   )}
+                  {/* 影片編號 底部細 pill */}
+                  <div className="absolute bottom-1 left-1 right-1 px-1.5 py-0.5 bg-black/70 rounded text-[9px] text-white font-mono truncate">
+                    {item.videoCode}
+                  </div>
                 </div>
               </a>
             ))}

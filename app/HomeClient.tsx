@@ -420,7 +420,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
             {/* Actress Grid */}
             {loading ? (
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                   <div key={i} className="skeleton h-48 rounded-2xl" />
                 ))}
@@ -433,7 +433,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                 {actresses.map((actress, index) => (
                   <div
                     key={actress.id}

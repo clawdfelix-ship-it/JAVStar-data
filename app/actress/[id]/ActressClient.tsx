@@ -315,23 +315,25 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                       )}
                     </div>
 
-                    {/* Stats Grid - WHITE CARDS with DARK TEXT */}
-                    <div className="grid grid-cols-5 gap-3">
-                      <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-4 text-center border border-pink-200">
-                        <div className="font-mono text-2xl sm:text-3xl font-bold text-pink-700">{actress.stats.total_events}</div>
-                        <div className="text-text-secondary text-sm mt-1 font-medium">📊 總活動</div>
+                    {/* Stats Grid — 2×2 mobile / 4-col desktop, unified pink theme (P0 #3) */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="bg-white rounded-xl p-4 text-center border border-border shadow-sm">
+                        <div className="font-mono text-2xl sm:text-3xl font-bold text-[rgb(var(--color-nadeshiko-dark))]">{actress.stats.total_events}</div>
+                        <div className="text-text-secondary text-xs sm:text-sm mt-1 font-medium">📊 總活動</div>
                       </div>
-                      <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 text-center border border-emerald-200">
-                        <div className="font-mono text-2xl sm:text-3xl font-bold text-emerald-700">{actress.stats.year_2026_events}</div>
-                        <div className="text-text-secondary text-sm mt-1 font-medium">📅 2026 年</div>
+                      <div className="bg-white rounded-xl p-4 text-center border border-border shadow-sm">
+                        <div className="font-mono text-2xl sm:text-3xl font-bold text-[rgb(var(--color-umenezumi))]">{actress.stats.year_2026_events}</div>
+                        <div className="text-text-secondary text-xs sm:text-sm mt-1 font-medium">📅 今年活動</div>
                       </div>
-                      <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 text-center border border-amber-200">
-                        <div className="font-mono text-2xl sm:text-3xl font-bold text-amber-700">{actress.stats.month_04_2026_events}</div>
-                        <div className="text-text-secondary text-sm mt-1 font-medium">🗓️ 4月活動</div>
+                      <div className="bg-white rounded-xl p-4 text-center border border-border shadow-sm">
+                        <div className="font-mono text-2xl sm:text-3xl font-bold text-[rgb(var(--color-umenezumi))]">{actress.stats.upcoming_events}</div>
+                        <div className="text-text-secondary text-xs sm:text-sm mt-1 font-medium">🗓️ 未來活動</div>
                       </div>
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
-                        <div className="font-mono text-2xl sm:text-3xl font-bold text-blue-700">{actress.vote_count}</div>
-                        <div className="text-text-secondary text-sm mt-1 font-medium">❤️ 投票</div>
+                      <div className="bg-white rounded-xl p-4 text-center border border-border shadow-sm flex flex-col items-center justify-between">
+                        <div>
+                          <div className="font-mono text-2xl sm:text-3xl font-bold text-[rgb(var(--color-nadeshiko-dark))]">{actress.vote_count}</div>
+                          <div className="text-text-secondary text-xs sm:text-sm mt-1 font-medium">❤️ 投票</div>
+                        </div>
                         <div className="mt-2 flex justify-center">
                           <VoteButton actressId={actress.id} initialCount={actress.vote_count} size="md" />
                         </div>

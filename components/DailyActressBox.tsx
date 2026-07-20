@@ -114,8 +114,8 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
     <section className="py-6 px-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-y border-border">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-          {/* 左邊：標題 + 按鈕 */}
-          <div className="text-center md:text-left">
+          {/* 左邊：標題 + 按鈕 (mobile: order-2 排結果框之後) */}
+          <div className="order-2 md:order-1 flex flex-col items-center md:items-start text-center md:text-left">
             <h2 className="text-xl md:text-2xl font-bold text-text-primary flex items-center gap-2 justify-center md:justify-start">
               <span className="text-2xl">🎁</span>
               今日女優盲盒
@@ -138,8 +138,8 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
             </button>
           </div>
 
-          {/* 右邊：結果顯示 */}
-          <div className="min-w-[200px]">
+          {/* 右邊：結果顯示 (mobile: order-1 top) */}
+          <div className="order-1 md:order-2 min-w-[200px] flex justify-center">
             {selectedActress ? (
               <Link 
                 href={`/actress/${selectedActress.id}`}
