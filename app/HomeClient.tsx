@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
 import EventCalendar from '@/components/EventCalendar';
-import VirtualList from '@/components/VirtualList';
+// VirtualList removed — variable-height EventCard caused overlapping rows
 import SearchBar from '@/components/SearchBar';
 import NewReleasesSection from '@/components/NewReleasesSection';
 import DvdRankingSection from '@/components/DvdRankingSection';
@@ -91,6 +91,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   }, [page]);
   const [sort, setSort] = useState('final_score');
   const [hasUpcoming, setHasUpcoming] = useState(false);
+  const [eventsShown, setEventsShown] = useState(60);
   const [filterPrefecture, setFilterPrefecture] = useState('ALL');
   const [filterType, setFilterType] = useState('ALL');
   const [activeTab, setActiveTab] = useState<'actress' | 'calendar' | 'events'>('actress');
@@ -561,28 +562,37 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
             ) : (
               <div className="space-y-4">
-                {/* 性能指標 */}
                 <div className="flex items-center justify-between">
                   <div className="fdb-badge fdb-badge-primary">
-                    ⚡ 虛擬滾動優化: {filteredEvents.length} 個活動
+                    🎫 共 {filteredEvents.length} 個活動
                   </div>
                 </div>
-                
-                {/* 虛擬滾動列表 */}
-                <VirtualList
-                  items={filteredEvents}
-                  itemHeight={140} // EventCard 高度
-                  containerHeight={700}
-                  overscan={6}
-                  getItemKey={(item) => item.id}
-                  className="rounded-2xl border bg-white border-border"
-                  emptyMessage="搵唔到符合條件嘅活動"
-                  renderItem={(event, index) => (
-                    <div className="px-4 py-2">
-                      <EventCard key={event.id} {...event} />
-                    </div>
-                  )}
-                />
+
+                {/* Native grid — variable-height EventCard 唔啱 VirtualList 硬設 itemHeight，
+                    強制 140px 導致內容重疊。首 60 個直接 render，超過先加 load more。 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredEvents.slice(0, eventsShown).map((event) => (
+                    <EventCard key={event.id} {...event} />
+                  ))}
+                </div>
+
+                {filteredEvents.length > eventsShown && (
+                  <div className="flex justify-center pt-4">
+                    <button
+                      onClick={() => setEventsShown(n => n + 60)}
+                      className="fdb-btn fdb-btn-outline"
+                    >
+                      顯示更多 ({filteredEvents.length - eventsShown} 個未顯示)
+                    </button>
+                  </div>
+                )}
+
+                {filteredEvents.length === 0 && (
+                  <div className="text-center py-16 bg-white rounded-2xl border border-border">
+                    <div className="text-4xl mb-3">🌸</div>
+                    <p className="text-text-secondary">搵唔到符合條件嘅活動</p>
+                  </div>
+                )}
               </div>
             )}
           </div>

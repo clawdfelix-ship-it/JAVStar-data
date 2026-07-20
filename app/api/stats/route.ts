@@ -41,8 +41,15 @@ export async function GET() {
     const eventResult = await sql`SELECT COUNT(*) as count FROM events`;
     const voteResult = await sql`SELECT COUNT(*) as count FROM votes`;
     
-    // 最後更新時間
-    const lastUpdateResult = await sql`SELECT NOW() as last_update`;
+    // 最後更新時間 — GREATEST of real data timestamps across all tables (not NOW())
+    const lastUpdateResult = await sql`
+      SELECT GREATEST(
+        (SELECT MAX(GREATEST(created_at, updated_at)) FROM actresses),
+        (SELECT MAX(created_at) FROM events),
+        (SELECT MAX(GREATEST(created_at, updated_at)) FROM dvd_ranking),
+        (SELECT MAX(GREATEST(created_at, updated_at)) FROM new_releases)
+      ) AS last_update
+    `;
     
     const actressCount = Number(actressResult[0]?.count || 0);
     const eventCount = Number(eventResult[0]?.count || 0);
