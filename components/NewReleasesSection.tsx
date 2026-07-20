@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useSWR from 'swr';
 
 interface NewRelease {
@@ -20,6 +20,18 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 export default function NewReleasesSection() {
   const [page, setPage] = useState(1);
   const [showAll, setShowAll] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Auto-scroll to section top when page changes
+  useEffect(() => {
+    if (typeof window === 'undefined' || page === 1) return;
+    requestAnimationFrame(() => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const y = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  }, [page]);
 
   const { data, error, isValidating } = useSWR(
     `/api/new-releases?page=${page}&limit=${showAll ? 60 : 24}`,
@@ -42,7 +54,7 @@ export default function NewReleasesSection() {
   }
 
   return (
-    <section className="py-10 px-4 bg-bg-secondary">
+    <section ref={sectionRef} className="py-10 px-4 bg-bg-secondary">
       <div className="max-w-7xl mx-auto">
         {/* 標題區 */}
         <div className="flex items-center justify-between mb-6">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useLayoutEffect } from 'react';
+import { useState, useMemo, useRef, useLayoutEffect, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
@@ -75,6 +75,20 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   // UI State
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  // Auto-scroll to grid top whenever page changes (fixes 上一頁/下一頁 not returning to top).
+  // Runs after React commits so the new DOM is in place.
+  const paginatedRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (page === 1 && !paginatedRef.current) return; // skip initial mount
+    paginatedRef.current = true;
+    requestAnimationFrame(() => {
+      const target = document.getElementById('actress-grid-top');
+      if (!target) return;
+      const y = target.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  }, [page]);
   const [sort, setSort] = useState('final_score');
   const [hasUpcoming, setHasUpcoming] = useState(false);
   const [filterPrefecture, setFilterPrefecture] = useState('ALL');
@@ -450,14 +464,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             {pagination && pagination.totalPages && pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-8">
                 <button
-                  onClick={() => {
-                    setPage(p => Math.max(1, p - 1));
-                    if (typeof window !== 'undefined') {
-                      const target = document.getElementById('actress-grid-top');
-                      const y = (target?.getBoundingClientRect().top ?? 0) + window.scrollY - 80;
-                      window.scrollTo({ top: y, behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="fdb-btn fdb-btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -467,15 +474,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   第 {page} 頁 / 共 {pagination.totalPages} 頁
                 </span>
                 <button
-                  onClick={() => {
-                    setPage(p => Math.min(pagination.totalPages || 1, p + 1));
-                    if (typeof window !== 'undefined') {
-                      const target = document.getElementById('actress-grid-top');
-                      const y = (target?.getBoundingClientRect().top ?? 0) + window.scrollY - 80;
-                      window.scrollTo({ top: y, behavior: 'smooth' });
-                    }
-                  }}
-                  disabled={page === pagination.totalPages}
+                  onClick={() => setPage(p => Math.min(pagination.totalPages || 1, p + 1))}
+                  disabled={page >= (pagination.totalPages || 1)}
                   className="fdb-btn fdb-btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   下一頁 →
