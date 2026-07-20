@@ -49,8 +49,9 @@ async function scrapePage(page: Page, pageNum: number, dateRange: string): Promi
       let location = '';
       let eventDate = '';
       
+      // NEW av-event format (2026): dt = label, dd = value — dd uses class `c-event-item_detail-value`
       const dts = item.querySelectorAll('dt.c-event-item_detail-term');
-      const dds = item.querySelectorAll('dd.c-event-item_detail-link');
+      const dds = item.querySelectorAll('dd');
       
       for (let i = 0; i < dts.length; i++) {
         const dtText = dts[i].textContent || '';
@@ -60,7 +61,8 @@ async function scrapePage(page: Page, pageNum: number, dateRange: string): Promi
         
         if (dtText.includes('開催場所')) {
           location = ddText;
-        } else if (dtText.includes('開催日')) {
+        } else if (dtText.includes('開催日') || dtText.includes('開催日時')) {
+          // match both "開催日" and "開催日時" (changed site label)
           eventDate = ddText;
         }
       }
