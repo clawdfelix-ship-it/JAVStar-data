@@ -1,7 +1,8 @@
 import { sql, getSql } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET /api/events - List upcoming events
+// GET /api/events - List events.
+// Default: only upcoming (datetime >= now). Pass ?past=1 to include past events.
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -13,23 +14,8 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sort') || 'datetime';
     const sortOrder = searchParams.get('order') === 'asc' ? 'ASC' : 'DESC';
 
-    const now = new Date();
-    const nowStr = now.toISOString();
-
-    // Whitelist validation — only these columns are allowed in ORDER BY
-    const allowedColumns: Record<string, string> = {
-      datetime: 'e.datetime',
-      created_at: 'e.created_at',
-      title: 'e.title',
-    };
-    const sortCol = allowedColumns[sortBy] || 'e.datetime';
-    const sortDir = sortOrder === 'ASC' ? 'ASC' : 'DESC';
-    const orderByClause = `${sortCol} ${sortDir} NULLS LAST`;
-
-    // GET /api/events - List events. Default: only upcoming (datetime >= now). Pass ?past=1 to include past events.
+    // Include past events? Default: only upcoming
     const includePast = searchParams.get('past') === '1' || searchParams.get('past') === 'true';
-    const now = new Date();
-    const nowStr = now.toISOString();
 
     // Whitelist validation — only these columns are allowed in ORDER BY
     const allowedColumns: Record<string, string> = {
@@ -40,6 +26,9 @@ export async function GET(request: NextRequest) {
     const sortCol = allowedColumns[sortBy] || 'e.datetime';
     const sortDir = sortOrder === 'ASC' ? 'ASC' : 'DESC';
     const orderByClause = `${sortCol} ${sortDir} NULLS LAST`;
+
+    const now = new Date();
+    const nowStr = now.toISOString();
 
     // Get events with optional filters
     let eventsResult: any[];
@@ -107,7 +96,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       data: enrichedEvents,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-      meta: { count: enrichedEvents.length, total, prefecture, event_type: eventType }
+      meta: { count: enrichedEvents.length, total, prefecture, eventType: eventType }
     });
 
   } catch (error) {
