@@ -87,78 +87,84 @@ async function scrapePage(page: Page, pageNum: number, dateRange: string): Promi
 async function scrapeEvents(): Promise<number> {
   console.log('[EVENTS] Starting av-event.jp scraper...');
 
-  // Dynamic date range: from 60 days ago through +365 days (covers recent past + full upcoming year)
+  // av-event.jp caps pagination at 5 pages (100 items) per query — if we ask
+  // for a whole year we only get the first 100 (usually most recent registrations,
+  // NOT most recent event dates). Iterate month-by-month for the next 6 months
+  // + past 2 months so each slice fits under the 5-page cap and we actually
+  // reach July/August events.
   const fmt = (d: Date) =>
     `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-  const now = new Date();
-  const past = new Date(now); past.setDate(now.getDate() - 60);
-  const future = new Date(now); future.setDate(now.getDate() + 365);
-  const dateRange = `begin_date=${fmt(past)}&end_date=${fmt(future)}`;
-  console.log(`[EVENTS] Date range: ${dateRange}`);
 
   const before = await sql`SELECT COUNT(*) as cnt FROM events`;
   const beforeCount = Number(before[0].cnt);
   console.log(`[EVENTS] Events before: ${beforeCount}`);
-  
+
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
-  
-  // Get total pages
-  await page.goto(`https://www.av-event.jp/search/?${dateRange}`);
-  await page.waitForTimeout(3000);
-  
-  const lastPage = await page.evaluate(() => {
-    const links = document.querySelectorAll('li.c-pagination_item a');
-    let maxPage = 1;
-    links.forEach(link => {
-      const href = link.getAttribute('href') || '';
-      const match = href.match(/\/search\/(\d+)\//);
-      if (match) {
-        const num = parseInt(match[1]);
-        if (num > maxPage) maxPage = num;
-      }
+
+  const now = new Date();
+  const startMonth = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+  const slices: Array<{ begin: string; end: string; label: string }> = [];
+  for (let i = 0; i < 9; i++) {
+    const s = new Date(startMonth.getFullYear(), startMonth.getMonth() + i, 1);
+    const e = new Date(startMonth.getFullYear(), startMonth.getMonth() + i + 1, 0);
+    slices.push({
+      begin: fmt(s),
+      end: fmt(e),
+      label: `${s.getFullYear()}-${String(s.getMonth() + 1).padStart(2, '0')}`,
     });
-    return maxPage;
-  });
-  console.log(`[EVENTS] Total pages: ${lastPage}`);
-  
-  // Scrape all pages
-  let totalEvents = 0;
-  for (let p = 1; p <= lastPage; p++) {
-    const events = await scrapePage(page, p, dateRange);
-    totalEvents += events.length;
-    
-    // Directly upsert to database
-    for (const e of events) {
-      try {
-        // Try to parse the event date
-        const datetime = parseEventDate(e.event_date);
-        
-        await sql`
-          INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, created_at, updated_at)
-          VALUES (${e.id}, 'unknown', ${e.event_name}, ${datetime}, '', ${e.location}, ${e.event_type}, ${e.url}, NOW(), NOW())
-          ON CONFLICT (id) DO UPDATE SET 
-            title = EXCLUDED.title,
-            datetime = EXCLUDED.datetime,
-            venue = EXCLUDED.venue,
-            url = EXCLUDED.url,
-            updated_at = NOW()
-        `;
-      } catch (err: any) {
-        // Skip duplicates or errors silently
-      }
-    }
-    
-    console.log(`[EVENTS] Page ${p}: processed ${events.length} events`);
-    if (p < lastPage) await new Promise(r => setTimeout(r, 2000));
   }
-  
+
+  let totalEvents = 0;
+  for (const slice of slices) {
+    const dateRange = `begin_date=${slice.begin}&end_date=${slice.end}`;
+    console.log(`[EVENTS] Slice ${slice.label}: ${dateRange}`);
+
+    await page.goto(`https://www.av-event.jp/search/?${dateRange}`);
+    await page.waitForTimeout(2500);
+
+    const lastPage = await page.evaluate(() => {
+      const links = document.querySelectorAll('li.c-pagination_item a');
+      let maxPage = 1;
+      links.forEach(link => {
+        const href = link.getAttribute('href') || '';
+        const m = href.match(/\/search\/(\d+)\//);
+        if (m) maxPage = Math.max(maxPage, parseInt(m[1]));
+      });
+      return maxPage;
+    });
+
+    let sliceCount = 0;
+    for (let p = 1; p <= lastPage; p++) {
+      const events = await scrapePage(page, p, dateRange);
+      sliceCount += events.length;
+      for (const e of events) {
+        try {
+          const datetime = parseEventDate(e.event_date);
+          await sql`
+            INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, created_at, updated_at)
+            VALUES (${e.id}, 'unknown', ${e.event_name}, ${datetime}, '', ${e.location}, ${e.event_type}, ${e.url}, NOW(), NOW())
+            ON CONFLICT (id) DO UPDATE SET
+              title = EXCLUDED.title,
+              datetime = EXCLUDED.datetime,
+              venue = EXCLUDED.venue,
+              url = EXCLUDED.url,
+              updated_at = NOW()
+          `;
+        } catch {}
+      }
+      if (p < lastPage) await new Promise(r => setTimeout(r, 1500));
+    }
+    totalEvents += sliceCount;
+    console.log(`[EVENTS] Slice ${slice.label}: ${sliceCount} events across ${lastPage} page(s)`);
+  }
+
   await browser.close();
-  
+
   const after = await sql`SELECT COUNT(*) as cnt FROM events`;
   const afterCount = Number(after[0].cnt);
   const newEvents = afterCount - beforeCount;
-  
+
   console.log(`[EVENTS] Scrape complete. Total scraped: ${totalEvents}, New in DB: ${newEvents}`);
   return newEvents;
 }
