@@ -429,7 +429,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                         </a>
                       )}
                       <a
-                        href={`https://www.minnano-av.com/actress/${actress.id}.html`}
+                        href={`https://www.minnano-av.com/actress${actress.id}.html`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="fdb-btn fdb-btn-outline"
