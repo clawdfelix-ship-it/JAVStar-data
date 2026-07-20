@@ -42,6 +42,7 @@ export function useEvents({
 }: UseEventsOptions = {}) {
   const params = new URLSearchParams({
     limit: String(limit),
+    past: '1', // Always include all events (past + future) for calendar/list view
   });
 
   if (prefecture !== 'ALL') {
