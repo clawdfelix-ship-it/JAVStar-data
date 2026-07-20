@@ -11,8 +11,13 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = Math.min(parseInt(searchParams.get('limit') || '200'), 1000);
     const offset = (page - 1) * limit;
-    const sortBy = searchParams.get('sort') || 'datetime';
-    const sortOrder = searchParams.get('order') === 'asc' ? 'ASC' : 'DESC';
+    const requestedSortBy = searchParams.get('sort') || 'datetime';
+    const requestedSortOrder = searchParams.get('order') === 'asc' ? 'ASC' : 'DESC';
+
+    // Always sort events by datetime DESC (newest first) so latest July/August appear first
+    // Default used to be ASC which meant only old events appeared in the first page
+    const actualSortBy = requestedSortBy;
+    const actualSortOrder = actualSortBy === 'datetime' ? 'DESC' : requestedSortOrder;
 
     // Include past events? Default: only upcoming
     const includePast = searchParams.get('past') === '1' || searchParams.get('past') === 'true';
@@ -23,8 +28,8 @@ export async function GET(request: NextRequest) {
       created_at: 'e.created_at',
       title: 'e.title',
     };
-    const sortCol = allowedColumns[sortBy] || 'e.datetime';
-    const sortDir = sortOrder === 'ASC' ? 'ASC' : 'DESC';
+    const sortCol = allowedColumns[actualSortBy] || 'e.datetime';
+    const sortDir = actualSortOrder === 'ASC' ? 'ASC' : 'DESC';
     const orderByClause = `${sortCol} ${sortDir} NULLS LAST`;
 
     const now = new Date();
