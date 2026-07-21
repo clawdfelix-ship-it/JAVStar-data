@@ -214,9 +214,19 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   
   // Filtered events
   const filteredEvents = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     return events.filter(e => {
       if (filterPrefecture !== 'ALL' && e.prefecture !== filterPrefecture) return false;
       if (filterType !== 'ALL' && e.event_type !== filterType) return false;
+      // For events list tab: only show future events (today or later)
+      // Calendar tab keeps all events (past + future) for history view
+      if (activeTab === 'events') {
+        const eventDate = new Date(e.datetime);
+        eventDate.setHours(0, 0, 0, 0);
+        if (eventDate < today) return false;
+      }
       if (search) {
         const searchLower = search.toLowerCase();
         return e.title.toLowerCase().includes(searchLower) ||
@@ -225,7 +235,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       }
       return true;
     });
-  }, [events, filterPrefecture, filterType, search]);
+  }, [events, filterPrefecture, filterType, search, activeTab]);
 
   // Tab config - Froala Design Blocks style
   const tabs = [
