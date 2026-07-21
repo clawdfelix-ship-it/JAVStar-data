@@ -42,12 +42,13 @@ export async function GET() {
     const voteResult = await sql`SELECT COUNT(*) as count FROM votes`;
     
     // 最後更新時間 — GREATEST of real data timestamps across all tables (not NOW())
+    // created_at/updated_at are stored as text, need explicit cast to timestamp
     const lastUpdateResult = await sql`
       SELECT GREATEST(
-        (SELECT MAX(GREATEST(created_at, updated_at)) FROM actresses),
-        (SELECT MAX(created_at) FROM events),
-        (SELECT MAX(GREATEST(created_at, updated_at)) FROM dvd_ranking),
-        (SELECT MAX(GREATEST(created_at, updated_at)) FROM new_releases)
+        (SELECT MAX(GREATEST(created_at::timestamp, updated_at::timestamp)) FROM actresses),
+        (SELECT MAX(created_at::timestamp) FROM events),
+        (SELECT MAX(GREATEST(created_at::timestamp, updated_at::timestamp)) FROM dvd_ranking),
+        (SELECT MAX(GREATEST(created_at::timestamp, updated_at::timestamp)) FROM new_releases)
       ) AS last_update
     `;
     
