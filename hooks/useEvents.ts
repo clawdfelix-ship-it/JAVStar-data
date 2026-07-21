@@ -36,7 +36,7 @@ interface UseEventsOptions {
  * SWR 自動處理: 緩存、去重、重試、背景刷新
  */
 export function useEvents({
-  limit = 1000,
+  limit = 2000,
   prefecture = 'ALL',
   eventType = 'ALL',
 }: UseEventsOptions = {}) {
