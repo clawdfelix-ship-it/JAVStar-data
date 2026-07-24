@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     function buildWhereParts(pastFilter: boolean) {
       const parts: string[] = [];
       if (!pastFilter) parts.push(`e.datetime >= '${nowStr}'`);
-      parts.push("e.actress_id IS NOT NULL AND e.actress_id != '0'");
+      parts.push("e.actress_id IS NOT NULL AND e.actress_id != '0' AND e.actress_id != 'unknown'");
       if (prefecture) parts.push(`e.prefecture = '${prefecture}'`);
       if (eventType) parts.push(`e.event_type = '${eventType}'`);
       if (region && region !== 'all' && regionClauses[region]) {
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     function buildCountWhere(pastFilter: boolean) {
       const parts: string[] = [];
       if (!pastFilter) parts.push(`datetime >= '${nowStr}'`);
-      parts.push("actress_id IS NOT NULL AND actress_id != '0'");
+      parts.push("actress_id IS NOT NULL AND actress_id != '0' AND actress_id != 'unknown'");
       if (prefecture) parts.push(`prefecture = '${prefecture}'`);
       if (eventType) parts.push(`event_type = '${eventType}'`);
       if (region && region !== 'all' && regionClauses[region]) {
