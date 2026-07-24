@@ -23,12 +23,13 @@ export default function EventsClient() {
   const [error, setError] = useState<string | null>(null);
   const [prefecture, setPrefecture] = useState('');
   const [eventType, setEventType] = useState('');
+  const [region, setRegion] = useState('all');
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEvents();
-  }, [prefecture, eventType]);
+  }, [prefecture, eventType, region]);
 
   useEffect(() => {
     fetch('/api/holidays')
@@ -49,11 +50,12 @@ export default function EventsClient() {
       const params = new URLSearchParams();
       if (prefecture) params.set('prefecture', prefecture);
       if (eventType) params.set('type', eventType);
+      if (region && region !== 'all') params.set('region', region);
       params.set('limit', '200');
 
       const res = await fetch(`/api/events?${params}`);
       const d = await res.json();
-      setEvents(d.events || []);
+      setEvents(d.data || []);
     } catch {
       setError('載入失敗');
     } finally {
@@ -150,7 +152,24 @@ export default function EventsClient() {
           </div>
 
           {/* Filters (right side) */}
-          <div className="lg:col-span-3 flex flex-wrap gap-3 content-start">
+          <div className="lg:col-span-3 flex flex-col gap-3">
+            {/* Region tabs */}
+            <div className="flex gap-1 bg-sakura-gray rounded-lg p-1">
+              {[['all','全部'],['japan','日本'],['taiwan','台灣'],['hk','香港']].map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => setRegion(val)}
+                  className={`flex-1 text-sm px-3 py-1.5 rounded-md font-medium transition-colors ${
+                    region === val
+                      ? 'bg-white text-primary-dark shadow-sm'
+                      : 'text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3 content-start">
             <select
               value={prefecture}
               onChange={e => setPrefecture(e.target.value)}
@@ -175,6 +194,7 @@ export default function EventsClient() {
                 清除篩選
               </button>
             )}
+            </div>
 
             {/* Event count badge */}
             <div className="w-full text-sm text-text-tertiary">

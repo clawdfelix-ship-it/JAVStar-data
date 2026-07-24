@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const prefecture = searchParams.get('prefecture');
     const eventType = searchParams.get('type');
+    const region = searchParams.get('region');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = Math.min(parseInt(searchParams.get('limit') || '200'), 2000);
     const offset = (page - 1) * limit;
@@ -35,61 +36,52 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const nowStr = now.toISOString();
 
-    // Get events with optional filters
-    let eventsResult: any[];
-    if (prefecture && eventType) {
-      if (includePast) {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.prefecture = ${prefecture} AND e.event_type = ${eventType} ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
-      } else {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} AND e.prefecture = ${prefecture} AND e.event_type = ${eventType} ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
+    // Region filter
+    const regionClauses: Record<string, string> = {
+      japan: "prefecture IS NOT NULL AND prefecture != '' AND prefecture != '台北' AND prefecture NOT LIKE '%香港%'",
+      taiwan: "prefecture = '台北'",
+      hk: "prefecture LIKE '%香港%'",
+    };
+
+    // Build base WHERE conditions
+    function buildWhereParts(pastFilter: boolean) {
+      const parts: string[] = [];
+      if (!pastFilter) parts.push(`e.datetime >= '${nowStr}'`);
+      parts.push("e.actress_id IS NOT NULL AND e.actress_id != '0'");
+      if (prefecture) parts.push(`e.prefecture = '${prefecture}'`);
+      if (eventType) parts.push(`e.event_type = '${eventType}'`);
+      if (region && region !== 'all' && regionClauses[region]) {
+        parts.push(regionClauses[region]);
       }
-    } else if (prefecture) {
-      if (includePast) {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.prefecture = ${prefecture} ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
-      } else {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} AND e.prefecture = ${prefecture} ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
-      }
-    } else if (eventType) {
-      if (includePast) {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.event_type = ${eventType} ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
-      } else {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} AND e.event_type = ${eventType} ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
-      }
-    } else {
-      if (includePast) {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
-      } else {
-        eventsResult = await getSql()`SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id WHERE e.datetime >= ${nowStr} ORDER BY ${orderByClause} LIMIT ${limit}` as any[];
-      }
+      return parts;
     }
 
-    // Get total count
-    let countResult: any[];
-    if (prefecture && eventType) {
-      if (includePast) {
-        countResult = await sql`SELECT COUNT(*) as total FROM events WHERE prefecture = ${prefecture} AND event_type = ${eventType}` as any[];
-      } else {
-        countResult = await sql`SELECT COUNT(*) as total FROM events WHERE datetime >= ${nowStr} AND prefecture = ${prefecture} AND event_type = ${eventType}` as any[];
-      }
-    } else if (prefecture) {
-      if (includePast) {
-        countResult = await sql`SELECT COUNT(*) as total FROM events WHERE prefecture = ${prefecture}` as any[];
-      } else {
-        countResult = await sql`SELECT COUNT(*) as total FROM events WHERE datetime >= ${nowStr} AND prefecture = ${prefecture}` as any[];
-      }
-    } else if (eventType) {
-      if (includePast) {
-        countResult = await sql`SELECT COUNT(*) as total FROM events WHERE event_type = ${eventType}` as any[];
-      } else {
-        countResult = await sql`SELECT COUNT(*) as total FROM events WHERE datetime >= ${nowStr} AND event_type = ${eventType}` as any[];
-      }
-    } else {
-      if (includePast) {
-        countResult = await sql`SELECT COUNT(*) as total FROM events` as any[];
-      } else {
-        countResult = await sql`SELECT COUNT(*) as total FROM events WHERE datetime >= ${nowStr}` as any[];
-      }
+    function buildWhere(pastFilter: boolean) {
+      const parts = buildWhereParts(pastFilter);
+      return parts.length > 0 ? 'WHERE ' + parts.join(' AND ') : '';
     }
+
+    function buildCountWhere(pastFilter: boolean) {
+      const parts: string[] = [];
+      if (!pastFilter) parts.push(`datetime >= '${nowStr}'`);
+      parts.push("actress_id IS NOT NULL AND actress_id != '0'");
+      if (prefecture) parts.push(`prefecture = '${prefecture}'`);
+      if (eventType) parts.push(`event_type = '${eventType}'`);
+      if (region && region !== 'all' && regionClauses[region]) {
+        parts.push(regionClauses[region]);
+      }
+      return parts.length > 0 ? 'WHERE ' + parts.join(' AND ') : '';
+    }
+
+    // Get events — use sql.query() for fully-built query strings
+    const whereClause = buildWhere(!includePast);
+    const countWhereClause = buildCountWhere(!includePast);
+    const fullQuery = `SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id ${whereClause} ORDER BY ${orderByClause} LIMIT ${limit}`;
+    const countQuery = `SELECT COUNT(*) as total FROM events ${countWhereClause}`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let eventsResult: any[] = await (getSql() as any).query(fullQuery) as any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const countResult: any[] = await (getSql() as any).query(countQuery) as any[];
     const total = Number(countResult[0]?.total || 0);
 
     const enrichedEvents = eventsResult.map(event => ({

@@ -15,12 +15,13 @@ interface CalendarProps {
   onMonthChange: (m: Date) => void;
   selectedDate: string | null;
   onDateSelect: (d: string | null) => void;
+  region?: string;
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
-export default function CalendarMonth({ events, currentMonth, onMonthChange, selectedDate, onDateSelect }: CalendarProps) {
+export default function CalendarMonth({ events, currentMonth, onMonthChange, selectedDate, onDateSelect, region }: CalendarProps) {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
