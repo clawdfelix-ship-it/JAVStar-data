@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { Search, X, Clock, Ticket, Loader2, FileText } from 'lucide-react';
 import useSearch, { highlightText } from '@/hooks/useSearch';
 
 interface SearchBarProps<T extends { id: string }> {
@@ -144,9 +145,11 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
       {/* 搜尋輸入框 - Froala Design Blocks style */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <span className="text-text-tertiary text-xl">
-            {search.isSearching ? '⏳' : '🔍'}
-          </span>
+          {search.isSearching ? (
+            <Loader2 className="w-5 h-5 text-text-tertiary animate-spin" />
+          ) : (
+            <Search className="w-5 h-5 text-text-tertiary" />
+          )}
         </div>
         
         <input
@@ -164,8 +167,9 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
           <button
             onClick={() => search.clearSearch()}
             className="absolute inset-y-0 right-0 pr-4 flex items-center text-text-tertiary hover:text-text-primary transition-colors"
+            aria-label="清除搜尋"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         )}
       </div>
@@ -180,8 +184,9 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
           {search.hasQuery && search.results.length > 0 && (
             <div className="max-h-80 overflow-y-auto">
               <div className="px-4 py-2 bg-bg-secondary border-b border-border">
-                <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">
-                  🔍 搜尋結果 ({search.resultCount})
+                <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wider flex items-center gap-1.5">
+                  <Search className="w-3 h-3" />
+                  搜尋結果 ({search.resultCount})
                 </span>
               </div>
               
@@ -196,15 +201,17 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
                   {renderSuggestion ? (
                     renderSuggestion(result.item, search.debouncedQuery)
                   ) : (
-                    <>
-                      <span className="text-nadeshiko">🎌</span>
-                      <span className="text-text-primary font-medium">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[rgba(var(--color-nadeshiko),0.3)] to-[rgba(var(--color-nadeshiko-dark),0.2)] flex items-center justify-center shrink-0">
+                        <Ticket className="w-4 h-4 text-[rgb(var(--color-nadeshiko-dark))]" />
+                      </div>
+                      <span className="text-text-primary font-medium truncate">
                         {highlightText(
                           result.item.name_ja || result.item.title || result.item.id,
                           result.matches
                         )}
                       </span>
-                    </>
+                    </div>
                   )}
                 </button>
               ))}
@@ -214,9 +221,9 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
           {/* 無結果提示 */}
           {search.hasQuery && search.results.length === 0 && (
             <div className="px-4 py-6 text-center">
-              <span className="text-3xl mb-2 block">🔍</span>
+              <Search className="w-8 h-8 text-text-tertiary mx-auto mb-2" />
               <p className="text-text-secondary text-sm">
-                搵唔到「<span className="text-nadeshiko-dark font-medium">{search.query}</span>」相關結果
+                搵唔到「<span className="text-[rgb(var(--color-nadeshiko-dark))] font-medium">{search.query}</span>」相關結果
               </p>
               <p className="text-text-tertiary text-xs mt-1">
                 試吓用其他關鍵字或者簡化搜尋條件
@@ -228,8 +235,9 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
           {showHistory && !search.hasQuery && search.searchHistory.length > 0 && (
             <div className="max-h-80 overflow-y-auto">
               <div className="px-4 py-2 bg-bg-secondary border-b border-border flex items-center justify-between">
-                <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">
-                  📝 最近搜尋
+                <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-3 h-3" />
+                  最近搜尋
                 </span>
                 <button
                   onClick={() => search.clearHistory()}
@@ -250,7 +258,7 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
                     onClick={() => handleHistoryClick(item)}
                     className="flex items-center gap-2 flex-1 text-left"
                   >
-                    <span className="text-text-tertiary">🕐</span>
+                    <Clock className="w-4 h-4 text-text-tertiary shrink-0" />
                     <span className="text-text-secondary group-hover:text-text-primary transition-colors">
                       {item}
                     </span>
@@ -261,8 +269,9 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
                       search.removeFromHistory(item);
                     }}
                     className="text-text-tertiary hover:text-danger opacity-0 group-hover:opacity-100 transition-all p-1"
+                    aria-label="移除搜尋歷史"
                   >
-                    ✕
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               ))}

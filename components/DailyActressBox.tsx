@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Gift, Dice5, User, Fingerprint, HelpCircle } from 'lucide-react';
 
 interface Actress {
   id: string;
@@ -117,7 +118,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
           {/* 左邊：標題 + 按鈕 (mobile: order-2 排結果框之後) */}
           <div className="order-2 md:order-1 flex flex-col items-center md:items-start text-center md:text-left">
             <h2 className="text-xl md:text-2xl font-bold text-text-primary flex items-center gap-2 justify-center md:justify-start">
-              <span className="text-2xl">🎁</span>
+              <Gift className="w-6 h-6 text-pink-500" />
               今日女優盲盒
               <span className="text-xs font-normal text-text-secondary ml-2">
                 DAILY ACTRESS
@@ -132,9 +133,10 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
             <button
               onClick={handleRandomPick}
               disabled={futureActresses.length === 0 || isSpinning}
-              className="mt-4 px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:from-pink-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="mt-4 px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:from-pink-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
             >
-              {isSpinning ? '🎰 抽取中...' : '🎲 立即抽取'}
+              <Dice5 className="w-4 h-4" />
+              {isSpinning ? '抽取中...' : '立即抽取'}
             </button>
           </div>
 
@@ -156,7 +158,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">
-                        👤
+                        <User className="w-12 h-12" />
                       </div>
                     )}
                   </div>
@@ -167,7 +169,10 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                     <h3 className="font-bold text-text-primary text-lg hover:text-pink-500 transition-colors">
                       {selectedActress.name_ja}
                     </h3>
-                    <p className="text-[10px] text-pink-400 mt-1">👆 點擊查看詳情</p>
+                    <p className="text-[10px] text-pink-400 mt-1 flex items-center justify-center gap-1">
+                      <Fingerprint className="w-3 h-3" />
+                      點擊查看詳情
+                    </p>
                     {/* 其他名稱 / 曾用名 */}
                     {selectedActress.name_cn && selectedActress.name_cn !== selectedActress.name_ja && (
                       <div className="mt-1">
@@ -199,7 +204,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
               </Link>
             ) : (
               <div className="bg-white/50 rounded-xl border-2 border-dashed border-gray-300 w-40 h-52 flex flex-col items-center justify-center">
-                <span className="text-4xl mb-2">❓</span>
+                <HelpCircle className="w-10 h-10 text-gray-300 mb-2" />
                 <p className="text-text-tertiary text-xs text-center">
                   點擊按鈕<br />抽取今日女優
                 </p>

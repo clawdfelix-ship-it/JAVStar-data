@@ -87,9 +87,9 @@ export default function ActressCard({
               src={avatar_url}
               alt={name_ja}
               className="w-full h-full object-cover transition-transform duration-slow ease-out md:group-hover:scale-105"
-              loading="eager"
+              loading={rank <= 2 ? "eager" : "lazy"}
               decoding="async"
-              fetchPriority="high"
+              fetchPriority={rank === 1 ? "high" : "auto"}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

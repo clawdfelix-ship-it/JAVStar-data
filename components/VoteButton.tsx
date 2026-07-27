@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Heart } from 'lucide-react';
 
 interface VoteButtonProps {
   actressId: string;
@@ -68,8 +69,8 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
 
   if (checking) {
     return (
-      <button className={`flex items-center ${sizeClasses} rounded-full border border-[rgba(var(--color-sakura-gray),0.6)] text-[rgb(var(--color-umenezumi-light))] bg-white cursor-wait ${className}`} disabled>
-        <span className="animate-pulse">♡</span>
+      <button className={`flex items-center ${sizeClasses} rounded-full border border-[rgba(var(--color-sakura-gray),0.6)] text-[rgb(var(--color-umenezumi-light))] bg-white cursor-wait ${className}`} disabled aria-label="載入投票中">
+        <Heart className="w-3.5 h-3.5 opacity-40" />
         <span>{voteCount}</span>
       </button>
     );
@@ -85,12 +86,9 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
           : 'bg-white text-[rgb(var(--color-umenezumi-light))] border border-[rgba(var(--color-sakura-gray),0.6)] hover:border-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-nadeshiko-dark))]'
       } ${loading ? 'opacity-50 cursor-wait' : ''} ${className}`}
     >
-      <span
-        key={hasVoted ? 'voted' : 'unvoted'}
-        className={`text-base leading-none inline-block ${hasVoted ? 'vote-heart-bump' : ''}`}
-      >
-        {hasVoted ? '♥' : '♡'}
-      </span>
+      <Heart
+        className={`w-3.5 h-3.5 leading-none transition-transform ${hasVoted ? 'fill-current text-white vote-heart-bump' : 'text-[rgb(var(--color-umenezumi-light))]'}`}
+      />
       <span key={voteCount} className="font-bold vote-count">{voteCount}</span>
       {size === 'md' && (
         <span className="text-[10px] opacity-80">{hasVoted ? '已投' : '投票'}</span>
