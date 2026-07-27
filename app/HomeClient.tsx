@@ -99,7 +99,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   // SWR Data Hooks - 自帶緩存、去重、重試
   const { actresses, pagination, loading, error, refresh: refreshActresses } = useActresses({
     page,
-    limit: 12,
+    limit: 10,
     sort,
     search: activeTab === 'actress' ? search : '',
     hasUpcoming,
@@ -465,7 +465,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                     className="grid-item-enter"
                     style={{ transitionDelay: `${Math.min(index * 30, 240)}ms` }}
                   >
-                    <ActressCard {...actress} rank={index + 1 + (page - 1) * 12} />
+                    <ActressCard {...actress} rank={index + 1 + (page - 1) * 10} />
                   </div>
                 ))}
               </div>
