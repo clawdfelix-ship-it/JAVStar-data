@@ -1,4 +1,5 @@
 import React from 'react';
+import { Flame, Zap, MapPin } from 'lucide-react';
 
 interface EventCardProps {
   id: string;
@@ -41,7 +42,8 @@ function getEventTypeLabel(type: string, title: string): string {
 
 function safeNewDate(datetime: string): Date {
   if (!datetime) return new Date(0);
-  const d = new Date(datetime);
+  // Handle both ISO (2026-07-25T00:00:00Z) and date-only (2026-07-25) formats
+  const d = new Date(datetime.includes('T') ? datetime : datetime + 'T00:00:00+09:00');
   return isNaN(d.getTime()) ? new Date(0) : d;
 }
 
@@ -127,13 +129,15 @@ function EventCardComponent({
           </div>
           
           {today && (
-            <span className="fdb-badge bg-gradient-to-r from-red-100 to-red-50 text-red-600 border border-red-200 pulse-animation">
-              🔥 今日
+            <span className="fdb-badge bg-gradient-to-r from-red-100 to-red-50 text-red-600 border border-red-200 pulse-animation flex items-center gap-1">
+              <Flame className="w-3 h-3" />
+              <span>今日</span>
             </span>
           )}
           {tomorrow && (
-            <span className="fdb-badge bg-gradient-to-r from-amber-100 to-amber-50 text-amber-600 border border-amber-200">
-              ⚡ 聽日
+            <span className="fdb-badge bg-gradient-to-r from-amber-100 to-amber-50 text-amber-600 border border-amber-200 flex items-center gap-1">
+              <Zap className="w-3 h-3" />
+              <span>聽日</span>
             </span>
           )}
         </div>
@@ -146,7 +150,7 @@ function EventCardComponent({
       {/* Venue Location */}
       {venue && (
         <div className="flex items-center gap-2 mb-3 p-2.5 bg-sakura-gray/20 rounded-lg">
-          <span className="text-kamenozoki-dark">📍</span>
+          <MapPin className="w-4 h-4 text-[rgb(var(--color-kamenozoki-dark))] shrink-0" />
           <span className="text-sm text-text-secondary truncate">
             {venue}{prefecture ? ` (${prefecture})` : ''}
           </span>
@@ -170,7 +174,7 @@ function EventCardComponent({
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           ) : (
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-nadeshiko-light to-nadeshiko flex items-center justify-center text-white text-xs font-japanese font-bold">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[rgba(var(--color-nadeshiko),0.4)] to-[rgba(var(--color-nadeshiko-dark),0.3)] flex items-center justify-center text-white text-xs font-japanese font-bold">
               {(actress_name || '?')[0]}
             </div>
           )}

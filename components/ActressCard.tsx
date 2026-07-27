@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Star, Calendar, Heart, ChevronRight, User } from 'lucide-react';
 import VoteButton from './VoteButton';
 
 interface ActressCardProps {
@@ -73,8 +74,9 @@ export default function ActressCard({
       </div>
 
       {/* Score Badge */}
-      <div className="absolute top-2 right-2 px-2 py-1 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-full text-[10px] font-bold shadow-md z-10">
-        ⭐ {final_score}
+      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-full text-[10px] font-bold shadow-md z-10">
+        <Star className="w-3 h-3 fill-current" />
+        <span>{final_score}</span>
       </div>
 
       {/* Avatar */}
@@ -91,7 +93,9 @@ export default function ActressCard({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <div className="text-5xl font-bold text-[rgba(var(--color-sakura-gray),0.8)]">{name_ja[0]}</div>
+              <div className="w-16 h-16 rounded-full bg-[rgba(var(--color-sakura-gray),0.4)] flex items-center justify-center">
+                <span className="text-3xl font-bold text-[rgba(var(--color-sakura-gray),0.8)]" style={{fontFamily: 'Noto Sans JP, sans-serif'}}>{name_ja[0]}</span>
+              </div>
             </div>
           )}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[rgba(var(--color-sakura),0.9)] to-transparent p-2">
@@ -122,12 +126,12 @@ export default function ActressCard({
             title={next_event_title || ''}
             className="mb-2.5 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[rgba(var(--color-nadeshiko),0.12)] border border-[rgba(var(--color-nadeshiko-dark),0.35)] text-[rgb(var(--color-nadeshiko-dark))] text-xs font-semibold hover:bg-[rgba(var(--color-nadeshiko),0.22)] transition-colors"
           >
-            <span aria-hidden>📅</span>
+            <Calendar className="w-3 h-3 shrink-0" />
             <span className="truncate">下場 {nextEventLabel}</span>
           </Link>
         ) : (
           <div className="mb-2.5 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[rgba(var(--color-sakura-gray),0.15)] text-[rgb(var(--color-umenezumi-light))] text-xs">
-            <span aria-hidden>🌙</span>
+            <span aria-hidden className="text-[rgb(var(--color-umenezumi-lighter))]">○</span>
             <span className="truncate">暫無公開活動</span>
           </div>
         )}
@@ -151,7 +155,7 @@ export default function ActressCard({
             href={`/actress/${id}`}
             className="flex-1 min-h-[44px] flex items-center justify-center bg-[rgb(var(--color-nadeshiko-dark))] hover:bg-[rgb(var(--color-nadeshiko))] active:scale-[0.98] text-white rounded-lg font-medium text-xs text-center transition-[background-color,transform] duration-base ease-out shadow-md"
           >
-            詳情 →
+            詳情 <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
       </div>
