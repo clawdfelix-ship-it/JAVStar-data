@@ -18,3 +18,7 @@ data/
 
 # Legacy imports & one-off scripts kept for reference but not part of the build
 archive/
+
+# build artifacts & runtime logs
+tsconfig.tsbuildinfo
+logs/
