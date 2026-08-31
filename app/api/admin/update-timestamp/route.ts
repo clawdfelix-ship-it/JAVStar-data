@@ -1,10 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // POST /api/admin/update-timestamp - 手動更新所有表的時間戳
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   const startTime = new Date();
   console.log('[Admin] Manual timestamp update started at:', startTime.toISOString());
 

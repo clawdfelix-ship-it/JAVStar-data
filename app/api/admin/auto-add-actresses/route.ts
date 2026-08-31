@@ -1,5 +1,6 @@
 import sql from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -115,6 +116,9 @@ function extractActressName(title: string): string[] {
  *   actress_id=xxx - 只處理特定女優的孤立活動
  */
 export async function GET(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   const startTime = Date.now();
   
   try {

@@ -1,9 +1,13 @@
 import sql from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const { actresses, events, votes } = await request.json();
     
@@ -138,7 +142,10 @@ export async function POST(request: NextRequest) {
 }
 
 // GET - 檢查數據庫當前狀態
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const [actressCount, eventCount, voteCount] = await Promise.all([
       sql`SELECT COUNT(*) as count FROM actresses`,

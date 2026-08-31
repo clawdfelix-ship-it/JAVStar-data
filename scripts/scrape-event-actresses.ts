@@ -1,7 +1,8 @@
 import { neon } from '@neondatabase/serverless';
 import * as fs from 'fs';
 
-const DATABASE_URL = "postgresql://neondb_owner:***REMOVED_SECRET***@ep-bitter-pond-an6f3hui-pooler.c-6.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require";
+try { process.loadEnvFile(); } catch {}
+const DATABASE_URL = process.env.DATABASE_URL!;
 const sql = neon(DATABASE_URL);
 
 // Get events with unknown actress_id

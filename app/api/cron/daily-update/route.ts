@@ -1,12 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { requireCron } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // 每日更新 Cron Job
 // Vercel 會每日 00:00 UTC 呼叫此 API (香港時間 08:00)
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const unauthorized = requireCron(request);
+  if (unauthorized) return unauthorized;
+
   const startTime = new Date();
   console.log('[Cron] Daily update started at:', startTime.toISOString());
 

@@ -1,5 +1,6 @@
 import sql from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 
 // Cache 配置
 const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
@@ -56,6 +57,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/actress-whitelist - 批量更新白名單
 export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await request.json();
     const { whitelist, source = 'DMM Actress Ranking', clearFirst = true } = body;

@@ -1,6 +1,7 @@
 import sql from '@/lib/db';
 import { NewRelease } from '@/lib/db/schema';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 300; // 缓存 5 分鐘
@@ -74,6 +75,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/new-releases - 批量導入新作
 export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await request.json();
     const { releases } = body;

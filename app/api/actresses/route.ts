@@ -1,5 +1,6 @@
 import { getSql } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -31,27 +32,40 @@ export async function GET(request: NextRequest) {
 
     const sql = getSql();
 
-    // WHERE conditions
+    // 分頁/輸入收緊：limit 設上限，避免傳入超大值拖垮查詢
+    const safeLimit = Math.min(Math.max(Number.isFinite(limit) ? limit : 20, 1), 100);
+    const safeOffset = Math.max(Number.isFinite(offset) ? offset : 0, 0);
+
+    // WHERE conditions（全部用參數佔位，杜絕字串拼接注入）
     const whereParts: string[] = [];
-    if (search) {
-      const safe = search.replace(/'/g, "''");
-      whereParts.push(`(a.name_ja ILIKE '%${safe}%' OR a.name_cn ILIKE '%${safe}%')`);
+    const params: any[] = [];
+    if (search.trim()) {
+      params.push(`%${search.trim()}%`);
+      const idx = params.length; // $1
+      whereParts.push(`(a.name_ja ILIKE $${idx} OR a.name_cn ILIKE $${idx})`);
     }
     if (hasUpcoming) {
       whereParts.push(`ne.datetime IS NOT NULL`);
     }
     const whereClause = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
 
-    // ORDER BY
-    // For 'upcoming' sort, put NULLs last so actresses with events surface first
+    // ORDER BY —— 列名/方向全部來自上方硬編碼 sortMap 白名單，唔接受用戶輸入
     const orderByClause = sortBy === 'upcoming'
       ? `ne.datetime ASC NULLS LAST`
       : sort
-        ? `"${sort.col}" ${sort.dir} NULLS LAST`
+        ? `${sort.col} ${sort.dir} NULLS LAST`
         : `(COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v.cnt, 0) * 0.3) DESC`;
 
+    // 日期下限亦參數化
+    params.push(new Date().toISOString().slice(0, 10));
+    const dateIdx = params.length;
+
     // Main query — uses pre-aggregated actress_events_count + indexed votes lookup
-    const nowStr = new Date().toISOString().slice(0, 10);
+    // LIMIT/OFFSET 用佔位符（$n），數值由上面收緊過
+    params.push(safeLimit, safeOffset);
+    const limitIdx = params.length - 1;
+    const offsetIdx = params.length;
+
     const query = `
       SELECT
         a.id, a.name_ja, a.name_cn, a.avatar_url,
@@ -72,34 +86,35 @@ export async function GET(request: NextRequest) {
       ) v ON true
       LEFT JOIN LATERAL (
         SELECT datetime, title FROM events
-        WHERE events.actress_id = a.id AND events.datetime >= '${nowStr}'
+        WHERE events.actress_id = a.id AND events.datetime >= $${dateIdx}
         ORDER BY events.datetime ASC LIMIT 1
       ) ne ON true
       ${whereClause}
       ORDER BY ${orderByClause}
-      LIMIT ${limit} OFFSET ${offset}
+      LIMIT $${limitIdx} OFFSET $${offsetIdx}
     `;
 
-    // Count query — same WHERE
+    // Count query — same WHERE（日期參數同主查詢共用同一個 $dateIdx 之前嘅參數）
+    const countParams = params.slice(0, dateIdx); // search 參數 + 日期參數
     const countQuery = `
       SELECT COUNT(*)::int as cnt FROM actresses a
       LEFT JOIN LATERAL (
         SELECT datetime FROM events
-        WHERE events.actress_id = a.id AND events.datetime >= '${nowStr}'
+        WHERE events.actress_id = a.id AND events.datetime >= $${dateIdx}
         ORDER BY events.datetime ASC LIMIT 1
       ) ne ON true
       ${whereClause}
     `;
-    const countRows = await sql.query(countQuery);
+    const countRows = await sql.query(countQuery, countParams);
     const total = (countRows as any)[0].cnt;
 
-    const rows = await sql.query(query);
+    const rows = await sql.query(query, params);
 
     const duration = Date.now() - startTime;
 
     return NextResponse.json({
       data: rows,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
       queryTimeMs: duration,
     });
 
@@ -110,6 +125,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await request.json();
     const { id, name_ja, name_cn, avatar_url, bio, height, bust, waist, hip } = body;

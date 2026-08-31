@@ -1,10 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql, getSql } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // Debug API - 檢查數據庫連接
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     // 1. 測試連接字
     const url =
@@ -36,10 +40,11 @@ export async function GET() {
     });
     
   } catch (error: any) {
+    // 唔好回傳 stack 畀客戶端（避免洩漏內部路徑/結構）
+    console.error('[debug-db]', error);
     return NextResponse.json({
       error: true,
-      message: error.message,
-      stack: error.stack?.substring(0, 500)
+      message: 'Database health check failed',
     }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import sql from '@/lib/db';
 import { findBestMatchingActress, validateActressEventMatch } from '@/lib/matching-validator';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,9 @@ export const dynamic = 'force-dynamic';
 //   dry-run=true - 只顯示報告，不修改數據庫
 //   actress_id=xxx - 只修復特定女優
 export async function GET(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   const startTime = Date.now();
   
   try {

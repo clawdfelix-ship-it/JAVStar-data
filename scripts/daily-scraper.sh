@@ -15,7 +15,16 @@ log() {
 run_scraper() {
   log "===== Scraper Run Started ($1) ====="
   cd "$PROJECT_DIR"
-  export DATABASE_URL='postgresql://neondb_owner:***REMOVED_SECRET***@ep-bitter-pond-an6f3hui-pooler.c-6.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require'
+  # Load secrets from local .env (never commit credentials)
+  if [ -f "$PROJECT_DIR/.env" ]; then
+    set -a
+    . "$PROJECT_DIR/.env"
+    set +a
+  fi
+  if [ -z "$DATABASE_URL" ]; then
+    log "ERROR: DATABASE_URL not set. Create $PROJECT_DIR/.env (see .env.example)."
+    return 1
+  fi
   log "Running scraper..."
   /opt/homebrew/bin/npx tsx scripts/daily-scraper.ts >> "$LOG_FILE" 2>&1
   log "===== Scraper Run Complete ($1) ====="

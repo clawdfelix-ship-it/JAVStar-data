@@ -1,9 +1,13 @@
 import { sql } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 
 // POST /api/admin/relink-events
 // 自動將 actress_id='unknown' 的活動配對到正確的女優
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     // 1. 拎所有 actress_id = 'unknown' 的活動
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
