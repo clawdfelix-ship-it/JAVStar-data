@@ -143,17 +143,22 @@ async function scrapeEvents(): Promise<number> {
       for (const e of events) {
         try {
           const datetime = parseEventDate(e.event_date);
+          // NOTE: events table has created_at (text) but NO updated_at column.
+          // Previously this INSERT referenced updated_at → every row failed and the
+          // empty catch swallowed it, so scraped events never reached the DB.
           await sql`
-            INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, created_at, updated_at)
-            VALUES (${e.id}, 'unknown', ${e.event_name}, ${datetime}, '', ${e.location}, ${e.event_type}, ${e.url}, NOW(), NOW())
+            INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, created_at)
+            VALUES (${e.id}, 'unknown', ${e.event_name}, ${datetime}, '', ${e.location}, ${e.event_type}, ${e.url}, NOW()::text)
             ON CONFLICT (id) DO UPDATE SET
               title = EXCLUDED.title,
               datetime = EXCLUDED.datetime,
               venue = EXCLUDED.venue,
-              url = EXCLUDED.url,
-              updated_at = NOW()
+              url = EXCLUDED.url
           `;
-        } catch {}
+        } catch (insErr) {
+          // Surface insert failures instead of silently dropping them.
+          console.error(`[EVENTS] insert failed for id=${e.id}:`, insErr instanceof Error ? insErr.message : insErr);
+        }
       }
       if (p < lastPage) await new Promise(r => setTimeout(r, 1500));
     }
@@ -211,11 +216,10 @@ async function main() {
     console.log(`[SCRAPER] New actresses: ${newActresses}`);
     
     if (newEvents > 0 || newActresses > 0) {
-      console.log('[SCRAPER] Data updated! Triggering deploy...');
-      // Trigger Vercel deploy via GitHub push
-      const { execSync } = await import('child_process');
-      execSync('git push origin main', { cwd: '/Users/chansiulungfelix/Projects/av-intelligence' });
-      console.log('[SCRAPER] Deploy triggered!');
+      // Data is written straight to the Neon DB and Vercel reads it at runtime,
+      // so no deploy is required. (Old code ran `git push` against a stale path
+      // /Users/chansiulungfelix/Projects/av-intelligence which no longer exists.)
+      console.log(`[SCRAPER] Data updated in DB (events +${newEvents}, actresses +${newActresses}). No redeploy needed.`);
     }
     
   } catch (err) {
