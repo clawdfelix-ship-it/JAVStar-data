@@ -22,6 +22,7 @@ module.exports = {
         nadeshiko: {
           DEFAULT: 'rgb(var(--color-nadeshiko))',
           dark: 'rgb(var(--color-nadeshiko-dark))',
+          strong: 'rgb(var(--color-nadeshiko-strong))',
           light: 'rgb(var(--color-nadeshiko-light))',
         },
         'sakura-gray': 'rgb(var(--color-sakura-gray))',

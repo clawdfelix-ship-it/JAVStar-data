@@ -11,7 +11,9 @@
   /* 撫子色 - なでしこいろ - 主色 */
   --color-nadeshiko: 244, 114, 182;
   /* 撫子深 - 深粉紅 */
-  --color-nadeshiko-dark: 236, 72, 153;
+  --color-nadeshiko-dark: 219, 39, 119;
+  /* 撫子極深 - 白字按鈕專用 (WCAG AA: 對白底 6.3:1) */
+  --color-nadeshiko-strong: 190, 24, 93;
   /* 撫子淺 - 淺粉紅 */
   --color-nadeshiko-light: 249, 168, 212;
   /* 灰櫻色 - 邊框/分隔線 */
@@ -76,7 +78,7 @@ body {
 }
 
 .fdb-btn-primary {
-  @apply bg-gradient-to-r from-[rgb(var(--color-nadeshiko-dark))] to-[rgb(var(--color-nadeshiko))] text-white shadow-lg shadow-pink-300/30 hover:shadow-pink-400/40 hover:scale-[1.02] active:scale-[0.98];
+  @apply bg-gradient-to-r from-[rgb(var(--color-nadeshiko-strong))] to-[rgb(var(--color-nadeshiko-dark))] text-white shadow-lg shadow-pink-300/30 hover:shadow-pink-400/40 hover:scale-[1.02] active:scale-[0.98];
 }
 
 .fdb-btn-outline {

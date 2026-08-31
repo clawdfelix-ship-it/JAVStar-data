@@ -110,7 +110,7 @@ export default function ActivityTimeline({ events, maxItems }: ActivityTimelineP
           {/* 月份標題 */}
           <div className="sticky top-20 z-10 mb-6">
             <div className="inline-flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-nadeshiko-dark to-nadeshiko flex items-center justify-center text-white text-xl shadow-lg">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-nadeshiko-strong to-nadeshiko-dark flex items-center justify-center text-white text-xl shadow-lg">
                 📅
               </div>
               <div>

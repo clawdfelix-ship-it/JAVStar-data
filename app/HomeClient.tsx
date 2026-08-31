@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useLayoutEffect, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Crown, Calendar, Ticket, MapPin, Trophy, BarChart2,
+  Crown, Calendar, Ticket, Trophy, BarChart2,
   Heart, Cake, Flower2, ArrowUp, RefreshCw, Check,
   Sparkles, Camera, ChevronLeft, ChevronRight, Search, X,
 } from 'lucide-react';
@@ -168,7 +168,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           type="submit"
           disabled={subscribeStatus === 'loading'}
           className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
-          style={{ backgroundColor: 'rgb(var(--color-nadeshiko))', color: 'white' }}
+          style={{ backgroundColor: 'rgb(var(--color-nadeshiko-strong))', color: 'white' }}
         >
           {subscribeStatus === 'loading' ? '訂閱中...' : '立即訂閱'}
         </button>
@@ -244,9 +244,9 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
   // Tab config - Froala Design Blocks style
   const tabs = [
-    { id: 'actress' as const, label: '女優排名', icon: '<Crown className="w-4 h-4" />', count: stats?.actressCount || 0 },
-    { id: 'calendar' as const, label: '活動日曆', icon: '<Calendar className="w-4 h-4" />', count: stats?.eventCount || 0 },
-    { id: 'events' as const, label: '活動列表', icon: '<Ticket className="w-4 h-4" />', count: filteredEvents.length },
+    { id: 'actress' as const, label: '女優排名', icon: Crown, count: stats?.actressCount || 0 },
+    { id: 'calendar' as const, label: '活動日曆', icon: Calendar, count: stats?.eventCount || 0 },
+    { id: 'events' as const, label: '活動列表', icon: Ticket, count: filteredEvents.length },
   ];
 
   // Tab underline slide (plan 004) — measure active tab position
@@ -380,18 +380,21 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       <div className="sticky top-0 z-40 border-b shadow-sm bg-white border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div ref={tabsContainerRef} className="relative flex items-center justify-center gap-2 py-3">
-            {tabs.map((tab) => (
+            {tabs.map((tab) => {
+              const TabIcon = tab.icon;
+              return (
               <button
                 key={tab.id}
                 data-tab-id={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`fdb-tab ${activeTab === tab.id ? 'active' : ''}`}
               >
-                <span className="text-lg">{tab.icon}</span>
+                <span className="text-lg"><TabIcon className="w-4 h-4" /></span>
                 <span>{tab.label}</span>
                 <span className="fdb-badge">{tab.count}</span>
               </button>
-            ))}
+              );
+            })}
             <span
               aria-hidden
               className="tab-underline"
@@ -534,7 +537,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 className="px-4 py-2 border rounded-xl text-sm font-medium focus:outline-none bg-white border-border text-text-primary"
               >
                 {prefectures.map((p) => (
-                  <option key={p} value={p}>{p === 'ALL' ? '<MapPin className="w-3 h-3" /> 全部地區' : `<MapPin className="w-3 h-3" /> ${p}`}</option>
+                  <option key={p} value={p}>{p === 'ALL' ? '全部地區' : p}</option>
                 ))}
               </select>
               
@@ -544,7 +547,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 className="px-4 py-2 border rounded-xl text-sm font-medium focus:outline-none bg-white border-border text-text-primary"
               >
                 {eventTypes.map((t) => (
-                  <option key={t} value={t}>{t === 'ALL' ? '<Theater className="w-3 h-3" /> 全部類型' : `<Theater className="w-3 h-3" /> ${t}`}</option>
+                  <option key={t} value={t}>{t === 'ALL' ? '全部類型' : t}</option>
                 ))}
               </select>
 

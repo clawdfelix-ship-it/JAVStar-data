@@ -174,7 +174,7 @@ function EventCardComponent({
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           ) : (
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[rgba(var(--color-nadeshiko),0.4)] to-[rgba(var(--color-nadeshiko-dark),0.3)] flex items-center justify-center text-white text-xs font-japanese font-bold">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[rgb(var(--color-nadeshiko-dark))] to-[rgb(var(--color-nadeshiko-strong))] flex items-center justify-center text-white text-xs font-japanese font-bold">
               {(actress_name || '?')[0]}
             </div>
           )}

@@ -112,7 +112,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-nadeshiko-light to-nadeshiko flex items-center justify-center text-white font-japanese font-bold text-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-nadeshiko-dark to-nadeshiko-strong flex items-center justify-center text-white font-japanese font-bold text-lg flex-shrink-0">
                   {(event.actress_name || '?')[0]}
                 </div>
               )}
@@ -252,7 +252,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
   return (
     <div className="slide-up">
       {/* Calendar Header - Froala + NIPPON COLORS style */}
-      <div className="bg-gradient-to-r from-nadeshiko-dark to-nadeshiko text-white rounded-t-2xl p-4 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-nadeshiko-strong to-nadeshiko-dark text-white rounded-t-2xl p-4 flex items-center justify-between">
         <button 
           onClick={() => setCurrentMonth(m => subMonths(m, 1))} 
           className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -311,7 +311,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
                 <div className={`
                   text-sm font-semibold mb-1 w-7 h-7 flex items-center justify-center rounded-lg ${
                     today 
-                      ? 'bg-gradient-to-br from-nadeshiko-dark to-nadeshiko text-white shadow-md' 
+                      ? 'bg-gradient-to-br from-nadeshiko-strong to-nadeshiko-dark text-white shadow-md' 
                       : 'text-text-primary'
                   }`}>
                   {format(day, 'd')}

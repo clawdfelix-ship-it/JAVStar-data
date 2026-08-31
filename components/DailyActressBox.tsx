@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Gift, Dice5, User, Fingerprint, HelpCircle } from 'lucide-react';
+import { Gift, Dice5, User, Fingerprint } from 'lucide-react';
 
 interface Actress {
   id: string;
@@ -133,7 +133,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
             <button
               onClick={handleRandomPick}
               disabled={futureActresses.length === 0 || isSpinning}
-              className="mt-4 px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:from-pink-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
+              className="mt-4 px-6 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg font-medium text-sm hover:from-pink-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
             >
               <Dice5 className="w-4 h-4" />
               {isSpinning ? '抽取中...' : '立即抽取'}
@@ -203,10 +203,12 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                 </div>
               </Link>
             ) : (
-              <div className="bg-white/50 rounded-xl border-2 border-dashed border-gray-300 w-40 h-52 flex flex-col items-center justify-center">
-                <HelpCircle className="w-10 h-10 text-gray-300 mb-2" />
-                <p className="text-text-tertiary text-xs text-center">
-                  點擊按鈕<br />抽取今日女優
+              <div className="bg-gradient-to-br from-nadeshiko-light/40 to-white rounded-xl border border-nadeshiko/30 shadow-sm w-40 h-52 flex flex-col items-center justify-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center">
+                  <Gift className="w-6 h-6 text-nadeshiko-dark" />
+                </div>
+                <p className="text-text-secondary text-xs text-center font-medium px-3 leading-relaxed">
+                  未抽取<br /><span className="text-text-tertiary font-normal">按「立即抽取」試試今日運氣</span>
                 </p>
               </div>
             )}

@@ -82,7 +82,7 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
       disabled={loading}
       className={`flex items-center ${sizeClasses} rounded-full transition-[transform,background-color,color,border-color] duration-base ease-out active:scale-[0.94] disabled:active:scale-100 ${
         hasVoted
-          ? 'bg-[rgb(var(--color-nadeshiko-dark))] text-white border border-[rgb(var(--color-nadeshiko-dark))] hover:bg-[rgb(var(--color-nadeshiko))]'
+          ? 'bg-[rgb(var(--color-nadeshiko-strong))] text-white border border-[rgb(var(--color-nadeshiko-strong))] hover:bg-[rgb(var(--color-nadeshiko-dark))]'
           : 'bg-white text-[rgb(var(--color-umenezumi-light))] border border-[rgba(var(--color-sakura-gray),0.6)] hover:border-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-nadeshiko-dark))]'
       } ${loading ? 'opacity-50 cursor-wait' : ''} ${className}`}
     >

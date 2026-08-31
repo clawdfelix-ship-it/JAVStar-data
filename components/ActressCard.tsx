@@ -52,7 +52,7 @@ export default function ActressCard({
     if (r === 1) return 'bg-gradient-to-br from-amber-400 to-amber-500 text-white shadow-lg shadow-amber-200';
     if (r === 2) return 'bg-gradient-to-br from-gray-300 to-gray-400 text-white shadow-lg shadow-gray-200';
     if (r === 3) return 'bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-lg shadow-orange-200';
-    return 'bg-gradient-to-br from-pink-400 to-pink-500 text-white shadow-lg shadow-pink-200';
+    return 'bg-gradient-to-br from-pink-600 to-pink-700 text-white shadow-lg shadow-pink-200';
   };
 
   // Format upcoming event: "8/9 週六" or "8/9" if no day-of-week
@@ -153,7 +153,7 @@ export default function ActressCard({
           <VoteButton actressId={id} initialCount={vote_count} size="sm" className="flex-1 justify-center min-h-[44px]" />
           <Link
             href={`/actress/${id}`}
-            className="flex-1 min-h-[44px] flex items-center justify-center bg-[rgb(var(--color-nadeshiko-dark))] hover:bg-[rgb(var(--color-nadeshiko))] active:scale-[0.98] text-white rounded-lg font-medium text-xs text-center transition-[background-color,transform] duration-base ease-out shadow-md"
+            className="flex-1 min-h-[44px] flex items-center justify-center bg-[rgb(var(--color-nadeshiko-strong))] hover:bg-[rgb(var(--color-nadeshiko-dark))] active:scale-[0.98] text-white rounded-lg font-medium text-xs text-center transition-[background-color,transform] duration-base ease-out shadow-md"
           >
             詳情 <ChevronRight className="w-3 h-3" />
           </Link>
