@@ -34,6 +34,9 @@ interface ActressDetail {
     upcoming_events: number;
   };
   vote_count: number;
+  vote_count_all?: number;
+  vote_month?: string;
+  my_voted?: boolean;
 }
 
 interface Event {
@@ -332,10 +335,10 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                       <div className="bg-white rounded-xl p-4 text-center border border-border shadow-sm flex flex-col items-center justify-between">
                         <div>
                           <div className="font-mono text-2xl sm:text-3xl font-bold text-[rgb(var(--color-nadeshiko-dark))]">{actress.vote_count}</div>
-                          <div className="text-text-secondary text-xs sm:text-sm mt-1 font-medium">❤️ 投票</div>
+                          <div className="text-text-secondary text-xs sm:text-sm mt-1 font-medium">❤️ 本月投票{actress.vote_count_all != null && `（累計 ${actress.vote_count_all}）`}</div>
                         </div>
                         <div className="mt-2 flex justify-center">
-                          <VoteButton actressId={actress.id} initialCount={actress.vote_count} size="md" />
+                          <VoteButton actressId={actress.id} initialCount={actress.vote_count} initialVoted={actress.my_voted} size="md" />
                         </div>
                       </div>
                     </div>

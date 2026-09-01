@@ -22,6 +22,8 @@ interface Actress {
   event_count: number;
   year_2026_events: number;
   vote_count: number;
+  vote_count_all?: number;
+  my_voted?: boolean;
   final_score: number;
   next_event_date?: string | null;
   next_event_title?: string | null;

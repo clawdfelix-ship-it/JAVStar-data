@@ -6,27 +6,48 @@ import { Heart } from 'lucide-react';
 interface VoteButtonProps {
   actressId: string;
   initialCount: number;
+  /**
+   * 由 list/detail API 一齊帶返嚟嘅「我今個月有冇投過」。
+   * 有呢個 prop 就唔再各自打 GET /vote（殺列表 N+1 request storm）；
+   * 淨係喺冇傳（例如獨立掛載）先 fallback 去 fetch。
+   */
+  initialVoted?: boolean;
   size?: 'sm' | 'md';
   className?: string;
 }
 
-export default function VoteButton({ actressId, initialCount, size = 'md', className = '' }: VoteButtonProps) {
+export default function VoteButton({ actressId, initialCount, initialVoted, size = 'md', className = '' }: VoteButtonProps) {
   const [voteCount, setVoteCount] = useState(initialCount);
-  const [hasVoted, setHasVoted] = useState(false);
+  const [hasVoted, setHasVoted] = useState(!!initialVoted);
   const [loading, setLoading] = useState(false);
-  const [checking, setChecking] = useState(true);
+  // 只有冇 external 狀態傳入時先需要自己 check
+  const [checking, setChecking] = useState(initialVoted === undefined);
 
-  // Check initial vote status
+  // Fallback：獨立使用（冇 initialVoted）先打 GET
   useEffect(() => {
+    if (initialVoted !== undefined) {
+      setHasVoted(initialVoted);
+      setVoteCount(initialCount);
+      setChecking(false);
+      return;
+    }
+    let cancelled = false;
     fetch(`/api/actresses/${actressId}/vote`)
       .then(r => r.json())
       .then(d => {
+        if (cancelled) return;
         setHasVoted(d.has_voted || false);
-        setVoteCount(d.vote_count || initialCount);
+        setVoteCount(d.vote_count ?? initialCount);
         setChecking(false);
       })
-      .catch(() => setChecking(false));
-  }, [actressId, initialCount]);
+      .catch(() => !cancelled && setChecking(false));
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actressId, initialVoted]);
+
+  // 外部數據刷新（翻頁/輪詢）時同步
+  useEffect(() => { setVoteCount(initialCount); }, [initialCount]);
+  useEffect(() => { if (initialVoted !== undefined) setHasVoted(initialVoted); }, [initialVoted]);
 
   const handleVote = useCallback(async () => {
     if (loading || checking) return;
@@ -34,24 +55,25 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
 
     try {
       if (hasVoted) {
-        // Remove vote
+        // 收回本月投票
         const res = await fetch(`/api/actresses/${actressId}/vote`, { method: 'DELETE' });
         const d = await res.json();
         if (res.ok) {
           setHasVoted(false);
           setVoteCount(d.vote_count ?? Math.max(0, voteCount - 1));
+        } else {
+          alert(d.error || '操作失敗');
         }
       } else {
-        // Cast vote
         const res = await fetch(`/api/actresses/${actressId}/vote`, { method: 'POST' });
         const d = await res.json();
         if (res.ok) {
           setHasVoted(true);
           setVoteCount(d.vote_count ?? voteCount + 1);
         } else if (d.voted) {
-          // Already voted this IP — sync state
+          // 呢個月已投過 — 同步狀態
           setHasVoted(true);
-          alert(d.error || '你已投過票');
+          alert(d.error || '你呢個月已投過');
         } else {
           alert(d.error || '投票失敗');
         }
@@ -61,7 +83,7 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
     } finally {
       setLoading(false);
     }
-  }, [actressId, hasVoted, loading, voteCount]);
+  }, [actressId, hasVoted, loading, checking, voteCount]);
 
   const sizeClasses = size === 'sm'
     ? 'text-xs gap-1 px-2 py-1'
@@ -80,6 +102,7 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
     <button
       onClick={handleVote}
       disabled={loading}
+      title={hasVoted ? '收回呢個月嘅投票' : '每月可以投一次'}
       className={`flex items-center ${sizeClasses} rounded-full transition-[transform,background-color,color,border-color] duration-base ease-out active:scale-[0.94] disabled:active:scale-100 ${
         hasVoted
           ? 'bg-[rgb(var(--color-nadeshiko-strong))] text-white border border-[rgb(var(--color-nadeshiko-strong))] hover:bg-[rgb(var(--color-nadeshiko-dark))]'
@@ -91,7 +114,7 @@ export default function VoteButton({ actressId, initialCount, size = 'md', class
       />
       <span key={voteCount} className="font-bold vote-count">{voteCount}</span>
       {size === 'md' && (
-        <span className="text-[10px] opacity-80">{hasVoted ? '已投' : '投票'}</span>
+        <span className="text-[10px] opacity-80">{hasVoted ? '已投·本月' : '本月投票'}</span>
       )}
     </button>
   );

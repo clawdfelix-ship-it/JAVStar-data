@@ -59,7 +59,9 @@ async function seed() {
       actress_id TEXT NOT NULL,
       ip_address TEXT NOT NULL,
       voted_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(actress_id, ip_address)
+      vote_month TEXT,
+      UNIQUE(actress_id, ip_address, vote_month),
+      FOREIGN KEY (actress_id) REFERENCES actresses(id) ON DELETE CASCADE
     )
   `;
 

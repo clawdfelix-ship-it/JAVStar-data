@@ -1,7 +1,10 @@
-import sql from '@/lib/db';
+import { getSql } from '@/lib/db';
 import { Actress } from '@/lib/db/schema';
+
+const sql = getSql();
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAllEvents } from '@/lib/matching-validator';
+import { getClientIp } from '@/lib/client-ip';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -60,9 +63,23 @@ export async function GET(request: NextRequest, { params }: Params) {
       date_iso: eventDate(e) || null,
     }));
 
-    // Get vote count
-    const voteResult = await sql`SELECT COUNT(*) as count FROM votes WHERE actress_id = ${id}`;
-    const voteCount = Number((voteResult as any[])[0]?.count || 0);
+    // 投票數：本月（主顯示）+ 累計；同時回傳「我今個月有冇投過」
+    const monthRows = await sql.query(
+      `SELECT to_char(now() AT TIME ZONE 'Asia/Hong_Kong', 'YYYY-MM') AS month`, []
+    );
+    const month = (monthRows as any[])[0].month as string;
+    const voteMonthRows = await sql`
+      SELECT COUNT(*)::int as count FROM votes WHERE actress_id = ${id} AND vote_month = ${month}
+    `;
+    const voteAllRows = await sql`
+      SELECT COUNT(*)::int as count FROM votes WHERE actress_id = ${id}
+    `;
+    const voteCount = Number((voteMonthRows as any[])[0]?.count || 0);
+    const voteCountAll = Number((voteAllRows as any[])[0]?.count || 0);
+    const ip = getClientIp(request);
+    const myVoteRows = await sql`
+      SELECT 1 FROM votes WHERE actress_id = ${id} AND ip_address = ${ip} AND vote_month = ${month} LIMIT 1
+    `;
 
     return NextResponse.json({
       actress: {
@@ -74,6 +91,9 @@ export async function GET(request: NextRequest, { params }: Params) {
           upcoming_events: upcomingEvents,
         },
         vote_count: voteCount,
+        vote_count_all: voteCountAll,
+        vote_month: month,
+        my_voted: (myVoteRows as any[]).length > 0,
       },
       events: normalizedEvents,
       // 配對校驗統計 - 便於調試和數據清洗

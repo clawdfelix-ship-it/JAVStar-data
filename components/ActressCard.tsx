@@ -23,6 +23,8 @@ interface ActressCardProps {
   event_count: number;
   year_2026_events: number;
   vote_count: number;
+  vote_count_all?: number;
+  my_voted?: boolean;
   final_score: number;
   next_event_date?: string | null;
   next_event_title?: string | null;
@@ -43,6 +45,8 @@ export default function ActressCard({
   event_count,
   year_2026_events,
   vote_count,
+  vote_count_all,
+  my_voted,
   final_score,
   next_event_date,
   next_event_title,
@@ -150,7 +154,7 @@ export default function ActressCard({
 
         {/* Vote + CTA Row — bumped touch target to 44px min height */}
         <div className="flex items-center gap-2">
-          <VoteButton actressId={id} initialCount={vote_count} size="sm" className="flex-1 justify-center min-h-[44px]" />
+          <VoteButton actressId={id} initialCount={vote_count} initialVoted={my_voted} size="sm" className="flex-1 justify-center min-h-[44px]" />
           <Link
             href={`/actress/${id}`}
             className="flex-1 min-h-[44px] flex items-center justify-center bg-[rgb(var(--color-nadeshiko-strong))] hover:bg-[rgb(var(--color-nadeshiko-dark))] active:scale-[0.98] text-white rounded-lg font-medium text-xs text-center transition-[background-color,transform] duration-base ease-out shadow-md"
