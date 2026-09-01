@@ -187,8 +187,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
   const { events, loading: eventsLoading } = useEvents({
     limit: 2000,
-    prefecture: activeTab === 'events' ? filterPrefecture : 'ALL',
-    eventType: activeTab === 'events' ? filterType : 'ALL',
+    // Always fetch the full set once; filtering is done client-side so the
+    // dropdown options (derived from data) stay stable regardless of selection.
   });
 
   const { stats } = useStats();
@@ -210,9 +210,24 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     return [...actressItems, ...eventItems];
   }, [actresses, events]);
 
-  // Filter options
-  const prefectures = ['ALL', '台北', '大阪', '東京', '其他'];
-  const eventTypes = ['ALL', '見面會', '攝影會', 'TRE', '簽名會', '出道活動', '實體活動'];
+  // Filter options — canonical DB codes (see events_derive_geo_type DB trigger).
+  // Values are the raw codes; labels are mapped for display.
+  const EVENT_TYPE_LABELS: Record<string, string> = {
+    meet: '店頭/サイン',
+    dvd: 'DVD/即売',
+    photo: '撮影会',
+    offkai: 'オフ会',
+    other: '其他活動',
+  };
+  const eventTypes = ['ALL', ...Object.keys(EVENT_TYPE_LABELS)];
+  // Prefectures derived from loaded data, most frequent first.
+  const prefectures = useMemo(() => {
+    const counts = new Map<string, number>();
+    (events || []).forEach(e => {
+      if (e.prefecture) counts.set(e.prefecture, (counts.get(e.prefecture) || 0) + 1);
+    });
+    return ['ALL', ...[...counts.entries()].sort((a, b) => b[1] - a[1]).map(([p]) => p)];
+  }, [events]);
 
   // ====================
   // Data Processing
@@ -548,7 +563,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 className="px-4 py-2 border rounded-xl text-sm font-medium focus:outline-none bg-white border-border text-text-primary"
               >
                 {eventTypes.map((t) => (
-                  <option key={t} value={t}>{t === 'ALL' ? '全部類型' : t}</option>
+                  <option key={t} value={t}>{t === 'ALL' ? '全部類型' : (EVENT_TYPE_LABELS[t] || t)}</option>
                 ))}
               </select>
 
