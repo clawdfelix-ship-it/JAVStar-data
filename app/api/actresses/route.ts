@@ -45,19 +45,18 @@ export async function GET(request: NextRequest) {
       whereParts.push(`(a.name_ja ILIKE $${idx} OR a.name_cn ILIKE $${idx})`);
     }
     if (hasUpcoming) {
-      whereParts.push(`ne.datetime IS NOT NULL`);
+      whereParts.push(`ne.date_iso IS NOT NULL`);
     }
     const whereClause = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
 
     // ORDER BY —— 列名/方向全部來自上方硬編碼 sortMap 白名單，唔接受用戶輸入
     const orderByClause = sortBy === 'upcoming'
-      ? `ne.datetime ASC NULLS LAST`
+      ? `ne.date_iso ASC NULLS LAST`
       : sort
         ? `${sort.col} ${sort.dir} NULLS LAST`
         : `(COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v.cnt, 0) * 0.3) DESC`;
 
-    // 日期下限亦參數化
-    params.push(new Date().toISOString().slice(0, 10));
+    // 下場活動喺 SQL 入面用 date_iso >= CURRENT_DATE 比較，唔再需要傳日期參數
     const dateIdx = params.length;
 
     // Main query — uses pre-aggregated actress_events_count + indexed votes lookup
@@ -75,8 +74,9 @@ export async function GET(request: NextRequest) {
         a.blog, a.official_site, a.tags,
         COALESCE(ec.year_2026_events, 0)::int AS year_2026_events,
         COALESCE(ec.year_2025_events, 0)::int AS year_2025_events,
+        (COALESCE(ec.year_2025_events, 0) + COALESCE(ec.year_2026_events, 0))::int AS event_count,
         COALESCE(v.cnt, 0)::int               AS vote_count,
-        ne.datetime                           AS next_event_date,
+        TO_CHAR(ne.date_iso, 'YYYY-MM-DD')    AS next_event_date,
         ne.title                              AS next_event_title,
         (COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v.cnt, 0) * 0.3) AS final_score
       FROM actresses a
@@ -85,9 +85,13 @@ export async function GET(request: NextRequest) {
         SELECT COUNT(*) AS cnt FROM votes WHERE votes.actress_id = a.id
       ) v ON true
       LEFT JOIN LATERAL (
-        SELECT datetime, title FROM events
-        WHERE events.actress_id = a.id AND events.datetime >= $${dateIdx}
-        ORDER BY events.datetime ASC LIMIT 1
+        -- Next upcoming event: compare on normalized date_iso (raw datetime
+        -- text has full-width digits that mis-sort/mis-compare).
+        SELECT date_iso, title FROM events
+        WHERE events.actress_id = a.id
+          AND events.date_iso IS NOT NULL
+          AND events.date_iso >= CURRENT_DATE
+        ORDER BY events.date_iso ASC LIMIT 1
       ) ne ON true
       ${whereClause}
       ORDER BY ${orderByClause}
@@ -99,9 +103,11 @@ export async function GET(request: NextRequest) {
     const countQuery = `
       SELECT COUNT(*)::int as cnt FROM actresses a
       LEFT JOIN LATERAL (
-        SELECT datetime FROM events
-        WHERE events.actress_id = a.id AND events.datetime >= $${dateIdx}
-        ORDER BY events.datetime ASC LIMIT 1
+        SELECT date_iso FROM events
+        WHERE events.actress_id = a.id
+          AND events.date_iso IS NOT NULL
+          AND events.date_iso >= CURRENT_DATE
+        ORDER BY events.date_iso ASC LIMIT 1
       ) ne ON true
       ${whereClause}
     `;

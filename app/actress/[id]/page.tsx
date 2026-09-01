@@ -16,23 +16,23 @@ async function fetchActressServer(id: string) {
     
     const actress = (actresses as any[])[0];
     
-    // 2. 查詢女優嘅活動
+    // 2. 查詢女優嘅活動。排序用 normalize 咗嘅 date_iso（DATE），唔好用 raw
+    //    datetime 文本——入面有全形數字（２０２６）同垃圾值，UTF-8 排序亂、
+    //    new Date() 又會變 1970。
     const events = await sql`
-      SELECT * FROM events 
-      WHERE actress_id = ${id} 
-      ORDER BY datetime DESC
+      SELECT * FROM events
+      WHERE actress_id = ${id}
+      ORDER BY date_iso DESC NULLS LAST
     `;
-    
-    // 3. 計算統計數據
-    const eventList = events as any[];
-    const year2026Events = eventList.filter(e => {
-      const date = new Date(e.datetime);
-      return date.getFullYear() === 2026;
-    }).length;
-    
-    const upcomingEvents = eventList.filter(e => {
-      return new Date(e.datetime) > new Date();
-    }).length;
+
+    // 3. 計算統計數據。日期一律以 date_iso（YYYY-MM-DD）做字串比較。
+    const eventList = (events as any[]).map(e => {
+      const iso = e.date_iso ? new Date(e.date_iso).toISOString().slice(0, 10) : '';
+      return { ...e, datetime: iso || e.datetime, date_iso: iso || null };
+    });
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const year2026Events = eventList.filter(e => (e.date_iso || '').slice(0, 4) === '2026').length;
+    const upcomingEvents = eventList.filter(e => (e.date_iso || '') >= todayStr).length;
     
     // 4. 查詢投票數
     const votes = await sql`
