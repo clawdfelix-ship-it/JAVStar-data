@@ -15,29 +15,23 @@ interface EventCardProps {
 }
 
 function getInferredEventType(type: string, title: string): string {
-  if (type && type !== 'other') return type;
-  if (title.includes('見面會')) return 'meeting';
-  if (title.includes('攝影會')) return 'photo';
-  if (title.includes('TRE')) return 'tre';
-  if (title.includes('簽名')) return 'sign';
-  if (title.includes('出道') || title.includes('新星')) return 'debut';
+  // DB now stores canonical types derived by the events trigger: dvd / photo / offkai / other
+  if (type && ['dvd', 'photo', 'offkai', 'other'].includes(type)) return type;
+  if (title.includes('撮影会') || title.includes('攝影會')) return 'photo';
+  if (title.includes('オフ会') || title.includes('見面會')) return 'offkai';
+  if (title.includes('サイン会') || title.includes('簽名') || title.includes('即売会') || title.includes('DVD') || title.includes('発売')) return 'dvd';
   return 'other';
 }
 
 function getEventTypeLabel(type: string, title: string): string {
   const t = getInferredEventType(type, title);
   const labels: Record<string, string> = {
-    sign: '簽名會',
-    debut: '出道活動',
-    live: 'LIVE',
-    talk: '座談會',
-    sale: '發售會',
-    meeting: '見面會',
-    photo: '攝影會',
-    tre: 'TRE',
-    other: '實體活動',
+    dvd: 'DVD/即売',
+    photo: '撮影会',
+    offkai: 'オフ会',
+    other: '活動',
   };
-  return labels[t] || '實體活動';
+  return labels[t] || '活動';
 }
 
 function safeNewDate(datetime: string): Date {
@@ -76,6 +70,12 @@ function formatDateTime(datetime: string): string {
 }
 
 function formatTime(datetime: string): string {
+  // date-only events (YYYY-MM-DD) have no real start time in the source data;
+  // showing a fabricated 09:00 is misleading. Show the weekday instead.
+  if (!datetime.includes('T')) {
+    const date = safeNewDate(datetime);
+    return date.toLocaleDateString('ja-JP', { weekday: 'short' });
+  }
   const date = safeNewDate(datetime);
   return date.toLocaleTimeString('ja-JP', {
     hour: '2-digit',
@@ -148,11 +148,13 @@ function EventCardComponent({
       </div>
 
       {/* Venue Location */}
-      {venue && (
+      {(venue || prefecture) && (
         <div className="flex items-center gap-2 mb-3 p-2.5 bg-sakura-gray/20 rounded-lg">
           <MapPin className="w-4 h-4 text-[rgb(var(--color-kamenozoki-dark))] shrink-0" />
           <span className="text-sm text-text-secondary truncate">
-            {venue}{prefecture ? ` (${prefecture})` : ''}
+            {prefecture === 'オンライン'
+              ? '🌐 オンライン活動'
+              : <>{venue}{prefecture && venue !== prefecture ? ` (${prefecture})` : ''}</>}
           </span>
         </div>
       )}

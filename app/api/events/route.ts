@@ -41,9 +41,10 @@ export async function GET(request: NextRequest) {
 
     // Region filter
     const regionClauses: Record<string, string> = {
-      japan: "prefecture IS NOT NULL AND prefecture != '' AND prefecture != '台北' AND prefecture NOT LIKE '%香港%'",
+      japan: "prefecture IS NOT NULL AND prefecture != '' AND prefecture != '台北' AND prefecture != 'オンライン' AND prefecture NOT LIKE '%香港%'",
       taiwan: "prefecture = '台北'",
       hk: "prefecture LIKE '%香港%'",
+      online: "prefecture = 'オンライン'",
     };
 
     // Build base WHERE conditions.

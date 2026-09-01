@@ -64,30 +64,27 @@ export default function EventsClient() {
   }
 
   function formatDate(d: string) {
-    const date = new Date(d);
+    const date = new Date(d.includes('T') ? d : d + 'T00:00:00+09:00');
     return date.toLocaleDateString('ja-JP', {
       month: 'short', day: 'numeric', weekday: 'short',
-      hour: '2-digit', minute: '2-digit',
     });
   }
 
   function getEventTypeLabel(t: string) {
     const map: Record<string, string> = {
-      sign: '簽名會', debut: '出道', live: '直播活動',
-      event: '實體活動', online: '線上活動', other: '其他',
+      dvd: 'DVD/即売', photo: '撮影会', offkai: 'オフ会', other: '其他活動',
     };
     return map[t] || t;
   }
 
   function getEventTypeColor(t: string) {
     const map: Record<string, string> = {
-      sign: 'text-[rgb(var(--color-nadeshiko-dark))] bg-[rgba(var(--color-sakura-gray),0.4)] border-[rgba(var(--color-nadeshiko),0.3)]',
-      debut: 'text-amber-400 bg-[rgba(251,191,36,0.15)] border-[rgba(251,191,36,0.3)]',
-      live: 'text-blue-400 bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.3)]',
-      event: 'text-purple-400 bg-[rgba(168,85,247,0.15)] border-[rgba(168,85,247,0.3)]',
-      online: 'text-teal-400 bg-[rgba(20,184,166,0.15)] border-[rgba(20,184,166,0.3)]',
+      dvd: 'text-[rgb(var(--color-nadeshiko-dark))] bg-[rgba(var(--color-sakura-gray),0.4)] border-[rgba(var(--color-nadeshiko),0.3)]',
+      photo: 'text-amber-600 bg-[rgba(251,191,36,0.15)] border-[rgba(251,191,36,0.3)]',
+      offkai: 'text-blue-600 bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.3)]',
+      other: 'text-[rgb(var(--color-umenezumi))] bg-[rgba(var(--color-sakura-gray),0.3)] border-[rgba(var(--color-sakura-gray),0.5)]',
     };
-    return map[t] || 'text-[rgb(var(--color-umenezumi))] bg-[rgba(var(--color-sakura-gray),0.3)] border-[rgba(var(--color-sakura-gray),0.5)]';
+    return map[t] || map.other;
   }
 
   function isToday(d: string) {
@@ -155,7 +152,7 @@ export default function EventsClient() {
           <div className="lg:col-span-3 flex flex-col gap-3">
             {/* Region tabs */}
             <div className="flex gap-1 bg-sakura-gray rounded-lg p-1">
-              {[['all','全部'],['japan','日本'],['taiwan','台灣'],['hk','香港']].map(([val, label]) => (
+              {[['all','全部'],['japan','日本'],['online','オンライン'],['taiwan','台灣'],['hk','香港']].map(([val, label]) => (
                 <button
                   key={val}
                   onClick={() => setRegion(val)}
@@ -239,10 +236,10 @@ export default function EventsClient() {
                       rel="noopener noreferrer"
                       className="flex items-center gap-4 bg-white border border-border rounded-xl p-4 hover:border-primary transition-colors group"
                     >
-                      {/* Time */}
+                      {/* Time / weekday — source has no start time for date-only events */}
                       <div className="text-center min-w-[60px]">
                         <div className="text-primary-dark font-bold text-sm">
-                          {new Date(ev.datetime).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(ev.datetime.includes('T') ? ev.datetime : ev.datetime + 'T00:00:00+09:00').toLocaleDateString('ja-JP', { weekday: 'short' })}
                         </div>
                       </div>
                       {/* Event info */}
@@ -259,7 +256,11 @@ export default function EventsClient() {
                         {ev.actress_name && (
                           <div className="text-xs text-text-tertiary mt-0.5">{ev.actress_name}</div>
                         )}
-                        <div className="text-xs text-text-tertiary mt-1">📍 {ev.venue} · {ev.prefecture}</div>
+                        {ev.prefecture === 'オンライン' ? (
+                          <div className="text-xs text-text-tertiary mt-1">🌐 オンライン活動</div>
+                        ) : (
+                          <div className="text-xs text-text-tertiary mt-1">📍 {ev.venue || ev.prefecture}{ev.venue && ev.prefecture && ev.venue !== ev.prefecture ? ` · ${ev.prefecture}` : ''}</div>
+                        )}
                       </div>
                       {/* External link icon */}
                       <div className="text-text-tertiary group-hover:text-primary-dark transition-colors">
