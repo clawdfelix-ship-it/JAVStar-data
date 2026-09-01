@@ -145,7 +145,7 @@ async function scrapeEvents(): Promise<number> {
           // empty catch swallowed it, so scraped events never reached the DB.
           await sql`
             INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, created_at)
-            VALUES (${e.id}, 'unknown', ${e.event_name}, ${datetime}, '', ${e.location}, ${e.event_type}, ${e.url}, NOW()::text)
+            VALUES (${e.id}, NULL, ${e.event_name}, ${datetime}, '', ${e.location}, ${e.event_type}, ${e.url}, NOW()::text)
             ON CONFLICT (id) DO UPDATE SET
               title = EXCLUDED.title,
               datetime = EXCLUDED.datetime,
@@ -173,16 +173,16 @@ async function scrapeEvents(): Promise<number> {
   return newEvents;
 }
 
-// Freshly scraped events are inserted with actress_id='unknown'. The public API
+// Freshly scraped events are inserted with actress_id=NULL. The public API
 // filters those out, so without this step new events never appear on the site.
 // Relink by finding an actress name inside the event title; longest name wins to
 // avoid short-name false positives.
 //
 // IMPORTANT: only match against CANONICAL actresses — numeric-id rows sourced
-// from minnano-av. The DB also contains auto-generated placeholder rows
-// (id LIKE 'auto_%', e.g. '周年記念', '大阪', 'オンライン') and 'unknown'/'0'
-// placeholders. Matching against those links events to junk labels that then
-// pollute the ranking and actress cards.
+// from minnano-av with the normal short id (max 10 digits). The DB history
+// includes auto-generated placeholder rows (id LIKE 'auto_%') and timestamp-
+// style fake ids (16 digits) created by older scripts; matching against those
+// links events to junk labels that pollute the ranking and actress cards.
 async function relinkUnknownEvents(): Promise<number> {
   const rows = await sql`
     UPDATE events e SET actress_id = sub.aid
@@ -191,14 +191,14 @@ async function relinkUnknownEvents(): Promise<number> {
       FROM events ev
       CROSS JOIN LATERAL (
         SELECT a.id AS aid, length(a.name_ja) AS l FROM actresses a
-          WHERE a.id ~ '^[0-9]+$' AND length(COALESCE(a.name_ja,'')) >= 2
+          WHERE a.id ~ '^[0-9]+$' AND length(a.id) <= 10 AND length(COALESCE(a.name_ja,'')) >= 2
             AND ev.title LIKE '%' || a.name_ja || '%'
         UNION ALL
         SELECT a.id, length(COALESCE(a.name_cn,'')) FROM actresses a
-          WHERE a.id ~ '^[0-9]+$' AND length(COALESCE(a.name_cn,'')) >= 2
+          WHERE a.id ~ '^[0-9]+$' AND length(a.id) <= 10 AND length(COALESCE(a.name_cn,'')) >= 2
             AND ev.title LIKE '%' || a.name_cn || '%'
       ) n
-      WHERE ev.actress_id IN ('unknown','0') OR ev.actress_id IS NULL
+      WHERE ev.actress_id IS NULL OR ev.actress_id IN ('unknown','0')
       ORDER BY ev.id, n.l DESC
     ) sub
     WHERE e.id = sub.eid
@@ -221,7 +221,7 @@ async function rebuildEventCounts(): Promise<void> {
       COUNT(*) FILTER (WHERE date_iso >= date_trunc('month', CURRENT_DATE)::date
                         AND date_iso <  (date_trunc('month', CURRENT_DATE) + interval '1 month')::date)::int
     FROM events
-    WHERE actress_id ~ '^[0-9]+$' AND date_iso IS NOT NULL
+    WHERE actress_id ~ '^[0-9]+$' AND length(actress_id) <= 10 AND date_iso IS NOT NULL
     GROUP BY actress_id
     ON CONFLICT (actress_id) DO UPDATE SET
       year_2025_events = EXCLUDED.year_2025_events,

@@ -40,7 +40,7 @@ async function seed() {
   await sql`
     CREATE TABLE IF NOT EXISTS events (
       id TEXT PRIMARY KEY,
-      actress_id TEXT NOT NULL,
+      actress_id TEXT,
       title TEXT NOT NULL,
       venue TEXT,
       prefecture TEXT,
