@@ -255,6 +255,10 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                e.actress_name?.toLowerCase().includes(searchLower);
       }
       return true;
+    }).sort((a, b) => {
+      // Upcoming list: nearest events first. datetime is normalized YYYY-MM-DD
+      // (see /api/events), so lexicographic compare equals chronological order.
+      return (a.datetime || '').localeCompare(b.datetime || '');
     });
   }, [events, filterPrefecture, filterType, search, activeTab]);
 
