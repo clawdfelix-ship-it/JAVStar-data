@@ -111,12 +111,17 @@ body {
 /* ---- Tabs (P1 #7) ---- */
 .fdb-tab {
   @apply relative inline-flex items-center gap-2 px-4 md:px-5 rounded-xl font-medium text-sm md:text-base
-         transition-[background-color,color] duration-base ease-out cursor-pointer;
+         transition-[background-color,color,transform] duration-fast ease-out cursor-pointer;
   min-height: 44px;
   color: rgb(var(--color-umenezumi));
+  -webkit-tap-highlight-color: transparent;
 }
 .fdb-tab:hover {
   background: rgba(var(--color-sakura-gray), 0.25);
+}
+.fdb-tab:active {
+  /* instant press feedback (Apple: respond on pointer-down) */
+  transform: scale(0.96);
 }
 .fdb-tab.active {
   @apply font-semibold;
@@ -305,6 +310,28 @@ body {
     .tab-panel { transform: none; }
     .search-clear { transform: scale(1); }
     .subscribe-success { transform: none; }
+  }
+}
+
+/* ---- Reduced transparency: frost translucent chrome to near-solid (Apple) ---- */
+@media (prefers-reduced-transparency: reduce) {
+  .sticky.top-0,
+  header.sticky {
+    background-color: #ffffff !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ---- Increased contrast: solid surfaces + defined borders ---- */
+@media (prefers-contrast: more) {
+  .sticky.top-0,
+  header.sticky {
+    background-color: #ffffff !important;
+    backdrop-filter: none !important;
+  }
+  .fdb-card,
+  .card {
+    border-width: 1.5px;
   }
 }
 

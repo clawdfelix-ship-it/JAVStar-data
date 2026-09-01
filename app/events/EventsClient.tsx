@@ -116,7 +116,7 @@ export default function EventsClient() {
   return (
     <div className="min-h-screen bg-white text-text-primary">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-border px-4 py-4">
+      <header className="sticky top-0 z-50 border-b border-border bg-white/70 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/60 px-4 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

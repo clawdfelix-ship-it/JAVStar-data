@@ -301,7 +301,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             </div>
             
             {/* Title - Froala typography */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-4 font-japanese leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-4 font-japanese leading-[1.08] tracking-[-0.02em] md:tracking-[-0.025em]">
               日本 AV 女優<span className="text-transparent bg-clip-text bg-gradient-to-r from-nadeshiko-dark to-nadeshiko">活動情報</span>
             </h1>
             
@@ -397,7 +397,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       {/* =========================================
           Tabs Navigation - Froala Design Blocks
           ========================================= */}
-      <div className="sticky top-0 z-40 border-b shadow-sm bg-white border-border">
+      <div className="sticky top-0 z-40 border-b border-border bg-white/70 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/60">
         <div className="max-w-7xl mx-auto px-4">
           <div ref={tabsContainerRef} className="relative flex items-center justify-center gap-2 py-3">
             {tabs.map((tab) => {
