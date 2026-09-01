@@ -118,27 +118,22 @@ async function scrapeEvents(): Promise<number> {
   }
 
   let totalEvents = 0;
+  // av-event.jp's pagination nav only ever renders ~5 page links (a sliding
+  // window), so reading it to find the last page caps us at page 5 — months with
+  // 300+ events (18 pages) silently lost everything past page 5. Instead, page
+  // forward until a page returns zero events. Safety cap avoids an infinite loop
+  // if the site ever returns items on an out-of-range URL.
+  const MAX_PAGES_PER_SLICE = 60;
   for (const slice of slices) {
     const dateRange = `begin_date=${slice.begin}&end_date=${slice.end}`;
     console.log(`[EVENTS] Slice ${slice.label}: ${dateRange}`);
 
-    await page.goto(`https://www.av-event.jp/search/?${dateRange}`);
-    await page.waitForTimeout(2500);
-
-    const lastPage = await page.evaluate(() => {
-      const links = document.querySelectorAll('li.c-pagination_item a');
-      let maxPage = 1;
-      links.forEach(link => {
-        const href = link.getAttribute('href') || '';
-        const m = href.match(/\/search\/(\d+)\//);
-        if (m) maxPage = Math.max(maxPage, parseInt(m[1]));
-      });
-      return maxPage;
-    });
-
     let sliceCount = 0;
-    for (let p = 1; p <= lastPage; p++) {
+    let pagesCrawled = 0;
+    for (let p = 1; p <= MAX_PAGES_PER_SLICE; p++) {
       const events = await scrapePage(page, p, dateRange);
+      pagesCrawled = p;
+      if (events.length === 0) break; // reached the last page for this slice
       sliceCount += events.length;
       for (const e of events) {
         try {
@@ -160,10 +155,10 @@ async function scrapeEvents(): Promise<number> {
           console.error(`[EVENTS] insert failed for id=${e.id}:`, insErr instanceof Error ? insErr.message : insErr);
         }
       }
-      if (p < lastPage) await new Promise(r => setTimeout(r, 1500));
+      await new Promise(r => setTimeout(r, 1500));
     }
     totalEvents += sliceCount;
-    console.log(`[EVENTS] Slice ${slice.label}: ${sliceCount} events across ${lastPage} page(s)`);
+    console.log(`[EVENTS] Slice ${slice.label}: ${sliceCount} events across ${pagesCrawled} page(s)`);
   }
 
   await browser.close();
