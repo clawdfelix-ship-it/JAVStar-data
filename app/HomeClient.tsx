@@ -467,7 +467,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   <option value="upcoming"><Calendar className="w-4 h-4" /> 最近活動</option>
                   <option value="event_count"><BarChart2 className="w-4 h-4" /> 活動數量</option>
                   <option value="year_2026_events"><Calendar className="w-4 h-4" /> 2026年活動</option>
-                  <option value="vote_count"><Heart className="w-4 h-4 fill-current" /> 今月人気（本月票）</option>
+                  <option value="votes"><Heart className="w-4 h-4 fill-current" /> 今月人気（本月票）</option>
                   <option value="votes_all"><Heart className="w-4 h-4" /> 累計人気（總票數）</option>
                   <option value="age"><Cake className="w-4 h-4" /> 年齡</option>
                 </select>

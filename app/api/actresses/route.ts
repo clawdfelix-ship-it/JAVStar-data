@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
       votes:       { col: 'vote_count',        dir: 'DESC' },
       votes_all:   { col: 'vote_count_all',    dir: 'DESC' },
       event_count: { col: 'year_2026_events',  dir: 'DESC' },
+      year_2026_events: { col: 'year_2026_events', dir: 'DESC' },
       age:         { col: 'age',              dir: 'DESC' },
       name_ja:     { col: 'name_ja',           dir: 'ASC'  },
       upcoming:    { col: 'next_event_date',   dir: 'ASC'  },
