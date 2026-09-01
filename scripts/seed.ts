@@ -45,6 +45,7 @@ async function seed() {
       venue TEXT,
       prefecture TEXT,
       datetime TEXT NOT NULL,
+      date_iso DATE,
       event_type TEXT,
       url TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,

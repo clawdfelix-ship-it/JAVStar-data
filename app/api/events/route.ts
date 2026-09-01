@@ -23,18 +23,21 @@ export async function GET(request: NextRequest) {
     // Include past events? Default: only upcoming
     const includePast = searchParams.get('past') === '1' || searchParams.get('past') === 'true';
 
-    // Whitelist validation — only these columns are allowed in ORDER BY
+    // Whitelist validation — only these columns are allowed in ORDER BY.
+    // NOTE: sort by the normalized DATE column `date_iso`, never the raw `datetime`
+    // text — raw values contain fullwidth digits (２０２６) and junk (2026-26-08)
+    // that sort above real ASCII dates and pollute the calendar/upcoming lists.
     const allowedColumns: Record<string, string> = {
-      datetime: 'e.datetime',
+      datetime: 'e.date_iso',
       created_at: 'e.created_at',
       title: 'e.title',
     };
-    const sortCol = allowedColumns[actualSortBy] || 'e.datetime';
+    const sortCol = allowedColumns[actualSortBy] || 'e.date_iso';
     const sortDir = actualSortOrder === 'ASC' ? 'ASC' : 'DESC';
-    const orderByClause = `${sortCol} ${sortDir} NULLS LAST`;
-
-    const now = new Date();
-    const nowStr = now.toISOString();
+    // Tie-break deterministically on date_iso, then insertion time.
+    const orderByClause = sortCol === 'e.date_iso'
+      ? `e.date_iso ${sortDir} NULLS LAST, e.created_at DESC`
+      : `${sortCol} ${sortDir} NULLS LAST`;
 
     // Region filter
     const regionClauses: Record<string, string> = {
@@ -43,10 +46,12 @@ export async function GET(request: NextRequest) {
       hk: "prefecture LIKE '%香港%'",
     };
 
-    // Build base WHERE conditions
+    // Build base WHERE conditions.
+    // Date filtering uses normalized `date_iso` (DATE) compared against CURRENT_DATE;
+    // rows with an unparseable date (date_iso IS NULL) are garbage and excluded.
     function buildWhereParts(pastFilter: boolean) {
-      const parts: string[] = [];
-      if (!pastFilter) parts.push(`e.datetime >= '${nowStr}'`);
+      const parts: string[] = ['e.date_iso IS NOT NULL'];
+      if (!pastFilter) parts.push('e.date_iso >= CURRENT_DATE');
       parts.push("e.actress_id IS NOT NULL AND e.actress_id != '0' AND e.actress_id != 'unknown'");
       if (prefecture) parts.push(`e.prefecture = '${prefecture}'`);
       if (eventType) parts.push(`e.event_type = '${eventType}'`);
@@ -62,8 +67,8 @@ export async function GET(request: NextRequest) {
     }
 
     function buildCountWhere(pastFilter: boolean) {
-      const parts: string[] = [];
-      if (!pastFilter) parts.push(`datetime >= '${nowStr}'`);
+      const parts: string[] = ['date_iso IS NOT NULL'];
+      if (!pastFilter) parts.push('date_iso >= CURRENT_DATE');
       parts.push("actress_id IS NOT NULL AND actress_id != '0' AND actress_id != 'unknown'");
       if (prefecture) parts.push(`prefecture = '${prefecture}'`);
       if (eventType) parts.push(`event_type = '${eventType}'`);
@@ -84,11 +89,23 @@ export async function GET(request: NextRequest) {
     const countResult: any[] = await (getSql() as any).query(countQuery) as any[];
     const total = Number(countResult[0]?.total || 0);
 
-    const enrichedEvents = eventsResult.map(event => ({
-      ...event,
-      actress_name: event.name_ja || event.name_cn || event.actress_id,
-      actress_avatar: event.avatar_url,
-    }));
+    // Normalize the date every consumer reads. Raw `datetime` is messy text
+    // (fullwidth ２０２６, junk 2026-26-08, Japanese) that `new Date()` / parseISO
+    // choke on. `date_iso` is a real DATE; when present expose it (YYYY-MM-DD) as
+    // `datetime` too so the calendar, list and home views all place events on the
+    // right day. Rows without a parseable date were already filtered out above.
+    const enrichedEvents = eventsResult.map(event => {
+      const isoDate = event.date_iso
+        ? new Date(event.date_iso).toISOString().slice(0, 10)
+        : null;
+      return {
+        ...event,
+        datetime: isoDate || event.datetime,
+        date_iso: isoDate,
+        actress_name: event.name_ja || event.name_cn || event.actress_id,
+        actress_avatar: event.avatar_url,
+      };
+    });
 
     return NextResponse.json({
       data: enrichedEvents,

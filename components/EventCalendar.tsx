@@ -12,10 +12,21 @@ function safeNewDate(dateStr: string | undefined | null): Date {
   } catch { return new Date(0); }
 }
 
+// Best available date for an event: raw `datetime` may contain fullwidth digits
+// (２０２６-0８-２２) or junk (2026-26-08) that parseISO can't read -> falls to
+// 1970. Prefer a successfully-parsed datetime (keeps clock time); otherwise fall
+// back to the normalized `date_iso` (YYYY-MM-DD) the API now returns.
+function bestEventDate(ev: DayEvent): Date {
+  const raw = safeNewDate(ev.datetime || null);
+  if (raw.getFullYear() >= 2000) return raw;
+  return safeNewDate(ev.date_iso || null);
+}
+
 interface DayEvent {
   id: string;
   title: string;
   datetime: string;
+  date_iso?: string;
   actress_name?: string;
   actress_avatar?: string;
   venue?: string;
@@ -37,8 +48,7 @@ interface EventCalendarProps {
 const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
 
 function generateICS(event: DayEvent): string {
-  let dt = new Date(0);
-  try { dt = parseISO(event.datetime); } catch { /* use epoch */ }
+  const dt = bestEventDate(event);
   const dtEnd = new Date(dt.getTime() + 2 * 60 * 60 * 1000);
   const formatICS = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const uid = `${event.id}@av-intelligence.local`;
@@ -67,7 +77,7 @@ function downloadICS(event: DayEvent) {
 }
 
 function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => void }) {
-  const eventDate = safeNewDate(event.datetime || null);
+  const eventDate = bestEventDate(event);
   const daysUntil = differenceInDays(eventDate, new Date());
   
   useEffect(() => {
@@ -219,7 +229,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
     const map = new Map<string, DayEvent[]>();
     const actressMap = new Map<string, Set<string>>();
     events.forEach(ev => {
-      const dateKey = format(safeNewDate(ev.datetime || null), 'yyyy-MM-dd');
+      const dateKey = format(bestEventDate(ev), 'yyyy-MM-dd');
       if (!map.has(dateKey)) { 
         map.set(dateKey, []); 
         actressMap.set(dateKey, new Set()); 
@@ -382,7 +392,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
                       </div>
                     </div>
                     <div className="text-xs text-nadeshiko-dark font-mono whitespace-nowrap bg-nadeshiko-light/30 px-2 py-1 rounded-md font-semibold">
-                      {format(safeNewDate(ev.datetime || null), 'HH:mm')}
+                      {format(bestEventDate(ev), 'HH:mm')}
                     </div>
                   </div>
                 ))}
