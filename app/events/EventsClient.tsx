@@ -72,7 +72,7 @@ export default function EventsClient() {
 
   function getEventTypeLabel(t: string) {
     const map: Record<string, string> = {
-      dvd: 'DVD/即売', photo: '撮影会', offkai: 'オフ会', other: '其他活動',
+      dvd: 'DVD/即売', photo: '撮影会', offkai: 'オフ会', meet: '店頭/サイン', other: '其他活動',
     };
     return map[t] || t;
   }
@@ -82,6 +82,7 @@ export default function EventsClient() {
       dvd: 'text-[rgb(var(--color-nadeshiko-dark))] bg-[rgba(var(--color-sakura-gray),0.4)] border-[rgba(var(--color-nadeshiko),0.3)]',
       photo: 'text-amber-600 bg-[rgba(251,191,36,0.15)] border-[rgba(251,191,36,0.3)]',
       offkai: 'text-blue-600 bg-[rgba(59,130,246,0.15)] border-[rgba(59,130,246,0.3)]',
+      meet: 'text-emerald-700 bg-[rgba(16,185,129,0.13)] border-[rgba(16,185,129,0.3)]',
       other: 'text-[rgb(var(--color-umenezumi))] bg-[rgba(var(--color-sakura-gray),0.3)] border-[rgba(var(--color-sakura-gray),0.5)]',
     };
     return map[t] || map.other;

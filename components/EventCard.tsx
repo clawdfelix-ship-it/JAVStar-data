@@ -15,11 +15,12 @@ interface EventCardProps {
 }
 
 function getInferredEventType(type: string, title: string): string {
-  // DB now stores canonical types derived by the events trigger: dvd / photo / offkai / other
-  if (type && ['dvd', 'photo', 'offkai', 'other'].includes(type)) return type;
+  // DB now stores canonical types derived by the events trigger: dvd / photo / offkai / meet / other
+  if (type && ['dvd', 'photo', 'offkai', 'meet', 'other'].includes(type)) return type;
   if (title.includes('撮影会') || title.includes('攝影會')) return 'photo';
   if (title.includes('オフ会') || title.includes('見面會')) return 'offkai';
-  if (title.includes('サイン会') || title.includes('簽名') || title.includes('即売会') || title.includes('DVD') || title.includes('発売')) return 'dvd';
+  if (/DVD|ＤＶＤ|ブルーレイ|即売会|発売記念/.test(title)) return 'dvd';
+  if (/サイン|チェキ|握手|お渡し|来店|写真集|REbecca|トークショー|イベント/.test(title)) return 'meet';
   return 'other';
 }
 
@@ -29,6 +30,7 @@ function getEventTypeLabel(type: string, title: string): string {
     dvd: 'DVD/即売',
     photo: '撮影会',
     offkai: 'オフ会',
+    meet: '店頭/サイン',
     other: '活動',
   };
   return labels[t] || '活動';

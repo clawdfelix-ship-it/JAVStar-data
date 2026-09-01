@@ -37,9 +37,19 @@ BEGIN
     NEW.event_type := 'photo';
   ELSIF NEW.title ~ 'オフ会' THEN
     NEW.event_type := 'offkai';
-  ELSIF NEW.title ~ '(DVD|ＤＶＤ|ブルーレイ|BD|リリース|発売記念|即売会|販売イベント|発売イベント)' THEN
+  ELSIF NEW.title ~ '(DVD|ＤＶＤ|ブルーレイ|Blu-ray|リリース|発売記念|即売会|販売イベント|発売イベント)' THEN
     NEW.event_type := 'dvd';
-  ELSIF COALESCE(NEW.event_type,'') = '' OR NEW.event_type NOT IN ('dvd','photo','offkai','other') THEN
+  ELSIF NEW.title ~ '(サイン|チェキ|握手|お渡し|特典会|ミーグリ|2ショット|ツーショット|来店|1日店長|一日店長|トークショー|写真集|REbecca|グラビア|生誕祭|バースデー|ファンミーティング)' THEN
+    -- sign / cheki / handshake / store-visit / photobook(REbecca) release events
+    NEW.event_type := 'meet';
+  ELSIF NEW.title ~ '『[^』]{2,}』[^『』]{0,12}[＠@]' THEN
+    -- photobook release event: 『title』＠venue (e.g. REbecca-style without the brand name)
+    NEW.event_type := 'meet';
+  ELSIF NEW.title ~ 'イベント'
+        AND NEW.title !~ '(オンライン|配信|リモート|Zoom|カフェ|コラボ|ハーレム|ボードゲーム|ワゴン|ライブ|ショー|福袋|キャンペーン|ハグ|交流会|茶会|パーティ|ナイト|クルーズ|バスツアー|フェス|スナック|吞み|呑み|歌)' THEN
+    -- generic in-store fan event (店頭イベント): name + イベント, not special/online themed
+    NEW.event_type := 'meet';
+  ELSIF COALESCE(NEW.event_type,'') = '' OR NEW.event_type NOT IN ('dvd','photo','offkai','meet','other') THEN
     -- normalize legacy junk values (e.g. 'イベント','release','實體活動') to other
     NEW.event_type := 'other';
   END IF;
