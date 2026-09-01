@@ -13,7 +13,8 @@ import EventCalendar from '@/components/EventCalendar';
 // VirtualList removed — variable-height EventCard caused overlapping rows
 import SearchBar from '@/components/SearchBar';
 import NewReleasesSection from '@/components/NewReleasesSection';
-import DvdRankingSection from '@/components/DvdRankingSection';
+// 月間DVD排行榜已隱藏（DMM 無法經 VPN 取得數據）。恢復時取消註解：
+// import DvdRankingSection from '@/components/DvdRankingSection';
 import DailyActressBox from '@/components/DailyActressBox';
 import { highlightText } from '@/hooks/useSearch';
 import { useActresses } from '@/hooks/useActresses';
@@ -619,8 +620,10 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
       {/* ==========================================
           月間DVD排行榜 - DMM Ranking
+          已隱藏：VPN 連唔到 DMM，拎唔到排行榜數據。
+          資料恢復後取消下面註解即可重新顯示（連同 import）。
           ========================================== */}
-      <DvdRankingSection />
+      {/* <DvdRankingSection /> */}
 
       {/* ==========================================
           每月新作 - New Releases Section (footer 上面)
