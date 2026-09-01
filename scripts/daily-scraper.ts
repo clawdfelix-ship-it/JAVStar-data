@@ -6,6 +6,8 @@
  * 3. 自動觸發 Vercel deploy
  */
 
+try { process.loadEnvFile(); } catch {}
+
 import { chromium, Page } from 'playwright';
 import { neon } from '@neondatabase/serverless';
 import * as fs from 'fs';
@@ -174,7 +176,13 @@ async function scrapeEvents(): Promise<number> {
 // Freshly scraped events are inserted with actress_id='unknown'. The public API
 // filters those out, so without this step new events never appear on the site.
 // Relink by finding an actress name inside the event title; longest name wins to
-// avoid short-name false positives (e.g. a 2-char name matching inside another).
+// avoid short-name false positives.
+//
+// IMPORTANT: only match against CANONICAL actresses — numeric-id rows sourced
+// from minnano-av. The DB also contains auto-generated placeholder rows
+// (id LIKE 'auto_%', e.g. '周年記念', '大阪', 'オンライン') and 'unknown'/'0'
+// placeholders. Matching against those links events to junk labels that then
+// pollute the ranking and actress cards.
 async function relinkUnknownEvents(): Promise<number> {
   const rows = await sql`
     UPDATE events e SET actress_id = sub.aid
@@ -183,10 +191,12 @@ async function relinkUnknownEvents(): Promise<number> {
       FROM events ev
       CROSS JOIN LATERAL (
         SELECT a.id AS aid, length(a.name_ja) AS l FROM actresses a
-          WHERE length(COALESCE(a.name_ja,'')) >= 2 AND ev.title LIKE '%' || a.name_ja || '%'
+          WHERE a.id ~ '^[0-9]+$' AND length(COALESCE(a.name_ja,'')) >= 2
+            AND ev.title LIKE '%' || a.name_ja || '%'
         UNION ALL
         SELECT a.id, length(COALESCE(a.name_cn,'')) FROM actresses a
-          WHERE length(COALESCE(a.name_cn,'')) >= 2 AND ev.title LIKE '%' || a.name_cn || '%'
+          WHERE a.id ~ '^[0-9]+$' AND length(COALESCE(a.name_cn,'')) >= 2
+            AND ev.title LIKE '%' || a.name_cn || '%'
       ) n
       WHERE ev.actress_id IN ('unknown','0') OR ev.actress_id IS NULL
       ORDER BY ev.id, n.l DESC
@@ -195,8 +205,30 @@ async function relinkUnknownEvents(): Promise<number> {
     RETURNING e.id
   `;
   const linked = (rows as unknown[]).length;
-  console.log(`[EVENTS] Relinked ${linked} unknown events to actresses`);
+  console.log(`[EVENTS] Relinked ${linked} unknown events to canonical actresses`);
   return linked;
+}
+
+// Rebuild the pre-aggregated ranking table from real, canonical (numeric-id),
+// valid-date events. The actresses list/ ranking reads actress_events_count,
+// which otherwise goes stale after new events are linked.
+async function rebuildEventCounts(): Promise<void> {
+  await sql`
+    INSERT INTO actress_events_count (actress_id, year_2025_events, year_2026_events, month_04_2026_events)
+    SELECT actress_id,
+      COUNT(*) FILTER (WHERE date_iso >= '2025-01-01' AND date_iso <  '2026-01-01')::int,
+      COUNT(*) FILTER (WHERE date_iso >= '2026-01-01' AND date_iso <  '2027-01-01')::int,
+      COUNT(*) FILTER (WHERE date_iso >= date_trunc('month', CURRENT_DATE)::date
+                        AND date_iso <  (date_trunc('month', CURRENT_DATE) + interval '1 month')::date)::int
+    FROM events
+    WHERE actress_id ~ '^[0-9]+$' AND date_iso IS NOT NULL
+    GROUP BY actress_id
+    ON CONFLICT (actress_id) DO UPDATE SET
+      year_2025_events = EXCLUDED.year_2025_events,
+      year_2026_events = EXCLUDED.year_2026_events,
+      month_04_2026_events = EXCLUDED.month_04_2026_events
+  `;
+  console.log('[EVENTS] Rebuilt actress_events_count ranking table');
 }
 
 function parseEventDate(dateStr: string): string {
@@ -233,6 +265,9 @@ async function main() {
     // 1b. Link newly scraped (unknown) events to their actresses by title, so the
     //     public API — which hides actress_id='unknown' rows — actually shows them.
     await relinkUnknownEvents();
+
+    // 1c. Refresh the pre-aggregated ranking table so ranking/cards reflect new data.
+    await rebuildEventCounts();
     
     // 2. Scrape and update actresses  
     const newActresses = await scrapeActresses();
