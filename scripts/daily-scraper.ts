@@ -176,6 +176,34 @@ async function scrapeEvents(): Promise<number> {
   return newEvents;
 }
 
+// Freshly scraped events are inserted with actress_id='unknown'. The public API
+// filters those out, so without this step new events never appear on the site.
+// Relink by finding an actress name inside the event title; longest name wins to
+// avoid short-name false positives (e.g. a 2-char name matching inside another).
+async function relinkUnknownEvents(): Promise<number> {
+  const rows = await sql`
+    UPDATE events e SET actress_id = sub.aid
+    FROM (
+      SELECT DISTINCT ON (ev.id) ev.id AS eid, n.aid
+      FROM events ev
+      CROSS JOIN LATERAL (
+        SELECT a.id AS aid, length(a.name_ja) AS l FROM actresses a
+          WHERE length(COALESCE(a.name_ja,'')) >= 2 AND ev.title LIKE '%' || a.name_ja || '%'
+        UNION ALL
+        SELECT a.id, length(COALESCE(a.name_cn,'')) FROM actresses a
+          WHERE length(COALESCE(a.name_cn,'')) >= 2 AND ev.title LIKE '%' || a.name_cn || '%'
+      ) n
+      WHERE ev.actress_id IN ('unknown','0') OR ev.actress_id IS NULL
+      ORDER BY ev.id, n.l DESC
+    ) sub
+    WHERE e.id = sub.eid
+    RETURNING e.id
+  `;
+  const linked = (rows as unknown[]).length;
+  console.log(`[EVENTS] Relinked ${linked} unknown events to actresses`);
+  return linked;
+}
+
 function parseEventDate(dateStr: string): string {
   if (!dateStr) return '';
   
@@ -206,6 +234,10 @@ async function main() {
   try {
     // 1. Scrape and update events
     const newEvents = await scrapeEvents();
+
+    // 1b. Link newly scraped (unknown) events to their actresses by title, so the
+    //     public API — which hides actress_id='unknown' rows — actually shows them.
+    await relinkUnknownEvents();
     
     // 2. Scrape and update actresses  
     const newActresses = await scrapeActresses();
