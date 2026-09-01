@@ -68,8 +68,8 @@ export function useActresses({
   search = '',
   hasUpcoming = false,
 }: UseActressesOptions = {}) {
-  // v20260719 = post-agency mapping backfill
-  const CACHE_BUSTER = 'v=20260719';
+  // v20260901 = ranking/card data fix + cache fixes (event_count, date_iso)
+  const CACHE_BUSTER = 'v=20260901';
 
   const params = new URLSearchParams({
     page: String(page),
@@ -86,6 +86,9 @@ export function useActresses({
     fetcher,
     {
       keepPreviousData: true, // 翻頁時保留舊數據
+      revalidateOnFocus: true, // 切返去個 tab 自動刷新
+      dedupingInterval: 15000, // 15 秒去重
+      refreshInterval: 300000, // 5 分鐘背景更新排名
     }
   );
 

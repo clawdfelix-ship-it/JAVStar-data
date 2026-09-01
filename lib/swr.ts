@@ -7,17 +7,18 @@ import { SWRConfiguration } from 'swr';
  * 應用於所有 useSWR hooks
  */
 export const swrConfig: SWRConfiguration = {
-  // 緩存時間: 10 分鐘 (數據不會經常變)
+  // 數據會透過爬蟲/DB 更新，寧可背景重新驗證都唔好顯示過期內容
   revalidateIfStale: true,
-  revalidateOnFocus: false, // 切換標籤頁唔自動刷新
+  revalidateOnFocus: true, // 切返去個 tab 自動刷新——解決「無痕先見到新數據」
   revalidateOnReconnect: true,
   revalidateOnMount: true,
-  dedupingInterval: 60000, // 1 分鐘內相同請求去重
+  refreshInterval: 300000, // 5 分鐘自動背景更新（排名/活動）
+  dedupingInterval: 15000, // 15 秒內相同請求去重（縮短，避免壓住新數據）
   errorRetryCount: 3, // 失敗重試 3 次
   errorRetryInterval: 5000, // 每次重試間隔 5 秒
   loadingTimeout: 10000, // 10 秒超時
   keepPreviousData: true, // 加載新數據時保留舊數據
-  
+
   // 緩存鍵前綴
   provider: () => new Map(),
 };
@@ -32,11 +33,10 @@ export async function fetcher<T>(url: string): Promise<T> {
     headers: {
       'Content-Type': 'application/json',
     },
-    // 瀏覽器緩存配置
-    cache: 'force-cache',
-    next: {
-      revalidate: 3600, // 1 小時強制刷新
-    },
+    // 用默認 cache 模式（配合 SWR 自己做快取）。
+    // 之前用 force-cache 會叫瀏覽器「唔驗證直接食磁碟快取」，
+    // 係正常視窗見唔到新數據、無痕卻見到嘅元兇。
+    cache: 'no-cache',
   });
 
   if (!response.ok) {

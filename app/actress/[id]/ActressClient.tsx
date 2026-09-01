@@ -82,7 +82,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
     setError(null);
 
     try {
-      const response = await fetch(`/api/actresses/${actressId}`);
+      const response = await fetch(`/api/actresses/${actressId}`, { cache: 'no-cache' });
       if (!response.ok) throw new Error('Failed to fetch');
 
       const data = await response.json();

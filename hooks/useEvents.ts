@@ -59,8 +59,11 @@ export function useEvents({
     key,
     fetcher,
     {
-      revalidateOnFocus: false, // 活動數據唔會經常變
-      dedupingInterval: 300000, // 5 分鐘內唔重複請求
+      revalidateOnFocus: true, // 切返去個 tab 自動刷新
+      revalidateOnReconnect: true,
+      dedupingInterval: 15000, // 15 秒去重
+      refreshInterval: 300000, // 5 分鐘背景更新
+      keepPreviousData: true,
     }
   );
 
