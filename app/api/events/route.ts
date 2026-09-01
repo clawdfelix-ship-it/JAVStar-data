@@ -79,8 +79,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Get events — use sql.query() for fully-built query strings
-    const whereClause = buildWhere(!includePast);
-    const countWhereClause = buildCountWhere(!includePast);
+    // includePast=true  -> show everything (no upcoming-only filter) => pastFilter=true
+    // includePast=false -> upcoming only (date_iso >= CURRENT_DATE) => pastFilter=false
+    const whereClause = buildWhere(includePast);
+    const countWhereClause = buildCountWhere(includePast);
     const fullQuery = `SELECT e.*, a.name_ja, a.name_cn, a.avatar_url FROM events e LEFT JOIN actresses a ON e.actress_id = a.id ${whereClause} ORDER BY ${orderByClause} LIMIT ${limit}`;
     const countQuery = `SELECT COUNT(*) as total FROM events ${countWhereClause}`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
