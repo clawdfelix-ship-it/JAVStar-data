@@ -96,7 +96,8 @@ weekly-ig/build.ts  (Node + tsx, 喺 JAVStar-data repo 內跑)
         │  4. Playwright 用本機 Chrome 渲染 → 1080×1080 PNG
         │  5. 產生 IG caption 草稿（日文+繁中，含 hashtag）
         ▼
-   推送 QQ（Felix）：PNG + caption 文字 + 候選清單摘要
+   推送 QQ（Felix）：PNG 圖卡 ＋ **完整帖文文字 caption**（可直接改字／加減 hashtag）＋ 候選清單摘要
+   （Felix 可改 caption、可換精選；「出」用 Felix 最終版本）
         │
         ├─ Felix 回「出」/「ok」→ publish 步驟
         ├─ Felix 回「換 n」/「改用…」→ 重新產圖再推
@@ -117,7 +118,7 @@ publish：
 | `marketing/ig/query-week.ts` | 查 Neon：日期範圍 events、每日 count、精選候選（含加權/過濾）。回傳結構化資料。 |
 | `marketing/ig/render-card.ts` | 將資料套入 HTML template 字串 → 寫暫存 HTML。 |
 | `marketing/ig/shoot.ts` | Playwright 開本機 Chrome → 設 viewport 1080×1080 → screenshot 出 PNG。 |
-| `marketing/ig/caption.ts` | 產生 IG caption（日文為主、繁中提示、hashtag、網址）。 |
+| `marketing/ig/caption.ts` | 產生 IG caption（日文為主、繁中提示、hashtag、網址）。**Caption 係可編輯產物**，隨 PNG 一齊推去 QQ 俾 Felix 改。 |
 | `marketing/ig/publish.ts` | Vercel Blob 上傳 + Graph API 兩步發佈。 |
 | `marketing/ig/build-weekly.ts` | 編排：query→render→shoot→caption，輸出 PNG + caption + 候選 JSON。CLI 入口。 |
 | `marketing/ig/template.ts` | 卡片 HTML/CSS（由確認樣辦抽出，placeholder 用資料填入）。 |
@@ -169,6 +170,28 @@ OpenClaw 側：
 - `render + shoot`：用測試資料產 PNG，核對尺寸 1080×1080、無 overflow、CJK/日文正常顯示。
 - `publish.ts`：先用 Graph API「**媒體容器建立但不 publish**」或開 **IG 沙盒模式**測試，唔會真係出帖；確認無誤先正式 publish。
 - caption 生成：截長度（IG caption 上限 2200 字、hashtag 30 個內）。
+
+### Caption 樣辦格式（真實一週 9/7–9/13）
+
+```
+🌸 今週のイベント 9/7(月)〜9/13(日) 🌸
+
+今週は全国で 77件 のイベント開催！
+土日は各25件と大盛り上がり🎉
+
+✨ 今週のピックアップ
+🩷 9/8(火) 小坂ひまり｜秋葉原・東京
+🩷 9/9(水) 坂井美桜 サイン・撮影会｜東京
+🩷 9/10(木) 波多野結衣 DVD発売記念｜秋葉原
+🩷 9/12(土) 東雲はる 個人撮影会｜大阪
+🩷 9/13(日) 吉根ゆりあ×小梅えな コラボ｜東京
+
+📍 完整77場時間表＋女優行程
+→ jav-star-data.vercel.app
+
+#AV女優 #イベント情報 #チェキ会 #撮影会 #オフ会 #秋葉原 #波多野結衣 #吉根ゆりあ #小坂ひまり #東雲はる #JAVSTAR
+```
+結構：開場標題＋日期 → 全週場數／週末爆場提示 → 精選 5 行（日期・女優名・類型｜地區）→ 網址 → hashtag（女優名自動生成＋固定字）。
 
 ---
 
