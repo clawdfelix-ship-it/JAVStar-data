@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1080px; height:1080px; overflow:hidden; }
+  body {
+    font-family:'M PLUS Rounded 1c','Noto Sans TC',sans-serif;
+    background: linear-gradient(160deg,#ffe3f1 0%,#ffd1e8 45%,#ffc2e0 100%);
+    padding:34px 48px;
+    position:relative;
+  }
+  .blob { position:absolute; border-radius:50%; background:rgba(255,255,255,.45); }
+  .b1 { width:340px; height:340px; top:-120px; right:-90px; }
+  .b2 { width:220px; height:220px; bottom:-80px; left:-60px; background:rgba(255,255,255,.35);}
+
+  .wrap { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; }
+
+  .header { text-align:center; margin-bottom:14px; }
+  .brand {
+    display:inline-block; background:#fff; color:#ff5fa2; font-weight:800;
+    font-size:23px; padding:6px 24px; border-radius:999px;
+    box-shadow:0 5px 0 #ffb3d4; letter-spacing:1px;
+  }
+  .title {
+    font-size:54px; font-weight:900; color:#e0368a; margin-top:10px;
+    text-shadow:0 4px 0 #fff; letter-spacing:2px; line-height:1;
+  }
+  .weekrange {
+    display:inline-block; margin-top:9px; background:#ff8fc0; color:#fff;
+    font-size:25px; font-weight:700; padding:6px 28px; border-radius:999px;
+    box-shadow:0 5px 0 #e06aa0;
+  }
+  .total { margin-top:8px; font-size:23px; font-weight:700; color:#c0508a; }
+
+  /* weekly day strip */
+  .weekstrip {
+    background:rgba(255,255,255,.9); border-radius:22px; border:3px solid #fff;
+    box-shadow:0 6px 16px rgba(224,54,138,.12);
+    padding:11px 12px; display:flex; gap:8px; justify-content:space-between; margin-bottom:13px;
+  }
+  .day { flex:1; text-align:center; border-radius:16px; padding:8px 4px; background:#fff0f7; }
+  .day.hot { background:linear-gradient(180deg,#ff7ab8,#ff5fa2); }
+  .day .dw { font-size:21px; font-weight:700; color:#a05a7e; }
+  .day.hot .dw { color:#fff; }
+  .day .dc { font-size:32px; font-weight:900; color:#e0368a; line-height:1.1; margin-top:2px; }
+  .day.hot .dc { color:#fff; }
+  .day .du { font-size:15px; font-weight:700; color:#c98bab; }
+  .day.hot .du { color:#ffe0ee; }
+
+  .secttl { font-size:26px; font-weight:900; color:#e0368a; margin:0 2px 8px; }
+
+  .events { display:flex; flex-direction:column; gap:9px; }
+  .ev {
+    background:rgba(255,255,255,.94); border-radius:20px; padding:9px 20px;
+    display:flex; align-items:center; gap:18px;
+    box-shadow:0 5px 14px rgba(224,54,138,.11); border:3px solid #fff;
+  }
+  .date {
+    flex:0 0 92px; text-align:center; background:linear-gradient(180deg,#ff7ab8,#ff5fa2);
+    color:#fff; border-radius:16px; padding:7px 4px;
+  }
+  .date .d { font-size:29px; font-weight:900; line-height:1; }
+  .date .w { font-size:17px; font-weight:700; margin-top:3px; }
+  .ev-body { flex:1; }
+  .ev-name { font-size:28px; font-weight:800; color:#4a2b3c; line-height:1.1; }
+  .ev-meta { font-size:20px; color:#a05a7e; margin-top:3px; font-weight:500; }
+  .tag {
+    flex:0 0 auto; background:#ffe0ee; color:#e0368a; font-size:18px; font-weight:700;
+    padding:6px 14px; border-radius:999px;
+  }
+
+  .footer { text-align:center; margin-top:auto; padding-top:12px; font-size:22px; color:#c0508a; font-weight:700; line-height:1.4; }
+  .footer b { color:#e0368a; }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="wrap">
+    <div class="header">
+      <span class="brand">JAVSTAR ⋆ 應援</span>
+      <div class="title">今週のイベント</div>
+      <span class="weekrange">9/7（一）– 9/13（日）</span>
+      <div class="total">🌸 本週全日本合計 <b>77</b> 場活動</div>
+    </div>
+
+    <div class="weekstrip">
+      <div class="day"><div class="dw">一</div><div class="dc">3</div><div class="du">9/7</div></div>
+      <div class="day"><div class="dw">二</div><div class="dc">6</div><div class="du">9/8</div></div>
+      <div class="day"><div class="dw">三</div><div class="dc">6</div><div class="du">9/9</div></div>
+      <div class="day"><div class="dw">四</div><div class="dc">5</div><div class="du">9/10</div></div>
+      <div class="day"><div class="dw">五</div><div class="dc">7</div><div class="du">9/11</div></div>
+      <div class="day hot"><div class="dw">六</div><div class="dc">25</div><div class="du">9/12</div></div>
+      <div class="day hot"><div class="dw">日</div><div class="dc">25</div><div class="du">9/13</div></div>
+    </div>
+
+    <div class="secttl">✨ 本週精選</div>
+    <div class="events">
+      <div class="ev">
+        <div class="date"><div class="d">9/8</div><div class="w">星期二</div></div>
+        <div class="ev-body"><div class="ev-name">小坂ひまり</div><div class="ev-meta">📍 秋葉原 · 東京都</div></div>
+        <div class="tag">イベント</div>
+      </div>
+      <div class="ev">
+        <div class="date"><div class="d">9/9</div><div class="w">星期三</div></div>
+        <div class="ev-body"><div class="ev-name">坂井美桜</div><div class="ev-meta">📍 ラムタラ · 東京都</div></div>
+        <div class="tag">サイン・撮影会</div>
+      </div>
+      <div class="ev">
+        <div class="date"><div class="d">9/10</div><div class="w">星期四</div></div>
+        <div class="ev-body"><div class="ev-name">波多野結衣</div><div class="ev-meta">📍 秋葉原 · 東京都</div></div>
+        <div class="tag">DVD発売記念</div>
+      </div>
+      <div class="ev">
+        <div class="date"><div class="d">9/12</div><div class="w">星期六</div></div>
+        <div class="ev-body"><div class="ev-name">東雲はる</div><div class="ev-meta">📍 大阪府</div></div>
+        <div class="tag">撮影会</div>
+      </div>
+      <div class="ev">
+        <div class="date"><div class="d">9/13</div><div class="w">星期日</div></div>
+        <div class="ev-body"><div class="ev-name">吉根ゆりあ × 小梅えな</div><div class="ev-meta">📍 東京都 · コラボ</div></div>
+        <div class="tag">コラボ企画</div>
+      </div>
+    </div>
+
+    <div class="footer">完整 77 場時間表＋女優行程 → <b>jav-star-data.vercel.app</b><br>每週一更新 · 追蹤唔會錯過心愛女優 💘</div>
+  </div>
+</body>
+</html>

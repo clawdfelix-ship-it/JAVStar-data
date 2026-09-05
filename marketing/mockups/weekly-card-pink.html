@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1080px; height:1080px; overflow:hidden; }
+  body {
+    font-family:'M PLUS Rounded 1c','Noto Sans TC',sans-serif;
+    background: linear-gradient(160deg,#ffe3f1 0%,#ffd1e8 45%,#ffc2e0 100%);
+    padding:40px 48px;
+    position:relative;
+    overflow:hidden;
+  }
+  /* soft deco circles */
+  .blob { position:absolute; border-radius:50%; background:rgba(255,255,255,.45); }
+  .b1 { width:340px; height:340px; top:-120px; right:-90px; }
+  .b2 { width:220px; height:220px; bottom:-80px; left:-60px; background:rgba(255,255,255,.35);}
+  .heart { position:absolute; font-size:60px; opacity:.5; }
+  .h1 { top:70px; right:120px; } .h2 { bottom:120px; right:90px; font-size:44px;}
+
+  .wrap { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; }
+
+  .header { text-align:center; margin-bottom:18px; }
+  .brand {
+    display:inline-block; background:#fff; color:#ff5fa2; font-weight:800;
+    font-size:23px; padding:6px 24px; border-radius:999px;
+    box-shadow:0 5px 0 #ffb3d4; letter-spacing:1px;
+  }
+  .title {
+    font-size:56px; font-weight:900; color:#e0368a; margin-top:12px;
+    text-shadow:0 4px 0 #fff; letter-spacing:2px; line-height:1;
+  }
+  .weekrange {
+    display:inline-block; margin-top:11px; background:#ff8fc0; color:#fff;
+    font-size:26px; font-weight:700; padding:6px 28px; border-radius:999px;
+    box-shadow:0 5px 0 #e06aa0;
+  }
+
+  .events { display:flex; flex-direction:column; gap:12px; }
+  .ev {
+    background:rgba(255,255,255,.92); border-radius:22px; padding:12px 22px;
+    display:flex; align-items:center; gap:20px;
+    box-shadow:0 6px 16px rgba(224,54,138,.12);
+    border:3px solid #fff;
+  }
+  .date {
+    flex:0 0 104px; text-align:center; background:linear-gradient(180deg,#ff7ab8,#ff5fa2);
+    color:#fff; border-radius:18px; padding:8px 6px;
+  }
+  .date .d { font-size:34px; font-weight:900; line-height:1; }
+  .date .w { font-size:19px; font-weight:700; margin-top:3px; }
+  .ev-body { flex:1; }
+  .ev-name { font-size:31px; font-weight:800; color:#4a2b3c; line-height:1.1; }
+  .ev-meta { font-size:22px; color:#a05a7e; margin-top:3px; font-weight:500; }
+  .tag {
+    flex:0 0 auto; background:#ffe0ee; color:#e0368a; font-size:20px; font-weight:700;
+    padding:6px 15px; border-radius:999px;
+  }
+
+  .rank {
+    margin-top:16px; background:rgba(255,255,255,.92); border-radius:24px;
+    padding:14px 26px; border:3px solid #fff;
+    box-shadow:0 6px 16px rgba(224,54,138,.12);
+  }
+  .rank-title { font-size:28px; font-weight:900; color:#e0368a; margin-bottom:6px; }
+  .rank-row { display:flex; align-items:center; gap:14px; margin:6px 0; }
+  .medal { font-size:28px; width:38px; text-align:center; }
+  .rank-name { flex:1; font-size:27px; font-weight:700; color:#4a2b3c; }
+  .rank-votes { font-size:23px; font-weight:800; color:#ff5fa2; }
+  .bar { height:12px; background:#ffe0ee; border-radius:999px; flex:0 0 210px; overflow:hidden;}
+  .bar > i { display:block; height:100%; background:linear-gradient(90deg,#ff8fc0,#ff5fa2); border-radius:999px;}
+
+  .footer { text-align:center; margin-top:14px; font-size:22px; color:#c0508a; font-weight:700; }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="heart h1">💗</div><div class="heart h2">🎀</div>
+  <div class="wrap">
+    <div class="header">
+      <span class="brand">JAVSTAR ⋆ 應援</span>
+      <div class="title">今週のイベント</div>
+      <span class="weekrange">9/7（一）– 9/13（日）</span>
+    </div>
+
+    <div class="events">
+      <div class="ev">
+        <div class="date"><div class="d">9/8</div><div class="w">星期二</div></div>
+        <div class="ev-body">
+          <div class="ev-name">女優 A</div>
+          <div class="ev-meta">📍 秋葉原 · 東京都</div>
+        </div>
+        <div class="tag">チェキ会</div>
+      </div>
+      <div class="ev">
+        <div class="date"><div class="d">9/10</div><div class="w">星期四</div></div>
+        <div class="ev-body">
+          <div class="ev-name">女優 B</div>
+          <div class="ev-meta">📍 難波 · 大阪府</div>
+        </div>
+        <div class="tag">撮影会</div>
+      </div>
+      <div class="ev">
+        <div class="date"><div class="d">9/12</div><div class="w">星期六</div></div>
+        <div class="ev-body">
+          <div class="ev-name">女優 C</div>
+          <div class="ev-meta">📍 新宿 · 東京都</div>
+        </div>
+        <div class="tag">イベント</div>
+      </div>
+      <div class="ev">
+        <div class="date"><div class="d">9/13</div><div class="w">星期日</div></div>
+        <div class="ev-body">
+          <div class="ev-name">女優 D</div>
+          <div class="ev-meta">📍 名古屋 · 愛知縣</div>
+        </div>
+        <div class="tag">チェキ会</div>
+      </div>
+    </div>
+
+    <div class="rank">
+      <div class="rank-title">🏆 本週人氣 TOP 3</div>
+      <div class="rank-row">
+        <div class="medal">🥇</div><div class="rank-name">女優 A</div>
+        <div class="bar"><i style="width:100%"></i></div><div class="rank-votes">128 票</div>
+      </div>
+      <div class="rank-row">
+        <div class="medal">🥈</div><div class="rank-name">女優 B</div>
+        <div class="bar"><i style="width:76%"></i></div><div class="rank-votes">97 票</div>
+      </div>
+      <div class="rank-row">
+        <div class="medal">🥉</div><div class="rank-name">女優 C</div>
+        <div class="bar"><i style="width:54%"></i></div><div class="rank-votes">69 票</div>
+      </div>
+    </div>
+
+    <div class="footer">每週一更新 · 追蹤 @javstar 唔會錯過心愛女優 💘</div>
+  </div>
+</body>
+</html>
