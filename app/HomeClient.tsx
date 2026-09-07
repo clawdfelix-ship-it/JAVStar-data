@@ -305,12 +305,12 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-nadeshiko-light/30 border border-nadeshiko/30 rounded-full mb-6">
-              <span className="text-nadeshiko-dark font-semibold text-sm"><Sparkles className="w-4 h-4" /> AV 女優活動情報平台</span>
+              <span className="text-nadeshiko-dark font-semibold text-sm"><Sparkles className="w-4 h-4" /> 星動行程追蹤平台</span>
             </div>
             
             {/* Title - Froala typography */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary mb-4 font-japanese leading-[1.08] tracking-[-0.02em] md:tracking-[-0.025em]">
-              日本 AV 女優<span className="text-transparent bg-clip-text bg-gradient-to-r from-nadeshiko-dark to-nadeshiko">活動情報</span>
+              日本女優<span className="text-transparent bg-clip-text bg-gradient-to-r from-nadeshiko-dark to-nadeshiko">活動情報</span>
             </h1>
             
             {/* Subtitle */}
@@ -671,7 +671,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 JAVStar-data
               </h3>
               <p className="text-text-secondary text-sm leading-relaxed">
-                日本 AV 女優活動情報平台，一站式追蹤心儀女優嘅最新動態
+                星動行程追蹤平台，一站式追蹤心儀女優嘅最新動態
               </p>
             </div>
             

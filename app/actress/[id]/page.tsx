@@ -66,13 +66,13 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   
   if (!data || !data.actress) {
     return {
-      title: '女優未找到 | AV Intelligence',
+      title: '女優未找到 | J-STAR CALENDAR',
       description: '該女優不存在或已被刪除',
     };
   }
 
   const actress = data.actress;
-  const title = `${actress.name_ja}${actress.name_cn ? `（${actress.name_cn}）` : ''} - 活動記錄 | AV Intelligence`;
+  const title = `${actress.name_ja}${actress.name_cn ? `（${actress.name_cn}）` : ''} - 活動記錄 | J-STAR CALENDAR`;
   
   const eventsInfo = actress.stats?.total_events 
     ? `${actress.stats.total_events}個活動${actress.stats.year_2026_events ? `，2026年${actress.stats.year_2026_events}個` : ''}`
@@ -90,8 +90,8 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   const keywords = [
     actress.name_ja,
     actress.name_cn || '',
-    'AV 女優',
-    'AV女優',
+    '女優',
+    '女優',
     '日本女優',
     'AV 活動',
     'サイン会',
@@ -107,7 +107,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       locale: 'ja_JP',
       alternateLocale: ['zh_HK', 'zh_TW'],
       url: `https://jav-star-data.vercel.app/actress/${params.id}`,
-      siteName: 'AV Intelligence｜日本 AV 女優情報平台',
+      siteName: 'J-STAR CALENDAR｜日本女優活動情報平台',
       title,
       description,
       images: actress.avatar_url ? [

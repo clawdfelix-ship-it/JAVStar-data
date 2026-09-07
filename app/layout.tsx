@@ -3,7 +3,7 @@ import './globals.css';
 import EventBanner from '@/components/EventBanner';
 
 export const metadata: Metadata = {
-  title: 'AV Intelligence｜日本 AV 女優情報平台 🇭🇰',
+  title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
   description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名',
   icons: {
     icon: '/favicon.svg',

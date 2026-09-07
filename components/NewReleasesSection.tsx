@@ -67,7 +67,7 @@ export default function NewReleasesSection() {
               </span>
             </h2>
             <p className="text-text-tertiary mt-1 text-xs">
-              最新日本 AV 新作速遞 • 數據來源：JavLibrary
+              最新日本新作速遞 • 數據來源：JavLibrary
             </p>
           </div>
           <button

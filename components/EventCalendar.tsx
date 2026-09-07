@@ -56,7 +56,7 @@ function generateICS(event: DayEvent): string {
   const description = [event.actress_name, event.venue, event.prefecture].filter(Boolean).join(' | ');
   const location = [event.venue, event.prefecture].filter(Boolean).join(', ');
   return [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//AV Intelligence//Event//EN',
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//J-STAR CALENDAR//Event//EN',
     'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
     `UID:${uid}`, `DTSTAMP:${formatICS(new Date())}`, `DTSTART:${formatICS(dt)}`,
     `DTEND:${formatICS(dtEnd)}`, `SUMMARY:${summary}`,

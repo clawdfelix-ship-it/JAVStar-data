@@ -3,13 +3,13 @@ import HomeClient from './HomeClient';
 // 首頁 SEO Metadata
 export const metadata = {
   title: {
-    default: 'AV Intelligence｜日本 AV 女優情報平台 🇭🇰',
-    template: '%s | AV Intelligence',
+    default: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
+    template: '%s | J-STAR CALENDAR',
   },
   description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報。',
   keywords: [
-    'AV 女優',
-    'AV女優',
+    '女優',
+    '女優',
     '日本女優',
     'AV 活動',
     'サイン会',
@@ -19,31 +19,31 @@ export const metadata = {
     'av-event.jp',
     '香港 AV 情報',
     'AV 情報平台',
-    '日本 AV 情報',
+    '日本活動情報',
   ],
-  authors: [{ name: 'AV Intelligence' }],
-  creator: 'AV Intelligence',
-  publisher: 'AV Intelligence',
+  authors: [{ name: 'J-STAR CALENDAR' }],
+  creator: 'J-STAR CALENDAR',
+  publisher: 'J-STAR CALENDAR',
   openGraph: {
     type: 'website',
     locale: 'ja_JP',
     alternateLocale: ['zh_HK', 'zh_TW'],
     url: 'https://jav-star-data.vercel.app',
-    siteName: 'AV Intelligence｜日本 AV 女優情報平台',
-    title: 'AV Intelligence｜日本 AV 女優情報平台 🇭🇰',
+    siteName: 'J-STAR CALENDAR｜日本女優活動情報平台',
+    title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
     images: [
       {
         url: 'https://jav-star-data.vercel.app/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'AV Intelligence - 日本 AV 女優情報平台',
+        alt: 'J-STAR CALENDAR - 日本女優活動情報平台',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AV Intelligence｜日本 AV 女優情報平台 🇭🇰',
+    title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
     images: ['https://jav-star-data.vercel.app/og-image.png'],
   },
@@ -63,13 +63,13 @@ export const metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "AV Intelligence",
+  "name": "J-STAR CALENDAR",
   "alternateName": "JAVStar-data",
   "url": "https://jav-star-data.vercel.app",
-  "description": "日本 AV 女優活動情報平台，一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報",
+  "description": "星動行程追蹤平台，一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報",
   "publisher": {
     "@type": "Organization",
-    "name": "AV Intelligence",
+    "name": "J-STAR CALENDAR",
     "logo": {
       "@type": "ImageObject",
       "url": "https://jav-star-data.vercel.app/logo.png"

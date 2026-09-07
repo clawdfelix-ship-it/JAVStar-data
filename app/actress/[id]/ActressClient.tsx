@@ -131,7 +131,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
     "image": actress.avatar_url || undefined,
     "url": `https://jav-star-data.vercel.app/actress/${actressId}`,
     "jobTitle": "AV Actress",
-    "description": `${actress.name_ja} - 日本 AV 女優，${actress.stats?.total_events || 0}個活動記錄`,
+    "description": `${actress.name_ja} - 日本女優，${actress.stats?.total_events || 0}個活動記錄`,
   };
 
   // Cross-sell: check if actress has upcoming event
