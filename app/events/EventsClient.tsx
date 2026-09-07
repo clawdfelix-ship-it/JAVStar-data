@@ -212,7 +212,7 @@ export default function EventsClient() {
         ) : events.length === 0 ? (
           <div className="text-center py-20 text-text-secondary">
             <div className="text-4xl mb-4">📅</div>
-            <p>短期內沒有活動</p>
+            <p>暫無符合條件嘅活動</p>
           </div>
         ) : (
           <div className="space-y-8">

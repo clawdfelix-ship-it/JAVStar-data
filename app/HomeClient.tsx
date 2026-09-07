@@ -175,7 +175,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
           style={{ backgroundColor: 'rgb(var(--color-nadeshiko-strong))', color: 'white' }}
         >
-          {subscribeStatus === 'loading' ? '訂閱中...' : '立即訂閱'}
+          {subscribeStatus === 'loading' ? '訂閱中...' : '🔔 訂閱通知'}
         </button>
       </form>
     );
@@ -600,7 +600,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             ) : filteredEvents.length === 0 ? (
               <div className="fdb-card p-10 md:p-14 text-center max-w-md mx-auto">
                 <div className="text-5xl mb-4" aria-hidden><Flower2 className="w-6 h-6 text-pink-400" /></div>
-                <p className="text-lg font-semibold text-text-primary mb-2">暫時搵唔到符合條件嘅活動</p>
+                <p className="text-lg font-semibold text-text-primary mb-2">暫無符合條件嘅活動</p>
                 <p className="text-sm text-text-secondary mb-6">
                   日本 av-event.jp 通常提前 1-2 個月公布新活動，訂閱後有新場即通知你
                 </p>
@@ -642,7 +642,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 {filteredEvents.length === 0 && (
                   <div className="text-center py-16 bg-white rounded-2xl border border-border">
                     <div className="text-4xl mb-3"><Flower2 className="w-6 h-6 text-pink-400" /></div>
-                    <p className="text-text-secondary">搵唔到符合條件嘅活動</p>
+                    <p className="text-text-secondary">暫無符合條件嘅活動</p>
                   </div>
                 )}
               </div>
