@@ -30,6 +30,9 @@
   --color-umenezumi-lighter: 168, 152, 160;
   /* 純白背景 */
   --color-shiro: 255, 255, 255;
+  /* 真金 - 星級評分專用 (唔同卡面融合) */
+  --color-gold: 245, 180, 0;
+  --color-gold-dark: 122, 84, 0;
 }
 
 /* =========================================
@@ -234,9 +237,11 @@ body {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 2px;
-  background: rgb(var(--color-nadeshiko-dark));
-  border-radius: 2px;
+  /* 2px 喺粉紅底上太淡 -> 加粗到 4px + 用最深粉紅 + 微光影，先睇到 */
+  height: 4px;
+  background: rgb(var(--color-nadeshiko-strong));
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(var(--color-nadeshiko-strong), 0.35);
   transition: transform var(--duration-slow) var(--ease-drawer),
               width var(--duration-slow) var(--ease-drawer);
   pointer-events: none;

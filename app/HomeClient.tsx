@@ -668,7 +668,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             <div>
               <h3 className="font-bold text-text-primary text-lg mb-4 flex items-center gap-2">
                 <span className="text-2xl"><Flower2 className="w-6 h-6 text-pink-400" /></span>
-                JAVStar-data
+                J-STAR CALENDAR
               </h3>
               <p className="text-text-secondary text-sm leading-relaxed">
                 星動行程追蹤平台，一站式追蹤心儀女優嘅最新動態
@@ -698,7 +698,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           
           <div className="border-t border-border mt-8 pt-8 text-center">
             <p className="text-sm text-text-tertiary">
-              © 2026 JAVStar-data. Made with <Heart className="w-4 h-4 fill-current" /> in Hong Kong.
+              © 2026 J-STAR CALENDAR. Made with <Heart className="w-4 h-4 fill-current" /> in Hong Kong.
             </p>
           </div>
         </div>

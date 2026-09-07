@@ -77,8 +77,9 @@ export default function ActressCard({
         {rank}
       </div>
 
-      {/* Score Badge */}
-      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-amber-400 to-amber-500 text-white rounded-full text-[10px] font-bold shadow-md z-10">
+      {/* Score Badge — 真金 #F5B400，深色字保對比度（白字喺金底上唔達標） */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded-full shadow-md z-10 border"
+        style={{ backgroundColor: 'rgb(var(--color-gold))', color: 'rgb(var(--color-gold-dark))', borderColor: 'rgba(122,84,0,0.25)' }}>
         <Star className="w-3 h-3 fill-current" />
         <span>{final_score}</span>
       </div>

@@ -264,7 +264,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                               onClick={() => {
                                 const shareUrl = 'https://twitter.com/intent/tweet?url=' + 
                                   encodeURIComponent(`https://jav-star-data.vercel.app/actress/${actressId}`) +
-                                  '&text=' + encodeURIComponent(`${actress.name_ja} - JAVStar Data`);
+                                  '&text=' + encodeURIComponent(`${actress.name_ja} - J-STAR CALENDAR`);
                                 window.open(shareUrl, '_blank');
                                 setShowShareMenu(false);
                               }}

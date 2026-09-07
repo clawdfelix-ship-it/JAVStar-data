@@ -83,7 +83,7 @@ export default function CompareClient() {
 
   function WinnerDot({ best, who }: { best: string; who: 'a' | 'b' }) {
     if (best !== who) return null;
-    return <span className="ml-1 text-[10px]">★</span>;
+    return <span className="ml-1 text-[10px]" style={{ color: 'rgb(var(--color-gold))' }}>★</span>;
   }
 
   return (
