@@ -6,6 +6,7 @@ import {
   Crown, Calendar, Ticket, Trophy, BarChart2,
   Heart, Cake, Flower2, ArrowUp, RefreshCw, Check,
   Sparkles, Camera, ChevronLeft, ChevronRight, Search, X,
+  Shield,
 } from 'lucide-react';
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
@@ -391,6 +392,10 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   </p>
                 </div>
                 <EmailSignupForm />
+                <p className="text-center text-xs mt-3 flex items-center justify-center gap-1" style={{color:'rgb(var(--color-umenezumi-light))'}}>
+                  <Shield className="w-3 h-3" />
+                  只會喺有新活動時通知你，唔發垃圾郵件，唔會轉移你嘅 email。可隨時取消訂閱。
+                </p>
               </div>
             </div>
           </div>

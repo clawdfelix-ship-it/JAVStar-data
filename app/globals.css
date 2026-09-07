@@ -49,6 +49,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 手機底部固定導航欄留位（桌面 BottomNav 隱藏，唔使留） */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
 .font-japanese {
   font-family: 'Noto Sans JP', 'Noto Sans HK', -apple-system, sans-serif;
 }

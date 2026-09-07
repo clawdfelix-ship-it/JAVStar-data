@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import EventBanner from '@/components/EventBanner';
+import BottomNav from '@/components/BottomNav';
 
 export const metadata: Metadata = {
   title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className="antialiased font-japanese bg-bg-secondary">
         <EventBanner />
         {children}
+        <BottomNav />
       </body>
     </html>
   );
