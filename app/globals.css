@@ -451,6 +451,15 @@ body {
     scrollbar-width: thin;
   }
 
+  /* 隱藏捲軸（手機橫向 carousel 用，保留滑動手勢） */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .scrollbar-thin::-webkit-scrollbar {
     width: 8px;
     height: 8px;

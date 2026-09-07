@@ -85,16 +85,17 @@ export default function NewReleasesSection() {
           </div>
         )}
 
-        {/* 影片網格 - 細尺寸 */}
+        {/* 影片網格 - 手機橫向滑動 carousel / 桌面 grid */}
         {releases.length > 0 && (
-          <div className="grid grid-cols-3 md:grid-cols-8 lg:grid-cols-12 gap-2">
+          <div className="flex md:grid overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none grid-cols-3 md:grid-cols-8 lg:grid-cols-12 gap-2 md:gap-3 -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0 scrollbar-hide">
             {releases.map((release: NewRelease) => (
               <a
                 key={release.id}
                 href={release.detail_url || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block bg-bg-primary rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                title={release.title}
+                className="group snap-start shrink-0 w-32 sm:w-36 md:w-auto block bg-bg-primary rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
               >
                 {/* 封面 */}
                 <div className="relative aspect-[2/3] overflow-hidden bg-gray-800">
@@ -111,9 +112,15 @@ export default function NewReleasesSection() {
                     </div>
                   )}
                   {/* 影片編號徽章 */}
-                  <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 rounded text-[9px] text-white font-mono truncate max-w-full">
+                  <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/70 rounded text-[9px] text-white font-mono truncate max-w-[calc(100%-0.5rem)]">
                     {release.video_code}
                   </div>
+                </div>
+                {/* 標題 - 只喺桌面顯示（手機 carousel 封面為主） */}
+                <div className="hidden md:block px-1.5 py-1.5">
+                  <p className="text-[10px] text-text-secondary line-clamp-2 leading-tight">
+                    {release.title}
+                  </p>
                 </div>
               </a>
             ))}
