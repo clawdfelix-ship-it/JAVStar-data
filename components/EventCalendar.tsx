@@ -339,7 +339,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
                       </div>
                     ))}
                     {dayEvents.length > 2 && (
-                      <div className="text-[10px] text-nadeshiko-dark font-bold">
+                      <div className="text-[10px] text-[rgb(var(--color-wine))] font-bold">
                         +{dayEvents.length - 2}
                       </div>
                     )}
@@ -391,7 +391,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
                         {ev.venue && <span className="fdb-badge">📍 {ev.venue}</span>}
                       </div>
                     </div>
-                    <div className="text-xs text-nadeshiko-dark font-mono whitespace-nowrap bg-nadeshiko-light/30 px-2 py-1 rounded-md font-semibold">
+                    <div className="text-xs text-[rgb(var(--color-wine))] font-mono whitespace-nowrap bg-nadeshiko-light/30 px-2 py-1 rounded-md font-semibold">
                       {format(bestEventDate(ev), 'HH:mm')}
                     </div>
                   </div>

@@ -129,7 +129,7 @@ export default function ActressCard({
           <Link
             href={`/actress/${id}`}
             title={next_event_title || ''}
-            className="mb-2.5 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[rgba(var(--color-nadeshiko),0.12)] border border-[rgba(var(--color-nadeshiko-dark),0.35)] text-[rgb(var(--color-nadeshiko-dark))] text-xs font-semibold hover:bg-[rgba(var(--color-nadeshiko),0.22)] transition-colors"
+            className="mb-2.5 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[rgba(var(--color-nadeshiko),0.12)] border border-[rgba(var(--color-wine),0.35)] text-[rgb(var(--color-wine))] text-xs font-semibold hover:bg-[rgba(var(--color-nadeshiko),0.22)] transition-colors"
           >
             <Calendar className="w-3 h-3 shrink-0" />
             <span className="truncate">下場 {nextEventLabel}</span>
@@ -144,11 +144,11 @@ export default function ActressCard({
         {/* Stats — condensed 2-col: 活動場數 + 得票 */}
         <div className="grid grid-cols-2 gap-1.5 mb-2.5">
           <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
-            <div className="text-base font-bold text-[rgb(var(--color-nadeshiko-dark))]">{event_count}</div>
+            <div className="text-base font-bold text-[rgb(var(--color-wine))]">{event_count}</div>
             <div className="text-[9px] text-[rgb(var(--color-umenezumi))] uppercase tracking-wider">總活動</div>
           </div>
           <div className="text-center p-1.5 rounded-lg bg-[rgba(var(--color-sakura),0.5)] border border-[rgba(var(--color-sakura-gray),0.6)]">
-            <div className="text-base font-bold text-[rgb(var(--color-nadeshiko-dark))]">{year_2026_events}</div>
+            <div className="text-base font-bold text-[rgb(var(--color-wine))]">{year_2026_events}</div>
             <div className="text-[9px] text-[rgb(var(--color-umenezumi))] uppercase tracking-wider">2026</div>
           </div>
         </div>

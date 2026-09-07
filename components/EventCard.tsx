@@ -122,10 +122,10 @@ function EventCardComponent({
         <div className="flex items-center gap-2">
           {/* Date Box - NIPPON COLORS style */}
           <div className="flex flex-col items-center justify-center bg-nadeshiko-light/20 rounded-lg px-3 py-2 min-w-[65px]">
-            <span className="text-xs text-nadeshiko-dark font-medium">
+            <span className="text-xs text-[rgb(var(--color-wine))] font-medium">
               {formatDateShort(datetime)}
             </span>
-            <span className="font-mono text-sm font-bold text-nadeshiko-dark">
+            <span className="font-mono text-sm font-bold text-[rgb(var(--color-wine))]">
               {formatTime(datetime)}
             </span>
           </div>
@@ -193,7 +193,7 @@ function EventCardComponent({
         <span className="text-xs text-text-tertiary font-mono">
           #{id.length > 8 ? id.slice(0, 8) : id}
         </span>
-        <span className="text-xs text-nadeshiko-dark font-medium flex items-center gap-1">
+        <span className="text-xs text-[rgb(var(--color-wine))] font-medium flex items-center gap-1">
           詳情 →
         </span>
       </div>

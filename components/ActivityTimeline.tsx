@@ -143,7 +143,7 @@ export default function ActivityTimeline({ events, maxItems }: ActivityTimelineP
                     <div className="flex-1 min-w-0">
                       {/* 日期 + 時間 */}
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-nadeshiko-light/30 text-nadeshiko-dark rounded-lg text-sm font-semibold">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-nadeshiko-light/30 text-[rgb(var(--color-wine))] rounded-lg text-sm font-semibold">
                           📍 {formatEventDate(event.datetime)}
                         </span>
                         <span className="text-text-tertiary text-sm">
@@ -171,7 +171,7 @@ export default function ActivityTimeline({ events, maxItems }: ActivityTimelineP
                           href={event.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="fdb-btn fdb-btn-sm fdb-btn-outline text-nadeshiko-dark border-nadeshiko hover:bg-nadeshiko-light/20"
+                          className="fdb-btn fdb-btn-sm fdb-btn-outline text-[rgb(var(--color-wine))] border-nadeshiko hover:bg-nadeshiko-light/20"
                         >
                           查看詳情 →
                         </a>

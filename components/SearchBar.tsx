@@ -223,7 +223,7 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
             <div className="px-4 py-6 text-center">
               <Search className="w-8 h-8 text-text-tertiary mx-auto mb-2" />
               <p className="text-text-secondary text-sm">
-                搵唔到「<span className="text-[rgb(var(--color-nadeshiko-dark))] font-medium">{search.query}</span>」相關結果
+                搵唔到「<span className="text-[rgb(var(--color-wine))] font-medium">{search.query}</span>」相關結果
               </p>
               <p className="text-text-tertiary text-xs mt-1">
                 試吓用其他關鍵字或者簡化搜尋條件
@@ -241,7 +241,7 @@ export function SearchBar<T extends { id: string; name_ja?: string; title?: stri
                 </span>
                 <button
                   onClick={() => search.clearHistory()}
-                  className="text-xs text-nadeshiko-dark hover:text-nadeshiko transition-colors"
+                  className="text-xs text-[rgb(var(--color-wine))] hover:text-nadeshiko transition-colors"
                 >
                   清除全部
                 </button>

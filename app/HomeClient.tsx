@@ -305,7 +305,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-nadeshiko-light/30 border border-nadeshiko/30 rounded-full mb-6">
-              <span className="text-nadeshiko-dark font-semibold text-sm"><Sparkles className="w-4 h-4" /> 星動行程追蹤平台</span>
+              <span className="text-[rgb(var(--color-wine))] font-semibold text-sm"><Sparkles className="w-4 h-4" /> 星動行程追蹤平台</span>
             </div>
             
             {/* Title - Froala typography */}

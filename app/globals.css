@@ -33,6 +33,9 @@
   /* 真金 - 星級評分專用 (唔同卡面融合) */
   --color-gold: 245, 180, 0;
   --color-gold-dark: 122, 84, 0;
+  /* 深酒紅 - 淺底上嘅粉紅細字/語意強調用 (白底對比 >7:1，達 WCAG AA)；nadeshiko-dark 喺細字只得 ~3.5:1 */
+  --color-wine: 139, 26, 74;
+  --color-wine-strong: 110, 18, 60;
 }
 
 /* =========================================
@@ -128,8 +131,8 @@ body {
 }
 .fdb-tab.active {
   @apply font-semibold;
-  color: rgb(var(--color-nadeshiko-dark));
-  background: rgba(var(--color-nadeshiko), 0.10);
+  color: rgb(var(--color-wine));
+  background: rgba(var(--color-nadeshiko), 0.12);
 }
 .fdb-badge {
   @apply inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold;
@@ -137,8 +140,8 @@ body {
   color: rgb(var(--color-umenezumi));
 }
 .fdb-tab.active .fdb-badge {
-  background: rgba(var(--color-nadeshiko-dark), 0.15);
-  color: rgb(var(--color-nadeshiko-dark));
+  background: rgba(var(--color-wine), 0.14);
+  color: rgb(var(--color-wine));
 }
 
 /* ---- Hero Gradients ---- */
