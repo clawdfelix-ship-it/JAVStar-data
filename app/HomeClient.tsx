@@ -16,6 +16,7 @@ import NewReleasesSection from '@/components/NewReleasesSection';
 // 月間DVD排行榜已隱藏（DMM 無法經 VPN 取得數據）。恢復時取消註解：
 // import DvdRankingSection from '@/components/DvdRankingSection';
 import DailyActressBox from '@/components/DailyActressBox';
+import Logo from '@/components/Logo';
 import { highlightText } from '@/hooks/useSearch';
 import { useActresses } from '@/hooks/useActresses';
 import { useEvents } from '@/hooks/useEvents';
@@ -297,6 +298,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
         
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-10">
+            {/* Logo / brand */}
+            <div className="flex justify-center mb-6">
+              <Logo size={56} />
+            </div>
+
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-nadeshiko-light/30 border border-nadeshiko/30 rounded-full mb-6">
               <span className="text-nadeshiko-dark font-semibold text-sm"><Sparkles className="w-4 h-4" /> AV 女優活動情報平台</span>

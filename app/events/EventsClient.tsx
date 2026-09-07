@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 import CalendarMonth from './CalendarMonth';
 
 interface Event {
@@ -120,6 +121,7 @@ export default function EventsClient() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <Logo size={30} withText={false} />
               <Link href="/" className="text-primary-dark hover:text-pink-700 text-sm">← 返回</Link>
               <h1 className="text-lg font-bold text-text-primary">活動列表</h1>
             </div>

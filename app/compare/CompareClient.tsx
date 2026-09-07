@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 
 interface Actress {
   id: string;
@@ -90,6 +91,7 @@ export default function CompareClient() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[rgba(var(--color-sakura),0.5)] border-b border-[rgba(var(--color-sakura-gray),0.6)] px-4 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
+          <Logo size={30} withText={false} />
           <Link href="/" className="text-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-nadeshiko))] text-sm">← 返回</Link>
           <h1 className="text-lg font-bold text-[rgb(var(--color-umenezumi))]">女優比較</h1>
         </div>
