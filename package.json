@@ -33,6 +33,7 @@
     "next": "^15.2.3",
     "node-cron": "^4.2.1",
     "node-fetch": "^2.7.0",
+    "opencc-js": "^1.4.2",
     "pg": "^8.20.0",
     "playwright": "^1.61.1",
     "postcss": "^8.5.3",

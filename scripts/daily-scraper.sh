@@ -27,6 +27,8 @@ run_scraper() {
   fi
   log "Running scraper..."
   /opt/homebrew/bin/npx tsx scripts/daily-scraper.ts >> "$LOG_FILE" 2>&1
+  # Phase 2 搜尋：新女優完整正規化（trigger 只兜底，呢度補假名/羅馬字/別名）
+  /opt/homebrew/bin/npx tsx scripts/backfill-search-fields.ts --new-only >> "$LOG_FILE" 2>&1
   log "===== Scraper Run Complete ($1) ====="
 }
 

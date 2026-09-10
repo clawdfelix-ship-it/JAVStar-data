@@ -2,6 +2,7 @@ import { getSql } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { getClientIp } from '@/lib/client-ip';
+import { buildQueryVariants } from '@/lib/search-query';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -30,26 +31,33 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ data: [], total: 0 });
       }
       const sqlQuick = getSql();
-      const like = `%${kw}%`;
-      const prefix = `${kw}%`;
+      // Phase 2：查詢變體（羅馬字/假名/日華異體）× trigram search_text/search_norm
+      const variants = buildQueryVariants(kw).slice(0, 8);
+      const whereSql: string[] = [];
+      const params: string[] = [];
+      for (const v of variants) {
+        const likeIdx = params.length + 1;
+        params.push(`%${v}%`);
+        whereSql.push(`(a.search_text ILIKE $${likeIdx} OR a.search_norm ILIKE $${likeIdx})`);
+      }
+      // 尾參數：前綴（原名優先）、similarity 原值
+      const prefixIdx = params.length + 1;
+      const simIdx = params.length + 2;
+      params.push(`${variants[0]}%`, variants[0]);
       const rows = await sqlQuick.query(
         `SELECT a.id, a.name_ja, a.name_cn, a.avatar_url,
                 COALESCE(ec.year_2026_events, 0)::int AS year_2026_events
            FROM actresses a
            LEFT JOIN actress_events_count ec ON ec.actress_id = a.id
-          WHERE a.name_ja ILIKE $1 OR a.name_cn ILIKE $1
+          WHERE ${whereSql.join(' OR ')}
           ORDER BY
-            -- 相關度權重：原名前綴 > 原名包含 > 別名前綴 > 別名包含
-            CASE
-              WHEN a.name_ja ILIKE $2 THEN 0
-              WHEN a.name_ja ILIKE $1 THEN 1
-              WHEN a.name_cn ILIKE $2 THEN 2
-              ELSE 3
-            END,
+            CASE WHEN a.name_ja ILIKE $${prefixIdx} THEN 0 ELSE 1 END,
+            GREATEST(COALESCE(similarity(a.search_text, $${simIdx}), 0),
+                     COALESCE(similarity(a.search_norm, $${simIdx}), 0)) DESC,
             COALESCE(ec.year_2026_events, 0) DESC,
             a.name_ja ASC
           LIMIT 9`,
-        [like, prefix]
+        params
       ) as any[];
       const dur = Date.now() - startTime;
       const res = NextResponse.json({ data: rows, total: rows.length, quick: true, queryTimeMs: dur });
@@ -82,9 +90,14 @@ export async function GET(request: NextRequest) {
     const whereParts: string[] = [];
     const params: any[] = [];
     if (search.trim()) {
-      params.push(`%${search.trim()}%`);
-      const idx = params.length; // $1
-      whereParts.push(`(a.name_ja ILIKE $${idx} OR a.name_cn ILIKE $${idx})`);
+      // Phase 2：行 search_text/search_norm（trigram），查詢變體覆蓋羅馬字/假名/簡繁日異體
+      const variants = buildQueryVariants(search.trim()).slice(0, 8);
+      const conds = variants.map((v) => {
+        const idx = params.length + 1;
+        params.push(`%${v}%`);
+        return `(a.search_text ILIKE $${idx} OR a.search_norm ILIKE $${idx})`;
+      });
+      whereParts.push(`(${conds.join(' OR ')})`);
     }
     if (hasUpcoming) {
       whereParts.push(`ne.date_iso IS NOT NULL`);
