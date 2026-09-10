@@ -20,6 +20,37 @@ export async function GET(request: NextRequest) {
     const hasUpcoming = searchParams.get('has_upcoming') === '1';
     const offset = (page - 1) * limit;
 
+    // ---------- mode=quick：typeahead 專用輕量查詢 ----------
+    // 不 JOIN votes、不做 COUNT、不計 final_score；只掃 actresses + 活動 count。
+    // Phase 1（2026-09-10 搜尋藍圖）：前綴匹配權重行先。
+    if (searchParams.get('mode') === 'quick') {
+      const kw = search.trim();
+      const cjk = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/.test(kw);
+      if (!kw || kw.length < (cjk ? 1 : 2)) {
+        return NextResponse.json({ data: [], total: 0 });
+      }
+      const sqlQuick = getSql();
+      const like = `%${kw}%`;
+      const prefix = `${kw}%`;
+      const rows = await sqlQuick.query(
+        `SELECT a.id, a.name_ja, a.name_cn, a.avatar_url,
+                COALESCE(ec.year_2026_events, 0)::int AS year_2026_events
+           FROM actresses a
+           LEFT JOIN actress_events_count ec ON ec.actress_id = a.id
+          WHERE a.name_ja ILIKE $1 OR a.name_cn ILIKE $1
+          ORDER BY (a.name_ja ILIKE $2 OR a.name_cn ILIKE $2) DESC,
+                   a.name_ja ASC
+          LIMIT 9`,
+        [like, prefix]
+      ) as any[];
+      const dur = Date.now() - startTime;
+      const res = NextResponse.json({ data: rows, total: rows.length, quick: true, queryTimeMs: dur });
+      // typeahead 關鍵字短暫快取，擋熱詞重複掃表
+      res.headers.set('Cache-Control', 's-maxage=300, stale-while-revalidate=86400');
+      return res;
+    }
+
+
     // Sort whitelist（votes = 今月の人気；votes_all = 累計人気）
     const sortMap: Record<string, { col: string; dir: string }> = {
       debut_year:  { col: 'debut_year',       dir: 'DESC' },

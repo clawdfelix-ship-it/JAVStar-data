@@ -5,21 +5,20 @@ import { useRouter } from 'next/navigation';
 import {
   Crown, Calendar, Ticket, Trophy, BarChart2,
   Heart, Cake, Flower2, ArrowUp, RefreshCw, Check,
-  Sparkles, Camera, ChevronLeft, ChevronRight, Search, X,
+  Sparkles, Camera, ChevronLeft, ChevronRight,
   Shield,
 } from 'lucide-react';
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
 import EventCalendar from '@/components/EventCalendar';
 // VirtualList removed — variable-height EventCard caused overlapping rows
-import SearchBar from '@/components/SearchBar';
+import ActressSearchBox from '@/components/ActressSearchBox';
 import NewReleasesSection from '@/components/NewReleasesSection';
 import AuctionPromoBanner from '@/components/AuctionPromoBanner';
 // 月間DVD排行榜已隱藏（DMM 無法經 VPN 取得數據）。恢復時取消註解：
 // import DvdRankingSection from '@/components/DvdRankingSection';
 import DailyActressBox from '@/components/DailyActressBox';
 import Logo from '@/components/Logo';
-import { highlightText } from '@/hooks/useSearch';
 import { useActresses } from '@/hooks/useActresses';
 import { useEvents } from '@/hooks/useEvents';
 import { useStats } from '@/hooks/useStats';
@@ -84,7 +83,6 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   const router = useRouter();
 
   // UI State
-  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   // Auto-scroll to grid top whenever page changes (fixes 上一頁/下一頁 not returning to top).
   // Runs after React commits so the new DOM is in place.
@@ -105,6 +103,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   const [eventsShown, setEventsShown] = useState(60);
   const [filterPrefecture, setFilterPrefecture] = useState('ALL');
   const [filterType, setFilterType] = useState('ALL');
+  // 活動 tab 專用文字篩選（Hero 搜尋框而家只負責搵女優，見 2026-09-10 搜尋藍圖）
+  const [eventQuery, setEventQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'actress' | 'calendar' | 'events'>('actress');
 
   // SWR Data Hooks - 自帶緩存、去重、重試
@@ -112,7 +112,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     page,
     limit: 10,
     sort,
-    search: activeTab === 'actress' ? search : '',
+    search: '',
     hasUpcoming,
   });
 
@@ -198,23 +198,6 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
 
   const { stats } = useStats();
 
-  // 綜合搜尋數據 (女優 + 活動)
-  const searchData = useMemo(() => {
-    const actressItems = (actresses || []).map(a => ({
-      ...a,
-      _type: 'actress' as const,
-      _displayName: a.name_ja,
-    }));
-    
-    const eventItems = (events || []).map(e => ({
-      ...e,
-      _type: 'event' as const,
-      _displayName: e.title,
-    }));
-    
-    return [...actressItems, ...eventItems];
-  }, [actresses, events]);
-
   // Filter options — canonical DB codes (see events_derive_geo_type DB trigger).
   // Values are the raw codes; labels are mapped for display.
   const EVENT_TYPE_LABELS: Record<string, string> = {
@@ -253,8 +236,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
         eventDate.setHours(0, 0, 0, 0);
         if (eventDate < today) return false;
       }
-      if (search) {
-        const searchLower = search.toLowerCase();
+      if (eventQuery) {
+        const searchLower = eventQuery.toLowerCase();
         return e.title.toLowerCase().includes(searchLower) ||
                e.venue.toLowerCase().includes(searchLower) ||
                e.actress_name?.toLowerCase().includes(searchLower);
@@ -265,7 +248,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       // (see /api/events), so lexicographic compare equals chronological order.
       return (a.datetime || '').localeCompare(b.datetime || '');
     });
-  }, [events, filterPrefecture, filterType, search, activeTab]);
+  }, [events, filterPrefecture, filterType, eventQuery, activeTab]);
 
   // Tab config - Froala Design Blocks style
   const tabs = [
@@ -323,30 +306,9 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報
             </p>
 
-            {/* Search Bar - Froala Design Blocks style */}
+            {/* Search Bar — 正統女優 typeahead（2026-09-10 搜尋藍圖 Phase 1） */}
             <div className="max-w-xl mx-auto mb-10">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <span className="text-text-tertiary text-xl"><Search className="w-5 h-5" /></span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="搜尋女優名、活動名稱、場地..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-12 pr-12 py-4 text-lg bg-white border-2 border-border rounded-2xl shadow-froala focus:border-nadeshiko focus:ring-4 focus:ring-nadeshiko-light/30 focus:outline-none transition-[border-color,box-shadow] duration-base ease-out placeholder:text-text-tertiary"
-                />
-                {search.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setSearch('')}
-                    aria-label="清除搜尋"
-                    className="search-clear absolute inset-y-0 right-0 pr-4 flex items-center text-text-tertiary hover:text-nadeshiko-dark active:scale-90 transition-transform duration-fast ease-out"
-                  >
-                    <span className="text-xl leading-none"><X className="w-5 h-5" /></span>
-                  </button>
-                )}
-              </div>
+              <ActressSearchBox />
             </div>
 
             {/* Stats Cards - unified color, semantic hierarchy (P0 #3) */}
@@ -528,9 +490,9 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 </div>
                 <p className="text-lg font-semibold text-text-primary mb-2">暫無符合條件嘅女優</p>
                 <p className="text-sm text-text-secondary mb-5">試下改關鍵字、清除篩選，或者睇其他排序。</p>
-                {(search || hasUpcoming) && (
+                {(eventQuery || hasUpcoming) && (
                   <button
-                    onClick={() => { setSearch(''); setHasUpcoming(false); setPage(1); }}
+                    onClick={() => { setEventQuery(''); setHasUpcoming(false); setPage(1); }}
                     className="fdb-btn fdb-btn-outline"
                   >
                     清除篩選
@@ -590,7 +552,15 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             </h2>
 
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              {/* 活動 tab 專用文字篩選（標題/場地/女優名） */}
+              <input
+                type="text"
+                value={eventQuery}
+                onChange={(e) => setEventQuery(e.target.value)}
+                placeholder="篩選活動標題、場地、女優…"
+                className="min-w-[200px] flex-1 sm:flex-none sm:w-64 min-h-[44px] px-4 border rounded-xl text-sm font-medium focus:outline-none bg-white border-border text-text-primary placeholder:text-text-tertiary"
+              />
               <select
                 value={filterPrefecture}
                 onChange={(e) => setFilterPrefecture(e.target.value)}
