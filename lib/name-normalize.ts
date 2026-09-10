@@ -46,9 +46,8 @@ function toKatakana(s: string) {
 
 // macron 羅馬字 → 純 ASCII
 function stripMacron(s: string) {
+  // 切勿 NFKD normalize：會拆壞日文濁音假名（ず→す+゛）
   return s
-    .normalize('NFKD')
-    .replace(/[̄̀-ͯ]/g, '') // combining diacritics
     .replace(/[āâ]/g, 'a').replace(/[īî]/g, 'i')
     .replace(/[ūû]/g, 'u').replace(/[ēê]/g, 'e').replace(/[ōô]/g, 'o')
     .replace(/[ĀÂ]/g, 'A').replace(/[ĪÎ]/g, 'I')

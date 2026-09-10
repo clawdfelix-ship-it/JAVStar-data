@@ -33,11 +33,14 @@ function toKatakana(s: string) {
 }
 
 function stripMacron(s: string) {
+  // ⚠️ 唔可以用 NFKD normalize 成串字：佢會將日文濁音假名（ず U+305A）拆成
+  // 「す + combining dakuten U+3099」，破壞所有含濁音嘅假名查詢（2026-09-10 bug）。
+  // 淨係針對拉丁 macron 字母做顯式替換。
   return s
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
     .replace(/[āâ]/g, 'a').replace(/[īî]/g, 'i')
     .replace(/[ūû]/g, 'u').replace(/[ēê]/g, 'e').replace(/[ōô]/g, 'o')
+    .replace(/[ĀÂ]/g, 'A').replace(/[ĪÎ]/g, 'I')
+    .replace(/[ŪÛ]/g, 'U').replace(/[ĒÊ]/g, 'E').replace(/[ŌÔ]/g, 'O')
     .toLowerCase()
     .trim();
 }
