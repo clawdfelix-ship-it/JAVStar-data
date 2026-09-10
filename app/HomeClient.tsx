@@ -14,6 +14,7 @@ import EventCalendar from '@/components/EventCalendar';
 // VirtualList removed — variable-height EventCard caused overlapping rows
 import SearchBar from '@/components/SearchBar';
 import NewReleasesSection from '@/components/NewReleasesSection';
+import AuctionPromoBanner from '@/components/AuctionPromoBanner';
 // 月間DVD排行榜已隱藏（DMM 無法經 VPN 取得數據）。恢復時取消註解：
 // import DvdRankingSection from '@/components/DvdRankingSection';
 import DailyActressBox from '@/components/DailyActressBox';
@@ -657,6 +658,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           資料恢復後取消下面註解即可重新顯示（連同 import）。
           ========================================== */}
       {/* <DvdRankingSection /> */}
+
+      {/* ==========================================
+          J-STAR 拍賣平台廣告位（女優排名 ↔ 每月新作中間）
+          ========================================== */}
+      <AuctionPromoBanner />
 
       {/* ==========================================
           每月新作 - New Releases Section (footer 上面)
