@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 
@@ -45,26 +45,45 @@ function getBest(a: number | null, b: number | null, higher: boolean): 'a' | 'b'
 }
 
 export default function CompareClient() {
-  const [actresses, setActresses] = useState<Actress[]>([]);
+  // 女優庫有 7,500+ 位，API limit 封頂 100；以前一次 load 500 實際只有頭 100 名，
+  // 令排名 100 開外嘅女優永遠搜唔到（2026-09-10 用戶回報）。
+  // 改成輸入時 debounced server-side search（API 支援 ILIKE 中日名）。
   const [s1, setS1] = useState('');
   const [s2, setS2] = useState('');
+  const [r1, setR1] = useState<Actress[]>([]);
+  const [r2, setR2] = useState<Actress[]>([]);
+  const [searching, setSearching] = useState(false);
   const [sel1, setSel1] = useState<Actress | null>(null);
   const [sel2, setSel2] = useState<Actress | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch('/api/actresses?limit=500')
-      .then(r => r.json())
-      .then(d => { setActresses(d.data || []); setLoading(false); });
+  const doSearch = useCallback(async (q: string) => {
+    const kw = q.trim();
+    if (!kw) return [];
+    setSearching(true);
+    try {
+      const res = await fetch(`/api/actresses?search=${encodeURIComponent(kw)}&limit=15`);
+      if (!res.ok) return [];
+      const d = await res.json();
+      return (d.data || []) as Actress[];
+    } catch {
+      return [];
+    } finally {
+      setSearching(false);
+    }
   }, []);
 
-  const f1 = actresses.filter(a =>
-    a.name_ja.includes(s1) || (a.name_cn && a.name_cn.includes(s1))
-  ).slice(0, 15);
+  // debounced 查詢 A / B
+  useEffect(() => {
+    if (sel1 || !s1.trim()) { setR1([]); return; }
+    const t = setTimeout(() => { doSearch(s1).then(setR1); }, 250);
+    return () => clearTimeout(t);
+  }, [s1, sel1, doSearch]);
 
-  const f2 = actresses.filter(a =>
-    a.name_ja.includes(s2) || (a.name_cn && a.name_cn.includes(s2))
-  ).slice(0, 15);
+  useEffect(() => {
+    if (sel2 || !s2.trim()) { setR2([]); return; }
+    const t = setTimeout(() => { doSearch(s2).then(setR2); }, 250);
+    return () => clearTimeout(t);
+  }, [s2, sel2, doSearch]);
 
   const rows: { label: string; v1: string; v2: string; best: 'a' | 'b' | 'tie' }[] = sel1 && sel2 ? [
     { label: '年齡', v1: getAgeDisplay(sel1), v2: getAgeDisplay(sel2), best: getBest(sel1.age, sel2.age, false) },
@@ -98,10 +117,7 @@ export default function CompareClient() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        {loading ? (
-          <div className="text-center py-20 text-[rgb(var(--color-umenezumi-light))]">載入中...</div>
-        ) : (
-          <>
+        <>
             {/* Selectors */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               {/* Selector 1 */}
@@ -125,7 +141,13 @@ export default function CompareClient() {
                 )}
                 {s1 && !sel1 && (
                   <div className="mt-1 space-y-1 max-h-48 overflow-y-auto">
-                    {f1.map(a => (
+                    {r1.length === 0 && !searching && (
+                      <div className="px-3 py-2 text-xs text-[rgb(var(--color-umenezumi-light))]">搵唔到符合嘅女優</div>
+                    )}
+                    {searching && r1.length === 0 && (
+                      <div className="px-3 py-2 text-xs text-[rgb(var(--color-umenezumi-light))]">搜尋中…</div>
+                    )}
+                    {r1.map(a => (
                       <button key={a.id} onClick={() => { setSel1(a); setS1(''); }}
                         className="w-full text-left px-3 py-2 rounded-lg hover:bg-[rgba(var(--color-sakura-gray),0.4)] text-sm flex items-center gap-2 transition-colors">
                         <span className="text-[rgb(var(--color-nadeshiko-dark))] font-bold">{a.name_ja[0]}</span>
@@ -158,7 +180,13 @@ export default function CompareClient() {
                 )}
                 {s2 && !sel2 && (
                   <div className="mt-1 space-y-1 max-h-48 overflow-y-auto">
-                    {f2.map(a => (
+                    {r2.length === 0 && !searching && (
+                      <div className="px-3 py-2 text-xs text-[rgb(var(--color-umenezumi-light))]">搵唔到符合嘅女優</div>
+                    )}
+                    {searching && r2.length === 0 && (
+                      <div className="px-3 py-2 text-xs text-[rgb(var(--color-umenezumi-light))]">搜尋中…</div>
+                    )}
+                    {r2.map(a => (
                       <button key={a.id} onClick={() => { setSel2(a); setS2(''); }}
                         className="w-full text-left px-3 py-2 rounded-lg hover:bg-[rgba(var(--color-sakura-gray),0.4)] text-sm flex items-center gap-2 transition-colors">
                         <span className="text-[rgb(var(--color-kamenozoki-dark))] font-bold">{a.name_ja[0]}</span>
@@ -204,7 +232,6 @@ export default function CompareClient() {
               </div>
             )}
           </>
-        )}
       </main>
     </div>
   );
