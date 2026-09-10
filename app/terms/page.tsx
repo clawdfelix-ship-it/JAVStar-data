@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: '使用條款｜J-STAR CALENDAR',
@@ -8,6 +10,9 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 pb-28">
+      <Link href="/" className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-[rgb(var(--color-wine))] mb-6 transition-colors">
+        <ChevronLeft className="w-4 h-4" /> 返回首頁
+      </Link>
       <h1 className="text-2xl font-bold text-text-primary mb-2">使用條款</h1>
       <p className="text-xs text-text-tertiary mb-8">最後更新：2026 年 9 月 10 日</p>
 

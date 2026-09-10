@@ -3,6 +3,8 @@ import './globals.css';
 import EventBanner from '@/components/EventBanner';
 import BottomNav from '@/components/BottomNav';
 import AgeGate from '@/components/AgeGate';
+import TopNav from '@/components/TopNav';
+import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
@@ -41,8 +43,10 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-japanese bg-bg-secondary">
         <AgeGate />
+        <TopNav />
         <EventBanner />
         {children}
+        <SiteFooter />
         <BottomNav />
       </body>
     </html>

@@ -86,7 +86,8 @@ export default function ActressCard({
 
       {/* Avatar */}
       <Link href={`/actress/${id}`} className="block">
-        <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-pink-900/20 to-blue-900/20">
+        {/* relative：令內裏 absolute bottom-0 漸層鎖定圖片區，唔好跌落卡片底遮住投票掣（2026-09-10 P1 修復） */}
+        <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-pink-900/20 to-blue-900/20">
           {avatar_url ? (
             <img
               src={avatar_url}

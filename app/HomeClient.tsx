@@ -520,6 +520,25 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
             )}
 
+            {/* 零結果空狀態（P2：以前淨係顯示「0」） */}
+            {!loading && !error && actresses.length === 0 && (
+              <div className="fdb-card p-10 md:p-14 text-center max-w-md mx-auto">
+                <div className="text-5xl mb-4 flex justify-center" aria-hidden>
+                  <Flower2 className="w-8 h-8 text-pink-400" />
+                </div>
+                <p className="text-lg font-semibold text-text-primary mb-2">暫無符合條件嘅女優</p>
+                <p className="text-sm text-text-secondary mb-5">試下改關鍵字、清除篩選，或者睇其他排序。</p>
+                {(search || hasUpcoming) && (
+                  <button
+                    onClick={() => { setSearch(''); setHasUpcoming(false); setPage(1); }}
+                    className="fdb-btn fdb-btn-outline"
+                  >
+                    清除篩選
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Pagination */}
             {pagination && pagination.totalPages && pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-8">

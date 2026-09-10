@@ -45,6 +45,8 @@ export default function VoteButton({ actressId, initialCount, initialVoted, size
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actressId, initialVoted]);
 
+  const [justVoted, setJustVoted] = useState(false);
+
   // 外部數據刷新（翻頁/輪詢）時同步
   useEffect(() => { setVoteCount(initialCount); }, [initialCount]);
   useEffect(() => { if (initialVoted !== undefined) setHasVoted(initialVoted); }, [initialVoted]);
@@ -70,6 +72,9 @@ export default function VoteButton({ actressId, initialCount, initialVoted, size
         if (res.ok) {
           setHasVoted(true);
           setVoteCount(d.vote_count ?? voteCount + 1);
+          // P2：以前成功咗冇任何反饋，用戶唔知有冇投到
+          setJustVoted(true);
+          setTimeout(() => setJustVoted(false), 1600);
         } else if (d.voted) {
           // 呢個月已投過 — 同步狀態
           setHasVoted(true);
@@ -99,6 +104,12 @@ export default function VoteButton({ actressId, initialCount, initialVoted, size
   }
 
   return (
+    <span className="relative inline-flex">
+    {justVoted && (
+      <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[rgb(var(--color-wine))] text-white text-[10px] font-bold px-2.5 py-1 shadow-lg animate-[agegateIn_0.2s_ease-out]">
+        已投票 ✓
+      </span>
+    )}
     <button
       onClick={handleVote}
       disabled={loading}
@@ -117,5 +128,6 @@ export default function VoteButton({ actressId, initialCount, initialVoted, size
         <span className="text-[10px] opacity-80">{hasVoted ? '已投·本月' : '本月投票'}</span>
       )}
     </button>
+    </span>
   );
 }
