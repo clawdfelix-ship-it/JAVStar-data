@@ -6,14 +6,20 @@ import Link from 'next/link';
  * Wordmark: J-STAR (bold) / CALENDAR (light) / 星動行程追蹤平台 (Chinese subtitle).
  * Mirrors public/favicon.svg.
  *
- * size = icon box width/height in px; withText shows the stacked wordmark.
+ * size = icon box width/height in px (base); withText shows the stacked wordmark.
+ * 內部全部用 CSS var --logo-size 等比驅動，可用 className 喺 breakpoint 覆蓋，
+ * 例如 className="md:[--logo-size:112px]" 做到響應式 logo（唔使 JS、冇 hydration mismatch）。
  */
-function StarCalendarMark({ size }: { size: number }) {
+function StarCalendarMark() {
   // 5-point star, golden-ratio inner radius, lower-right overlapping the calendar.
   const star =
     'M60.5 47.5 L64.9 61.0 L79.0 61.0 L67.6 69.3 L72.0 82.8 L60.5 74.4 L49.0 82.8 L53.4 69.3 L42.0 61.0 L56.1 61.0 Z';
   return (
-    <svg viewBox="0 0 100 100" style={{ width: size, height: size }} aria-hidden>
+    <svg
+      viewBox="0 0 100 100"
+      style={{ width: 'var(--logo-size)', height: 'var(--logo-size)' }}
+      aria-hidden
+    >
       <defs>
         <linearGradient id="logoStarGrad" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#F4A6A6" />
@@ -47,25 +53,28 @@ export default function Logo({
   className?: string;
 }) {
   const inner = (
-    <span className={`inline-flex flex-col items-center ${className}`}>
-      <StarCalendarMark size={size} />
+    <span
+      className={`inline-flex flex-col items-center ${className}`}
+      style={{ ['--logo-size' as string]: `${size}px` } as React.CSSProperties}
+    >
+      <StarCalendarMark />
       {withText && (
         <span className="mt-1.5 flex flex-col items-center leading-none">
           <span
             className="font-extrabold tracking-tight text-[#2F4053]"
-            style={{ fontSize: size * 0.34 }}
+            style={{ fontSize: 'calc(var(--logo-size) * 0.34)' }}
           >
             J-STAR
           </span>
           <span
             className="mt-0.5 font-light tracking-[0.22em] text-[#2F4053]"
-            style={{ fontSize: size * 0.22 }}
+            style={{ fontSize: 'calc(var(--logo-size) * 0.22)' }}
           >
             CALENDAR
           </span>
           <span
             className="mt-1 font-medium tracking-[0.05em] text-[#5b6b7c]"
-            style={{ fontSize: size * 0.19 }}
+            style={{ fontSize: 'calc(var(--logo-size) * 0.19)' }}
           >
             星動行程追蹤平台
           </span>

@@ -300,14 +300,18 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
         
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-10">
-            {/* Logo / brand */}
+            {/* Logo / brand — 響應式：手機 88，桌面 120。
+                Logo 用 inline style 設預設 var，會贏普通 class，所以 breakpoint 要 !important。 */}
             <div className="flex justify-center mb-6">
-              <Logo size={56} />
+              <Logo size={88} className="md:[--logo-size:120px!important]" />
             </div>
 
-            {/* Badge */}
+            {/* Badge — 用 live 女優數，避免同 logo 中文副標重複 */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-nadeshiko-light/30 border border-nadeshiko/30 rounded-full mb-6">
-              <span className="text-[rgb(var(--color-wine))] font-semibold text-sm"><Sparkles className="w-4 h-4" /> 星動行程追蹤平台</span>
+              <span className="text-[rgb(var(--color-wine))] font-semibold text-sm">
+                <Sparkles className="w-4 h-4 inline-block mr-1 -mt-0.5" />
+                {stats?.actressCount ? `${stats.actressCount.toLocaleString()}+ 女優情報實時更新` : '每日更新情報'}
+              </span>
             </div>
             
             {/* Title - Froala typography */}
