@@ -282,9 +282,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     if (!container) return;
     const active = container.querySelector<HTMLButtonElement>(`[data-tab-id="${activeTab}"]`);
     if (!active) return;
-    const cRect = container.getBoundingClientRect();
-    const aRect = active.getBoundingClientRect();
-    setUnderline({ left: aRect.left - cRect.left, width: aRect.width });
+    // 用 offsetLeft/Width（相對 position:relative 容器），唔受橫向 scrollLeft 影響
+    setUnderline({ left: active.offsetLeft, width: active.offsetWidth });
   }, [activeTab, stats?.actressCount, stats?.eventCount, filteredEvents.length]);
 
   return (
@@ -417,7 +416,10 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           ========================================= */}
       <div className="sticky top-0 z-40 border-b border-border bg-white/70 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/60">
         <div className="max-w-7xl mx-auto px-4">
-          <div ref={tabsContainerRef} className="relative flex items-center justify-center gap-2 py-3">
+          <div
+            ref={tabsContainerRef}
+            className="relative flex items-center justify-start sm:justify-center gap-2 py-3 overflow-x-auto sm:overflow-visible [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
             {tabs.map((tab) => {
               const TabIcon = tab.icon;
               return (
@@ -425,7 +427,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 key={tab.id}
                 data-tab-id={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`fdb-tab ${activeTab === tab.id ? 'active' : ''}`}
+                className={`fdb-tab shrink-0 whitespace-nowrap ${activeTab === tab.id ? 'active' : ''}`}
               >
                 <span className="text-lg"><TabIcon className="w-4 h-4" /></span>
                 <span>{tab.label}</span>
