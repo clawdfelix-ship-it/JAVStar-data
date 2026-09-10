@@ -72,7 +72,7 @@ function LotCard({ lot, serverNow }: { lot: LiveLot; serverNow: number }) {
       href={lot.lotUrl}
       target="_blank"
       rel="noopener noreferrer sponsored"
-      className="group shrink-0 w-36 sm:w-44 bg-white rounded-2xl border border-[rgba(var(--color-sakura-gray),0.7)] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all"
+      className="group block snap-start shrink-0 w-36 sm:w-44 bg-white rounded-2xl border border-[rgba(var(--color-sakura-gray),0.7)] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all"
     >
       <div className="relative aspect-[3/4] bg-[rgba(var(--color-sakura-gray),0.25)] overflow-hidden">
         {lot.coverUrl ? (
@@ -195,9 +195,7 @@ export default function AuctionPromoBanner() {
         {/* 產品橫排（手機可橫滑，桌面一排過） */}
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory [scrollbar-width:thin]">
           {items.map((lot) => (
-            <div key={lot.id} className="snap-start">
-              <LotCard lot={lot} serverNow={serverNow} />
-            </div>
+            <LotCard key={lot.id} lot={lot} serverNow={serverNow} />
           ))}
         </div>
       </div>
