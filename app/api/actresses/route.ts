@@ -38,8 +38,16 @@ export async function GET(request: NextRequest) {
            FROM actresses a
            LEFT JOIN actress_events_count ec ON ec.actress_id = a.id
           WHERE a.name_ja ILIKE $1 OR a.name_cn ILIKE $1
-          ORDER BY (a.name_ja ILIKE $2 OR a.name_cn ILIKE $2) DESC,
-                   a.name_ja ASC
+          ORDER BY
+            -- 相關度權重：原名前綴 > 原名包含 > 別名前綴 > 別名包含
+            CASE
+              WHEN a.name_ja ILIKE $2 THEN 0
+              WHEN a.name_ja ILIKE $1 THEN 1
+              WHEN a.name_cn ILIKE $2 THEN 2
+              ELSE 3
+            END,
+            COALESCE(ec.year_2026_events, 0) DESC,
+            a.name_ja ASC
           LIMIT 9`,
         [like, prefix]
       ) as any[];
