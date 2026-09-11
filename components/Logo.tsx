@@ -1,49 +1,18 @@
 import Link from 'next/link';
-import { useId } from 'react';
 
 /**
  * Brand logo — IG-safe: no adult wording anywhere.
- * Mark: dark-navy line-art calendar with an overlapping pink-gradient star.
- * Wordmark: J-STAR (bold) / CALENDAR (light) / 星動行程追蹤平台 (Chinese subtitle).
- * Mirrors public/favicon.svg.
  *
- * size = icon box width/height in px (base); withText shows the stacked wordmark.
- * 內部全部用 CSS var --logo-size 等比驅動，可用 className 喺 breakpoint 覆蓋，
- * 例如 className="md:[--logo-size:112px]" 做到響應式 logo（唔使 JS、冇 hydration mismatch）。
+ * 2026-09-12 起直接用 Felix 提供嘅原設計切圖（粉紅圓潤實星 + 白卡粉線 + JSTAR/JSTAR CALENDAR）：
+ *   withText=true  → /brand-logo-full.png（icon + JSTAR + JSTAR CALENDAR，直向）
+ *   withText=false → /brand-logo-mark.png（淨 icon，header／compare 用）
+ *
+ * size = 顯示寬度 px（內部用 CSS var --logo-size 驅動），可用 className 喺
+ * breakpoint 覆蓋，例如 className="md:[--logo-size:120px]"。
+ * 純光柵圖、冇 SVG gradient id，舊版多實例重複 id 令粒星變無色嘅問題一併消失。
  */
-function StarCalendarMark({ gradId }: { gradId: string }) {
-  // 5-point star, golden-ratio inner radius, lower-right overlapping the calendar.
-  const star =
-    'M60.5 47.5 L64.9 61.0 L79.0 61.0 L67.6 69.3 L72.0 82.8 L60.5 74.4 L49.0 82.8 L53.4 69.3 L42.0 61.0 L56.1 61.0 Z';
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      style={{ width: 'var(--logo-size)', height: 'var(--logo-size)' }}
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#F4A6A6" />
-          <stop offset="1" stopColor="#B83D5E" />
-        </linearGradient>
-      </defs>
-      {/* Calendar body: line-art rounded rect */}
-      <rect x="22" y="30" width="48" height="47" rx="7" fill="#ffffff" stroke="#2F4053" strokeWidth="3.6" />
-      {/* Binding rings */}
-      <rect x="34.5" y="21" width="4.6" height="15" rx="2.3" fill="#2F4053" />
-      <rect x="53" y="21" width="4.6" height="15" rx="2.3" fill="#2F4053" />
-      {/* Vertical page lines */}
-      <line x1="34" y1="45" x2="34" y2="69" stroke="#2F4053" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
-      <line x1="46" y1="45" x2="46" y2="69" stroke="#2F4053" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
-      <line x1="58" y1="45" x2="58" y2="69" stroke="#2F4053" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
-      {/* Overlapping filled star in front */}
-      <path d={star} fill={`url(#${gradId})`} stroke="#ffffff" strokeWidth="2.6" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default function Logo({
-  size = 56,
+  size = 88,
   withText = true,
   href = '/',
   className = '',
@@ -53,44 +22,32 @@ export default function Logo({
   href?: string;
   className?: string;
 }) {
-  // 每個實例獨有 gradient id——舊版固定 id 'logoStarGrad' 令一頁多個 Logo 出現重複 id；
-  // 喺 Safari／手機上若第一個定義藏喺 display:none 容器，url(#id) 解析失敗，粒星變無色。
-  const rawId = useId();
-  const gradId = `logo-star-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  const src = withText ? '/brand-logo-full.png' : '/brand-logo-mark.png';
+  const alt = 'JSTAR CALENDAR';
   const inner = (
     <span
       className={`inline-flex flex-col items-center ${className}`}
       style={{ ['--logo-size' as string]: `${size}px` } as React.CSSProperties}
     >
-      <StarCalendarMark gradId={gradId} />
-      {withText && (
-        <span className="mt-1.5 flex flex-col items-center leading-none">
-          <span
-            className="font-extrabold tracking-tight text-[#2F4053]"
-            style={{ fontSize: 'calc(var(--logo-size) * 0.34)' }}
-          >
-            J-STAR
-          </span>
-          <span
-            className="mt-0.5 font-light tracking-[0.22em] text-[#2F4053]"
-            style={{ fontSize: 'calc(var(--logo-size) * 0.22)' }}
-          >
-            CALENDAR
-          </span>
-          <span
-            className="mt-1 font-medium tracking-[0.05em] text-[#5b6b7c]"
-            style={{ fontSize: 'calc(var(--logo-size) * 0.19)' }}
-          >
-            星動行程追蹤平台
-          </span>
-        </span>
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        width={withText ? 790 : 512}
+        height={withText ? 1200 : 491}
+        draggable={false}
+        style={{
+          width: 'var(--logo-size)',
+          height: 'auto',
+          display: 'block',
+        }}
+      />
     </span>
   );
 
   if (!href) return inner;
   return (
-    <Link href={href} className="inline-block transition-transform duration-fast ease-out hover:scale-[1.03] active:scale-[0.98]">
+    <Link href={href} aria-label="JSTAR CALENDAR 首頁" className="inline-block transition-transform duration-fast ease-out hover:scale-[1.03] active:scale-[0.98]">
       {inner}
     </Link>
   );
