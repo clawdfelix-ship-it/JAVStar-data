@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useId } from 'react';
 
 /**
  * Brand logo — IG-safe: no adult wording anywhere.
@@ -10,7 +11,7 @@ import Link from 'next/link';
  * 內部全部用 CSS var --logo-size 等比驅動，可用 className 喺 breakpoint 覆蓋，
  * 例如 className="md:[--logo-size:112px]" 做到響應式 logo（唔使 JS、冇 hydration mismatch）。
  */
-function StarCalendarMark() {
+function StarCalendarMark({ gradId }: { gradId: string }) {
   // 5-point star, golden-ratio inner radius, lower-right overlapping the calendar.
   const star =
     'M60.5 47.5 L64.9 61.0 L79.0 61.0 L67.6 69.3 L72.0 82.8 L60.5 74.4 L49.0 82.8 L53.4 69.3 L42.0 61.0 L56.1 61.0 Z';
@@ -21,7 +22,7 @@ function StarCalendarMark() {
       aria-hidden
     >
       <defs>
-        <linearGradient id="logoStarGrad" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#F4A6A6" />
           <stop offset="1" stopColor="#B83D5E" />
         </linearGradient>
@@ -36,7 +37,7 @@ function StarCalendarMark() {
       <line x1="46" y1="45" x2="46" y2="69" stroke="#2F4053" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
       <line x1="58" y1="45" x2="58" y2="69" stroke="#2F4053" strokeWidth="2.2" strokeLinecap="round" opacity="0.35" />
       {/* Overlapping filled star in front */}
-      <path d={star} fill="url(#logoStarGrad)" stroke="#ffffff" strokeWidth="2.6" strokeLinejoin="round" />
+      <path d={star} fill={`url(#${gradId})`} stroke="#ffffff" strokeWidth="2.6" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -52,12 +53,16 @@ export default function Logo({
   href?: string;
   className?: string;
 }) {
+  // 每個實例獨有 gradient id——舊版固定 id 'logoStarGrad' 令一頁多個 Logo 出現重複 id；
+  // 喺 Safari／手機上若第一個定義藏喺 display:none 容器，url(#id) 解析失敗，粒星變無色。
+  const rawId = useId();
+  const gradId = `logo-star-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const inner = (
     <span
       className={`inline-flex flex-col items-center ${className}`}
       style={{ ['--logo-size' as string]: `${size}px` } as React.CSSProperties}
     >
-      <StarCalendarMark />
+      <StarCalendarMark gradId={gradId} />
       {withText && (
         <span className="mt-1.5 flex flex-col items-center leading-none">
           <span
