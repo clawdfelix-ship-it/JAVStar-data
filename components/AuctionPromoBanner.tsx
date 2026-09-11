@@ -5,9 +5,9 @@ import useSWR from 'swr';
 import { Hammer, ArrowRight, Flame, Clock } from 'lucide-react';
 
 // 拍賣平台「正在拍賣」廣告位（女優排名 ↔ 每月新作中間）
-// 經本站 /api/auction-live proxy 拉 auction 平台嘅 live lot
+// 經本站 /api/auction-live proxy 拉 flash-bids.com 嘅 active 貨品（2026-09-11 起）
 const AUCTION_URL =
-  process.env.NEXT_PUBLIC_AUCTION_URL || 'https://auction-website-tan.vercel.app';
+  process.env.NEXT_PUBLIC_AUCTION_URL || 'https://flash-bids.com';
 
 interface LiveLot {
   id: string;
@@ -95,9 +95,9 @@ function LotCard({ lot, serverNow }: { lot: LiveLot; serverNow: number }) {
         <p className="text-[13px] font-bold text-text-primary leading-snug line-clamp-2 min-h-[2.4em]">
           {lot.title}
         </p>
-        {lot.idolName && (
-          <p className="text-[11px] text-pink-600 mt-0.5 truncate">{lot.idolName}</p>
-        )}
+        {lot.category ? (
+          <p className="text-[11px] text-pink-600 mt-0.5 truncate">{lot.category}</p>
+        ) : null}
         <div className="flex items-end justify-between gap-1 mt-1.5">
           <div>
             <p className="text-[10px] text-text-tertiary leading-none mb-0.5">現價</p>
@@ -130,8 +130,8 @@ function StaticBanner() {
           <Hammer className="w-6 h-6 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-white text-base md:text-xl font-black">J-STAR 偶像周邊拍賣</h3>
-          <p className="text-pink-100 text-xs mt-0.5">拍立得・簽名・絕版週邊｜自動出價，唔使守尾場</p>
+          <h3 className="text-white text-base md:text-xl font-black">Flash Bids 即時拍賣</h3>
+          <p className="text-pink-100 text-xs mt-0.5">拍立得・寫真・偶像周邊｜自動出價，唔使守尾場</p>
         </div>
         <span className="shrink-0 inline-flex items-center gap-1.5 bg-white text-[rgb(var(--color-wine))] font-bold text-sm px-4 py-2.5 rounded-xl group-hover:scale-105 transition-transform">
           入場 <ArrowRight className="w-4 h-4" />
@@ -169,7 +169,7 @@ export default function AuctionPromoBanner() {
         <div className="flex items-end justify-between mb-4 gap-3">
           <div>
             <h2 className="text-lg md:text-2xl font-bold text-text-primary flex items-center gap-2">
-              <span className="text-xl md:text-2xl">🔨</span>
+              <span className="text-xl md:text-2xl">⚡</span>
               正在拍賣
               <a
                 href={AUCTION_URL}
@@ -177,10 +177,10 @@ export default function AuctionPromoBanner() {
                 rel="noopener noreferrer sponsored"
                 className="text-[10px] md:text-xs font-semibold text-white bg-[rgb(var(--color-nadeshiko-strong))] px-2 py-0.5 rounded-full"
               >
-                J-STAR AUCTION
+                FLASH BIDS
               </a>
             </h2>
-            <p className="text-text-tertiary mt-0.5 text-xs">偶像周邊實時競投 • 出價後系統自動幫你頂到僅僅贏</p>
+            <p className="text-text-tertiary mt-0.5 text-xs">偶像周邊實時競投 • 即刻入 flash-bids.com 出價</p>
           </div>
           <a
             href={AUCTION_URL}
