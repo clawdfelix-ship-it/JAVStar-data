@@ -7,6 +7,9 @@
 
 set -u
 
+# launchd 預設 PATH 冇 homebrew（node/npx 喺 /opt/homebrew/bin），必須自行補上
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
 PROJECT_DIR="/Users/chansiulungfelix/.openclaw/workspace-coding-qwen/JAVStar-data"
 PAGES="${NEW_RELEASE_PAGES:-4}"   # 每日爬頭 4 頁（~80 件），足夠覆蓋一日新增
 TODAY="$(date +%Y%m%d)"

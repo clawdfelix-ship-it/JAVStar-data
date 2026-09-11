@@ -1,7 +1,11 @@
 #!/bin/bash
 # Daily scraper for AV Intelligence
-# Morning run at 6:00 AM + Afternoon run at 3:00 PM via launchd
+# 每日 08:00 經 launchd 跑（com.avintelligence.daily-scraper）
 # Logs to logs/scraper-YYYYMMDD.log
+
+# launchd 預設 PATH 冇 homebrew，npx/node 喺 /opt/homebrew/bin，必須自行補上
+# （唔補會報 env: node: No such file or directory）
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 PROJECT_DIR="/Users/chansiulungfelix/.openclaw/workspace-coding-qwen/JAVStar-data"
 LOG_FILE="$PROJECT_DIR/logs/scraper-$(date +%Y%m%d).log"
