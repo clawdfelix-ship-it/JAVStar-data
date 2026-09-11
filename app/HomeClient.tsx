@@ -704,7 +704,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           
           <div className="border-t border-border mt-8 pt-8 text-center">
             <p className="text-sm text-text-tertiary">
-              © 2026 J-STAR CALENDAR. Made with <Heart className="w-4 h-4 fill-current" /> in Hong Kong.
+              © 2026 J-STAR CALENDAR. Made with <Heart className="inline-block w-4 h-4 fill-current align-[-0.15em] mx-0.5 text-[rgb(var(--color-nadeshiko-strong))]" /> in Hong Kong.
             </p>
           </div>
         </div>
