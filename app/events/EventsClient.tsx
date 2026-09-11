@@ -160,7 +160,7 @@ export default function EventsClient() {
           <div className="lg:col-span-3 flex flex-col gap-3">
             {/* Region tabs */}
             <div className="flex gap-1 bg-sakura-gray rounded-lg p-1">
-              {[['all','全部'],['japan','日本'],['online','オンライン'],['taiwan','台灣'],['hk','香港']].map(([val, label]) => (
+              {[['all','全部'],['japan','🇯🇵 日本'],['hk','🇭🇰 香港'],['taiwan','🇹🇼 台灣'],['online','🌐 オンライン']].map(([val, label]) => (
                 <button
                   key={val}
                   onClick={() => setRegion(val)}
