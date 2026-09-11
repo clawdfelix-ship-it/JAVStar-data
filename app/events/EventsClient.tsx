@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
+import EventSubmissionForm from '@/components/EventSubmissionForm';
 import CalendarMonth from './CalendarMonth';
 
 interface Event {
@@ -282,6 +283,11 @@ export default function EventsClient() {
             ))}
           </div>
         )}
+
+        {/* 粉絲補充活動資料（同主頁日曆 tab 同一個表單，提交後待管理員批核） */}
+        <div className="max-w-3xl mx-auto mt-10">
+          <EventSubmissionForm />
+        </div>
       </main>
     </div>
   );
