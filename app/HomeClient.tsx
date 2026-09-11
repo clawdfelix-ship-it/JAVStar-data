@@ -585,6 +585,15 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               <div className="fdb-card p-12 text-center">
                 <div className="skeleton h-96 w-full rounded-xl" />
               </div>
+            ) : calendarEvents.length === 0 ? (
+              <div className="fdb-card p-10 md:p-14 text-center max-w-md mx-auto">
+                <div className="text-5xl mb-4" aria-hidden>🌏</div>
+                <p className="text-lg font-semibold text-text-primary mb-2">暫無產地活動</p>
+                <p className="text-sm text-text-secondary">
+                  {calendarRegion === 'hk' ? '香港' : calendarRegion === 'taiwan' ? '台灣' : '此分類'}
+                  場次一有資料就會喺呢度顯示
+                </p>
+              </div>
             ) : (
               <EventCalendar events={calendarEvents} />
             )}
