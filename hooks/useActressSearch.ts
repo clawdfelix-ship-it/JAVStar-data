@@ -50,12 +50,27 @@ export function useActressSearch() {
   const [failed, setFailed] = useState(false);
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
+  // 空 focus 時顯示「熱門女優」（ranking 頭 5，lazy 載入一次；藍圖 3.5）
+  const [hot, setHot] = useState<QuickActress[]>([]);
+  const hotLoadedRef = useRef(false);
 
   const composingRef = useRef(false);
   const seqRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => setHistory(loadHistory()), []);
+
+  const loadHot = useCallback(() => {
+    if (hotLoadedRef.current) return;
+    hotLoadedRef.current = true;
+    fetch('/api/actresses?limit=5')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((d) => setHot(Array.isArray(d.data) ? d.data.slice(0, 5) : []))
+      .catch(() => {
+        // 失敗可以重試
+        hotLoadedRef.current = false;
+      });
+  }, []);
 
   const pushHistory = useCallback((term: string) => {
     const t = term.trim();
@@ -154,6 +169,8 @@ export function useActressSearch() {
     open,
     setOpen,
     history,
+    hot,
+    loadHot,
     pushHistory,
     clearHistory,
     removeHistoryItem,

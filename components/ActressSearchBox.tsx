@@ -17,7 +17,7 @@ export default function ActressSearchBox({
   const router = useRouter();
   const {
     query, setQuery, results, loading, failed,
-    open, setOpen, history, pushHistory, clearHistory, removeHistoryItem,
+    open, setOpen, history, hot, loadHot, pushHistory, clearHistory, removeHistoryItem,
     onCompositionStart, onCompositionEnd,
   } = useActressSearch();
 
@@ -30,10 +30,10 @@ export default function ActressSearchBox({
   }, [autoFocus]);
 
   const trimmed = query.trim();
-  const showDropdown = open && (loading || results.length > 0 || failed || (!!trimmed && !loading) || (!trimmed && history.length > 0));
+  const showDropdown = open && (loading || results.length > 0 || failed || (!!trimmed && !loading) || (!trimmed && (history.length > 0 || hot.length > 0)));
 
-  // 可選項：有查詢時 = 結果 + 「睇全部」；空查詢 focus = 歷史
-  const optionCount = trimmed ? results.length + 1 : history.length;
+  // 可選項：有查詢時 = 結果 + 「睇全部」；空查詢 focus = 歷史 + 熱門
+  const optionCount = trimmed ? results.length + 1 : history.length + hot.length;
 
   useEffect(() => {
     setActiveIdx(-1);
@@ -52,6 +52,8 @@ export default function ActressSearchBox({
     router.push(`/actress/${a.id}`);
   }, [pushHistory, query, router, setOpen]);
 
+  const hotStart = history.length;
+
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -61,12 +63,20 @@ export default function ActressSearchBox({
       e.preventDefault();
       setActiveIdx((i) => Math.max(i - 1, 0));
     } else if (e.key === 'Enter') {
-      if (activeIdx >= 0 && activeIdx < results.length) {
+      if (trimmed && activeIdx >= 0 && activeIdx < results.length) {
         e.preventDefault();
         pickActress(results[activeIdx]);
       } else if (trimmed) {
         e.preventDefault();
         commitTerm(trimmed);
+      } else if (activeIdx >= 0) {
+        // 空查詢：歷史（前面）> 熱門（後面）
+        e.preventDefault();
+        if (activeIdx < history.length) commitTerm(history[activeIdx]);
+        else {
+          const hotIdx = activeIdx - history.length;
+          if (hot[hotIdx]) pickActress(hot[hotIdx]);
+        }
       }
     } else if (e.key === 'Escape') {
       setOpen(false);
@@ -95,7 +105,7 @@ export default function ActressSearchBox({
           placeholder="搜尋女優名、假名、羅馬字…"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => { setOpen(true); }}
+          onFocus={() => { setOpen(true); loadHot(); }}
           onBlur={() => { blurTimer.current = setTimeout(() => setOpen(false), 140); }}
           onKeyDown={onKeyDown}
           onCompositionStart={onCompositionStart}
@@ -158,6 +168,41 @@ export default function ActressSearchBox({
                   </button>
                 </li>
               ))}
+            </>
+          )}
+
+          {/* 空查詢 + 熱門女優 */}
+          {!trimmed && hot.length > 0 && (
+            <>
+              <li className="flex items-center gap-1 px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+                <TrendingUp className="w-3 h-3" /> 熱門女優
+              </li>
+              {hot.map((a, i) => {
+                const idx = hotStart + i;
+                return (
+                  <li key={`hot-${a.id}`} role="option" aria-selected={activeIdx === idx} id={`actress-opt-${idx}`}>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onMouseEnter={() => setActiveIdx(idx)}
+                      onClick={() => pickActress(a)}
+                      className={`w-full flex items-center gap-3 px-4 py-2 min-h-[44px] text-left ${activeIdx === idx ? 'bg-[rgba(var(--color-nadeshiko),0.12)]' : ''}`}
+                    >
+                      {a.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={a.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover shrink-0 bg-[rgba(var(--color-sakura-gray),0.4)]" loading="lazy" />
+                      ) : (
+                        <span className="w-8 h-8 rounded-full shrink-0 bg-[rgba(var(--color-nadeshiko-dark),0.15)] text-[rgb(var(--color-nadeshiko-dark))] font-bold flex items-center justify-center text-xs">{a.name_ja[0]}</span>
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-text-primary truncate" style={{ fontFamily: 'Noto Sans JP, sans-serif' }}>{a.name_ja}</span>
+                        {a.name_cn && <span className="block text-xs text-text-tertiary truncate">{a.name_cn}</span>}
+                      </span>
+                      <span className="text-[10px] font-semibold text-text-tertiary shrink-0">No.{i + 1}</span>
+                    </button>
+                  </li>
+                );
+              })}
             </>
           )}
 
