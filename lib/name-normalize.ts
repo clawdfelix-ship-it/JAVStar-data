@@ -59,6 +59,15 @@ function stripMacron(s: string) {
 const KANA_RE = /[぀-ゟ゠-ヿー]/;
 const ROMAJI_RE = /^[A-Za-zāīūēōĀĪŪĒŌ\s.'-]+$/;
 
+// 片商／廠牌名唔係女優別名：name_cn 常帶「かな(本中)」「真奈美(溜池ゴロー)」呢類括號，
+// 舊版照收做 alias，每日 scraper 見標題前綴【プレステージ】即錯配品牌活動
+// （2026-09-12 修復，見 scripts/fix-studio-label-mislink.ts）。源頭抽走。
+const STUDIO_LABELS = new Set([
+  'プレステージ', '本中', '溜池ゴロー', 'S1', 'MOODYZ', 'マドンナ',
+  'アイデアポケット', 'アタッカーズ', 'FALENO', 'ダスッ！', 'ワンズファクトリー',
+  'OPPAI', 'E-BODY', 'kira☆kira', 'kawaii', 'ナンパJAPAN',
+]);
+
 /** 拆 name_cn：取「（假名 / 羅馬字）」同其餘括號別名 */
 export function parseNameCn(nameCn: string | null): { kana: string | null; romaji: string | null; aliases: string[] } {
   if (!nameCn) return { kana: null, romaji: null, aliases: [] };
@@ -99,13 +108,15 @@ export function parseNameCn(nameCn: string | null): { kana: string | null; romaj
       romaji = stripMacron(inner);
       continue;
     }
-    // 其他括號內容（系列名、標籤）→ 有意義先做別名；過濾描述性垃圾
-    if (inner.length >= 2 && inner.length <= 20 && !/チーム|パルプンテ|FC2ライブ/.test(inner)) aliases.push(inner);
+    // 其他括號內容（系列名、標籤）→ 有意義先做別名；過濾描述性垃圾同片商名
+    if (inner.length >= 2 && inner.length <= 20
+        && !/チーム|パルプンテ|FC2ライブ/.test(inner)
+        && !STUDIO_LABELS.has(inner)) aliases.push(inner);
   }
 
-  // 括號外嘅文字 = 中文譯名/另一個藝名
+  // 括號外嘅文字 = 中文譯名/另一個藝名（純片商名如 name_cn='プレステージ' 唔收）
   const lead = rest.replace(/\s+/g, ' ').trim();
-  if (lead && lead.length <= 30) aliases.unshift(lead);
+  if (lead && lead.length <= 30 && !STUDIO_LABELS.has(lead)) aliases.unshift(lead);
 
   return { kana, romaji, aliases: dedupe(aliases) };
 }

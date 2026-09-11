@@ -183,6 +183,14 @@ async function scrapeEvents(): Promise<number> {
 // includes auto-generated placeholder rows (id LIKE 'auto_%') and timestamp-
 // style fake ids (16 digits) created by older scripts; matching against those
 // links events to junk labels that pollute the ranking and actress cards.
+// 片商／廠牌名唔係女優名：舊版將 name_cn='プレステージ' 嘅女優錯配全部【プレステージ】
+// 品牌活動（2026-09-12 修復，見 scripts/fix-studio-label-mislink.ts）。配對時一律排除。
+const STUDIO_LABELS = [
+  'プレステージ', '本中', '溜池ゴロー', 'S1', 'MOODYZ', 'マドンナ',
+  'アイデアポケット', 'アタッカーズ', 'FALENO', 'ダスッ！', 'ワンズファクトリー',
+  'OPPAI', 'E-BODY', 'kira☆kira', 'kawaii', 'ナンパJAPAN',
+];
+
 async function relinkUnknownEvents(): Promise<number> {
   const rows = await sql`
     UPDATE events e SET actress_id = sub.aid
@@ -192,10 +200,16 @@ async function relinkUnknownEvents(): Promise<number> {
       CROSS JOIN LATERAL (
         SELECT a.id AS aid, length(a.name_ja) AS l FROM actresses a
           WHERE a.id ~ '^[0-9]+$' AND length(a.id) <= 10 AND length(COALESCE(a.name_ja,'')) >= 2
+            AND COALESCE(a.name_ja,'') <> ALL(${STUDIO_LABELS})
+            AND COALESCE(a.name_cn,'') <> ALL(${STUDIO_LABELS})
+            AND NOT (COALESCE(a.aliases, ARRAY[]::text[]) && ${STUDIO_LABELS}::text[])
             AND ev.title LIKE '%' || a.name_ja || '%'
         UNION ALL
         SELECT a.id, length(COALESCE(a.name_cn,'')) FROM actresses a
           WHERE a.id ~ '^[0-9]+$' AND length(a.id) <= 10 AND length(COALESCE(a.name_cn,'')) >= 2
+            AND COALESCE(a.name_ja,'') <> ALL(${STUDIO_LABELS})
+            AND COALESCE(a.name_cn,'') <> ALL(${STUDIO_LABELS})
+            AND NOT (COALESCE(a.aliases, ARRAY[]::text[]) && ${STUDIO_LABELS}::text[])
             AND ev.title LIKE '%' || a.name_cn || '%'
       ) n
       WHERE ev.actress_id IS NULL OR ev.actress_id IN ('unknown','0')
