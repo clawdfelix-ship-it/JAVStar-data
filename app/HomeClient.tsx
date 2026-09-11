@@ -11,6 +11,7 @@ import {
 import ActressCard from '@/components/ActressCard';
 import EventCard from '@/components/EventCard';
 import EventCalendar from '@/components/EventCalendar';
+import EventSubmissionForm from '@/components/EventSubmissionForm';
 // VirtualList removed — variable-height EventCard caused overlapping rows
 import ActressSearchBox from '@/components/ActressSearchBox';
 import NewReleasesSection from '@/components/NewReleasesSection';
@@ -597,6 +598,9 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             ) : (
               <EventCalendar events={calendarEvents} />
             )}
+
+            {/* 粉絲補充活動資料（提交後待管理員批核） */}
+            <EventSubmissionForm />
           </div>
         )}
 
