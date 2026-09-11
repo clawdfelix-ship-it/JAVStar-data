@@ -22,3 +22,7 @@ archive/
 # build artifacts & runtime logs
 tsconfig.tsbuildinfo
 logs/
+
+# 新作爬蟲本機 camoufox venv
+.venv-scrape/
+logs/
