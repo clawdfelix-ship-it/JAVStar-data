@@ -52,7 +52,11 @@ export default function EventsClient() {
       if (prefecture) params.set('prefecture', prefecture);
       if (eventType) params.set('type', eventType);
       if (region && region !== 'all') params.set('region', region);
-      params.set('limit', '200');
+      // 即將活動有 400+，舊版寫死 200 會由最遲日期降序切走最近一至兩週（連今日都睇唔到）。
+      // 拉齊（API 上限 2000）＋升序，最快到嘅活動排最前。
+      params.set('limit', '2000');
+      params.set('sort', 'datetime');
+      params.set('order', 'asc');
 
       const res = await fetch(`/api/events?${params}`);
       const d = await res.json();
