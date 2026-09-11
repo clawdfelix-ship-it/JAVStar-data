@@ -1,0 +1,65 @@
+{
+  "_comment": "JAVSM 自家香港活動 2026/9–11（來源：M4 9-11月香港活動總表 + Shopify active products，2026-09-12 整理）。只入 JAVSM 自家場；其他主辦撞期資料屬內部參考，唔入庫。每女優每日一列，星期六＝攝影會+OFF會+旺角快閃，星期日＝粉絲見面會。",
+  "events": [
+    {
+      "id": "hkjsm-0912", "actress_ja": "田野憂", "date": "2026-09-12", "kind": "photo",
+      "title": "田野憂 香港粉絲攝影會 + OFF會 + 旺角快閃【2026/9/12】",
+      "venue": "香港（旺角快閃 15:40–16:40）",
+      "url": "https://javstarmeet.com/products/📸-田野憂香港粉絲攝影會-2026年9月12日"
+    },
+    {
+      "id": "hkjsm-0913", "actress_ja": "田野憂", "date": "2026-09-13", "kind": "meet",
+      "title": "田野憂 香港粉絲見面會【2026/9/13】",
+      "venue": "香港",
+      "url": "https://javstarmeet.com/products/福田悠亞-香港粉絲見面會-2026年8月16日-限定walk-in套裝-副本"
+    },
+    {
+      "id": "hkjsm-0919", "actress_ja": "唯井まひろ", "date": "2026-09-19", "kind": "photo",
+      "title": "唯井真尋 香港粉絲攝影會 + OFF會 + 旺角快閃【2026/9/19】",
+      "venue": "香港（旺角快閃 15:40–16:40）",
+      "url": "https://javstarmeet.com/products/📸-唯井真尋香港粉絲攝影會-2026年9月19日"
+    },
+    {
+      "id": "hkjsm-0920", "actress_ja": "唯井まひろ", "date": "2026-09-20", "kind": "meet",
+      "title": "唯井真尋 香港粉絲見面會【2026/9/20】",
+      "venue": "香港",
+      "url": "https://javstarmeet.com/products/唯井真尋-香港粉絲見面會-2026年9月20日-入場券"
+    },
+    {
+      "id": "hkjsm-1003", "actress_ja": "伊藤舞雪", "date": "2026-10-03", "kind": "photo",
+      "title": "伊藤舞雪 香港粉絲攝影會 + OFF會 + 旺角快閃【2026/10/3】",
+      "venue": "香港（旺角快閃 15:40–16:40）",
+      "url": "https://javstarmeet.com/products/📸-伊藤舞雪香港粉絲攝影會-2026年10月3日"
+    },
+    {
+      "id": "hkjsm-1004", "actress_ja": "伊藤舞雪", "date": "2026-10-04", "kind": "meet",
+      "title": "伊藤舞雪 香港粉絲見面會【2026/10/4】",
+      "venue": "香港",
+      "url": "https://javstarmeet.com/products/伊藤舞雪-香港粉絲見面會-2026年10月4日-入場券-1"
+    },
+    {
+      "id": "hkjsm-1010", "actress_ja": "松永あかり", "date": "2026-10-10", "kind": "photo",
+      "title": "松永明里 香港粉絲攝影會 + OFF會 + 旺角快閃【2026/10/10】",
+      "venue": "香港（旺角快閃 15:40–16:40）",
+      "url": "https://javstarmeet.com/products/松永明里-香港粉絲攝影會-2026年10月10日-1"
+    },
+    {
+      "id": "hkjsm-1011", "actress_ja": "松永あかり", "date": "2026-10-11", "kind": "meet",
+      "title": "松永明里 香港粉絲見面會【2026/10/11】",
+      "venue": "香港",
+      "url": "https://javstarmeet.com/products/松永明里-香港粉絲見面會-2026年10月11日-入場券-1"
+    },
+    {
+      "id": "hkjsm-1121", "actress_ja": "篠原いよ", "date": "2026-11-21", "kind": "meet",
+      "title": "篠原伊代 香港粉絲見面會【2026/11/21】",
+      "venue": "香港",
+      "url": "https://javstarmeet.com/"
+    },
+    {
+      "id": "hkjsm-1122", "actress_ja": "篠原いよ", "date": "2026-11-22", "kind": "meet",
+      "title": "篠原伊代 香港粉絲見面會【2026/11/22】",
+      "venue": "香港",
+      "url": "https://javstarmeet.com/"
+    }
+  ]
+}
