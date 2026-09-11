@@ -106,6 +106,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   // 活動 tab 專用文字篩選（Hero 搜尋框而家只負責搵女優，見 2026-09-10 搜尋藍圖）
   const [eventQuery, setEventQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'actress' | 'calendar' | 'events'>('actress');
+  // 活動日曆 tab 地區分頁：全部/日本/香港/台灣/オンライン（分類規則同 /api/events region）
+  const [calendarRegion, setCalendarRegion] = useState<'all' | 'japan' | 'hk' | 'taiwan' | 'online'>('all');
 
   // SWR Data Hooks - 自帶緩存、去重、重試
   const { actresses, pagination, loading, error, refresh: refreshActresses } = useActresses({
@@ -249,6 +251,26 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       return (a.datetime || '').localeCompare(b.datetime || '');
     });
   }, [events, filterPrefecture, filterType, eventQuery, activeTab]);
+
+  // 活動日曆按地區過濾（唔影響「活動列表」tab 自己嘅 prefecture/type 篩選）
+  const calendarEvents = useMemo(() => {
+    if (calendarRegion === 'all') return events;
+    return events.filter((e) => {
+      const p = e.prefecture || '';
+      switch (calendarRegion) {
+        case 'japan':
+          return p !== '' && p !== '台北' && p !== 'オンライン' && !p.includes('香港');
+        case 'taiwan':
+          return p === '台北';
+        case 'hk':
+          return p.includes('香港');
+        case 'online':
+          return p === 'オンライン';
+        default:
+          return true;
+      }
+    });
+  }, [events, calendarRegion]);
 
   // Tab config - Froala Design Blocks style
   const tabs = [
@@ -533,12 +555,38 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               <span className="text-nadeshiko-dark"><Calendar className="w-4 h-4" /></span>
               活動日曆
             </h2>
+
+            {/* 地區分頁：日本/香港/台灣 */}
+            <div className="flex gap-1 bg-sakura-gray rounded-xl p-1 mb-6 max-w-md" role="tablist" aria-label="按地區篩選日曆">
+              {([
+                ['all', '全部'],
+                ['japan', '🇯🇵 日本'],
+                ['hk', '🇭🇰 香港'],
+                ['taiwan', '🇹🇼 台灣'],
+                ['online', '🌐 オンライン'],
+              ] as const).map(([val, label]) => (
+                <button
+                  key={val}
+                  role="tab"
+                  aria-selected={calendarRegion === val}
+                  onClick={() => setCalendarRegion(val)}
+                  className={`flex-1 text-xs sm:text-sm px-2 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                    calendarRegion === val
+                      ? 'bg-white text-primary-dark shadow-sm'
+                      : 'text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
             {eventsLoading ? (
               <div className="fdb-card p-12 text-center">
                 <div className="skeleton h-96 w-full rounded-xl" />
               </div>
             ) : (
-              <EventCalendar events={events} />
+              <EventCalendar events={calendarEvents} />
             )}
           </div>
         )}
