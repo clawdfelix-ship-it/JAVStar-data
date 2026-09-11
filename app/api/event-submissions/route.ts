@@ -48,6 +48,14 @@ export async function POST(request: NextRequest) {
     if (!actressName) missing.push('actressName');
     if (!location) missing.push('location');
     if (!content) missing.push('content');
+    // 地點只收三個地區（方便日曆地區分頁配對；具體場地寫喺 content）
+    const ALLOWED_LOCATIONS = ['日本', '香港', '台灣'];
+    if (location && !ALLOWED_LOCATIONS.includes(location)) {
+      return NextResponse.json(
+        { error: '地點只能揀 日本／香港／台灣', fields: ['location'] },
+        { status: 400 },
+      );
+    }
     if (missing.length) {
       return NextResponse.json({ error: '請填妥日期、女優、地點同內容', fields: missing }, { status: 400 });
     }

@@ -15,8 +15,9 @@ export default function EventSubmissionForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
-  const set = (k: keyof typeof EMPTY) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set = (k: keyof typeof EMPTY) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -80,18 +81,23 @@ export default function EventSubmissionForm() {
             </label>
           </div>
           <label className="block">
-            <span className="text-xs font-semibold text-text-secondary">地點 <span className="text-danger">*</span></span>
-            <input
-              type="text" required value={form.location} onChange={set('location')}
-              placeholder="例：JKF Studio｜臺北市中山區民生東路三段…"
+            <span className="text-xs font-semibold text-text-secondary">地區 <span className="text-danger">*</span></span>
+            <select
+              required value={form.location} onChange={set('location')}
               className="mt-1 w-full min-h-[44px] px-3 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-[rgb(var(--color-nadeshiko))]"
-            />
+            >
+              <option value="" disabled>請選擇地區</option>
+              <option value="日本">🇯🇵 日本</option>
+              <option value="香港">🇭🇰 香港</option>
+              <option value="台灣">🇹🇼 台灣</option>
+            </select>
+            <span className="block mt-1 text-[11px] text-text-tertiary">具體場地／地址請寫喺「內容」格</span>
           </label>
           <label className="block">
             <span className="text-xs font-semibold text-text-secondary">內容 <span className="text-danger">*</span></span>
             <textarea
               required value={form.content} onChange={set('content')} rows={3}
-              placeholder="活動名稱／環節／票價／時間等，愈詳細愈好"
+              placeholder="活動名稱／具體場地地址／環節／票價／時間等，愈詳細愈好"
               className="mt-1 w-full px-3 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-[rgb(var(--color-nadeshiko))] resize-y"
             />
           </label>
