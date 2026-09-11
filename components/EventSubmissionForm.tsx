@@ -2,14 +2,16 @@
 
 import { useState } from 'react';
 import { Send, CheckCircle2, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import ActressSelectField, { type PickedActress } from './ActressSelectField';
 
 // 粉絲補充活動資料表單（2026-09-11）
 // 公開提交 → event_submissions(pending) → Felix 喺 /admin/event-submissions 批核
-const EMPTY = { eventDate: '', actressName: '', location: '', content: '', sourceUrl: '', contact: '' };
+const EMPTY = { eventDate: '', location: '', content: '', sourceUrl: '', contact: '' };
 
 export default function EventSubmissionForm() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY);
+  const [actress, setActress] = useState<PickedActress | null>(null);
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
@@ -24,7 +26,11 @@ export default function EventSubmissionForm() {
       const r = await fetch('/api/event-submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          actressId: actress?.id || '',
+          actressName: actress ? `${actress.name_ja}${actress.name_cn ? ' ' + actress.name_cn : ''}` : '',
+        }),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -35,6 +41,7 @@ export default function EventSubmissionForm() {
       setStatus('ok');
       setMessage(d.message || '收到！');
       setForm(EMPTY);
+      setActress(null);
     } catch {
       setStatus('error');
       setMessage('網絡錯誤，請稍後再試');
@@ -69,11 +76,7 @@ export default function EventSubmissionForm() {
             </label>
             <label className="block">
               <span className="text-xs font-semibold text-text-secondary">女優 <span className="text-danger">*</span></span>
-              <input
-                type="text" required value={form.actressName} onChange={set('actressName')}
-                placeholder="日文原名最好，例：七嶋舞"
-                className="mt-1 w-full min-h-[44px] px-3 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-[rgb(var(--color-nadeshiko))]"
-              />
+              <ActressSelectField value={actress} onChange={setActress} />
             </label>
           </div>
           <label className="block">

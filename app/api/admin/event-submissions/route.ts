@@ -51,9 +51,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.action === 'approve') {
-      const actressId = String(body.actressId || '').trim();
+      // 粉絲提交時已用搜尋配對女優（sub.actress_id）；管理員可在審批台改配對覆蓋
+      const actressId = String(body.actressId || sub.actress_id || '').trim();
       if (!/^\d{1,10}$/.test(actressId)) {
-        return NextResponse.json({ error: '要揀返一位已配對女優先可以上架（日曆只顯示有女優嘅場）' }, { status: 400 });
+        return NextResponse.json({ error: '呢筆未配對到女優，請喺下面搜尋揀一位先上架' }, { status: 400 });
+      }
+      const found = await sql`SELECT id FROM actresses WHERE id=${actressId} LIMIT 1`;
+      if (!(found as any[]).length) {
+        return NextResponse.json({ error: '女優 id 不存在' }, { status: 400 });
       }
 
       // 管理員可微調日期/地點/標題，否則用提交原值

@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
 
     const eventDate = clean(body.eventDate, 10);
     const actressName = clean(body.actressName, LIMITS.actressName);
+    const actressId = clean(body.actressId, 20);
     const location = clean(body.location, LIMITS.location);
     const content = clean(body.content, LIMITS.content);
     const sourceUrl = clean(body.sourceUrl, LIMITS.sourceUrl);
@@ -49,6 +50,19 @@ export async function POST(request: NextRequest) {
     if (!content) missing.push('content');
     if (missing.length) {
       return NextResponse.json({ error: '請填妥日期、女優、地點同內容', fields: missing }, { status: 400 });
+    }
+
+    // 女優必須係表單搜尋配對到嘅真實女優（numeric id）；驗證真係存在
+    let verifiedActressId: string | null = null;
+    if (/^\d{1,10}$/.test(actressId)) {
+      const found = await sql`SELECT id FROM actresses WHERE id = ${actressId} LIMIT 1`;
+      if ((found as any[]).length) verifiedActressId = actressId;
+    }
+    if (!verifiedActressId) {
+      return NextResponse.json(
+        { error: '請喺女優欄搜尋並揀選一位女優（自由輸入文字唔受理）', fields: ['actressId'] },
+        { status: 400 }
+      );
     }
 
     // 來源連結如果有填，要似 URL 或 TG 群組（寬鬆：http/https/t.me）
@@ -68,8 +82,8 @@ export async function POST(request: NextRequest) {
     }
 
     await sql`
-      INSERT INTO event_submissions (event_date, actress_name, location, content, source_url, contact, ip)
-      VALUES (${eventDate}, ${actressName}, ${location}, ${content},
+      INSERT INTO event_submissions (event_date, actress_name, actress_id, location, content, source_url, contact, ip)
+      VALUES (${eventDate}, ${actressName}, ${verifiedActressId}, ${location}, ${content},
               ${sourceUrl || null}, ${contact || null}, ${ip})
     `;
 

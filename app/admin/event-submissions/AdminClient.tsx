@@ -23,7 +23,7 @@ interface Suggestion { id: string; name_ja: string; name_cn: string | null; year
 function Row({ sub, token, onReviewed }: { sub: Submission; token: string; onReviewed: () => void }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [actressId, setActressId] = useState('');
+  const [actressId, setActressId] = useState(String(sub.actress_id || ''));
   const [kw, setKw] = useState(sub.actress_name);
   const [sugg, setSugg] = useState<Suggestion[]>([]);
   const [searching, setSearching] = useState(false);
@@ -82,7 +82,7 @@ function Row({ sub, token, onReviewed }: { sub: Submission; token: string; onRev
 
       {/* 配對女優 */}
       <div className="mt-3 border-t border-border pt-3">
-        <label className="text-xs font-semibold text-text-secondary">配對女優（批准上架必需）</label>
+        <label className="text-xs font-semibold text-text-secondary">配對女優（粉絲提交時已配對，可改）</label>
         <div className="flex gap-2 mt-1">
           <input
             value={kw}
