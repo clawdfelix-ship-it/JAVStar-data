@@ -99,7 +99,8 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       window.scrollTo({ top: y, behavior: 'smooth' });
     });
   }, [page]);
-  const [sort, setSort] = useState('final_score');
+  // 預設按「香港最新活動」排：有即將香港場嘅女優行先、檔期最近優先（見 API hk_upcoming）
+  const [sort, setSort] = useState('hk_upcoming');
   const [hasUpcoming, setHasUpcoming] = useState(false);
   const [eventsShown, setEventsShown] = useState(60);
   const [filterPrefecture, setFilterPrefecture] = useState('ALL');
@@ -466,8 +467,9 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   onChange={(e) => setSort(e.target.value)}
                   className="min-h-[44px] px-4 border rounded-xl text-sm font-medium focus:outline-none bg-white border-border text-text-primary"
                 >
+                  <option value="hk_upcoming"><Calendar className="w-4 h-4" /> 🇭🇰 香港最新活動</option>
                   <option value="final_score"><Trophy className="w-4 h-4" /> 綜合評分</option>
-                  <option value="upcoming"><Calendar className="w-4 h-4" /> 最近活動</option>
+                  <option value="upcoming"><Calendar className="w-4 h-4" /> 最近活動（全部地區）</option>
                   <option value="event_count"><BarChart2 className="w-4 h-4" /> 活動數量</option>
                   <option value="year_2026_events"><Calendar className="w-4 h-4" /> 2026年活動</option>
                   <option value="votes"><Heart className="w-4 h-4 fill-current" /> 今月人気（本月票）</option>

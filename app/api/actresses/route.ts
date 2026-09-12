@@ -77,6 +77,8 @@ export async function GET(request: NextRequest) {
       age:         { col: 'age',              dir: 'DESC' },
       name_ja:     { col: 'name_ja',           dir: 'ASC'  },
       upcoming:    { col: 'next_event_date',   dir: 'ASC'  },
+      // 香港活動排序喺 ORDER BY 特殊處理（用 hk LATERAL，見下）
+      hk_upcoming:  { col: 'next_hk_event_date', dir: 'ASC' },
     };
     const sort = sortMap[sortBy] ?? null;
 
@@ -106,11 +108,15 @@ export async function GET(request: NextRequest) {
 
     // ORDER BY —— 列名/方向全部來自上方硬編碼 sortMap 白名單，唔接受用戶輸入
     // 綜合評分用「本月票數」(v_m)，每月歸零重計、貼近近期人氣
+    const scoreExpr = '(COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v_m.cnt, 0) * 0.3)';
     const orderByClause = sortBy === 'upcoming'
-      ? `ne.date_iso ASC NULLS LAST`
-      : sort
-        ? `${sort.col} ${sort.dir} NULLS LAST`
-        : `(COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v_m.cnt, 0) * 0.3) DESC`;
+      ? `ne.date_iso ASC NULLS LAST, ${scoreExpr} DESC`
+      : sortBy === 'hk_upcoming'
+        // 有香港活動嘅女優按最近檔期升序（最近→最遠），冇香港活動墊後再以綜合分排
+        ? `hk.date_iso ASC NULLS LAST, ${scoreExpr} DESC`
+        : sort
+          ? `${sort.col} ${sort.dir} NULLS LAST`
+          : `${scoreExpr} DESC`;
 
     // 下場活動喺 SQL 入面用 date_iso >= CURRENT_DATE 比較，唔再需要傳日期參數
     const dateIdx = params.length;
@@ -135,6 +141,8 @@ export async function GET(request: NextRequest) {
         COALESCE(v.cnt, 0)::int               AS vote_count_all,
         TO_CHAR(ne.date_iso, 'YYYY-MM-DD')    AS next_event_date,
         ne.title                              AS next_event_title,
+        TO_CHAR(hk.date_iso, 'YYYY-MM-DD')    AS next_hk_event_date,
+        hk.title                              AS next_hk_event_title,
         (COALESCE(ec.year_2026_events, 0) * 0.7 + COALESCE(v_m.cnt, 0) * 0.3) AS final_score
       FROM actresses a
       LEFT JOIN actress_events_count ec ON ec.actress_id = a.id
@@ -157,6 +165,15 @@ export async function GET(request: NextRequest) {
           AND events.date_iso >= CURRENT_DATE
         ORDER BY events.date_iso ASC LIMIT 1
       ) ne ON true
+      LEFT JOIN LATERAL (
+        -- 下一場香港活動（2026-09-12 女優排名預設排序用）
+        SELECT date_iso, title FROM events
+        WHERE events.actress_id = a.id
+          AND events.date_iso IS NOT NULL
+          AND events.date_iso >= CURRENT_DATE
+          AND (events.prefecture = '香港' OR events.venue LIKE '%香港%')
+        ORDER BY events.date_iso ASC LIMIT 1
+      ) hk ON true
       ${whereClause}
       ORDER BY ${orderByClause}
       LIMIT $${limitIdx} OFFSET $${offsetIdx}
