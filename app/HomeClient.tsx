@@ -225,21 +225,18 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   // Data Processing
   // ====================
   
-  // Filtered events
+  // Filtered events（活動列表 tab + tab badge 共用，一律只計未來活動）
+  const todayKey = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD（本地時區）
   const filteredEvents = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
     return events.filter(e => {
       if (filterPrefecture !== 'ALL' && e.prefecture !== filterPrefecture) return false;
       if (filterType !== 'ALL' && e.event_type !== filterType) return false;
-      // For events list tab: only show future events (today or later)
-      // Calendar tab keeps all events (past + future) for history view
-      if (activeTab === 'events') {
-        const eventDate = new Date(e.datetime);
-        eventDate.setHours(0, 0, 0, 0);
-        if (eventDate < today) return false;
-      }
+      // 活動列表一律只計今日或之後（tab badge 無論喺邊個 tab 都要同列表一致；
+      // 舊版只喺 activeTab==='events' 先篩，導致排名 tab badge 顯示 ~2000、點入變 ~450）。
+      // 日曆 tab 嘅歷史視圖用另一個 calendarEvents，唔受呢度影響。
+      // datetime 已正規化做 YYYY-MM-DD，用字串比較避開時區偏移。
+      const dateKey = (e.datetime || '').slice(0, 10);
+      if (dateKey < todayKey) return false;
       if (eventQuery) {
         const searchLower = eventQuery.toLowerCase();
         return e.title.toLowerCase().includes(searchLower) ||
@@ -252,7 +249,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       // (see /api/events), so lexicographic compare equals chronological order.
       return (a.datetime || '').localeCompare(b.datetime || '');
     });
-  }, [events, filterPrefecture, filterType, eventQuery, activeTab]);
+  }, [events, filterPrefecture, filterType, eventQuery, todayKey]);
 
   // 活動日曆按地區過濾（唔影響「活動列表」tab 自己嘅 prefecture/type 篩選）
   const calendarEvents = useMemo(() => {
