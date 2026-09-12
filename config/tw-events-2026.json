@@ -1,0 +1,23 @@
+{
+  "_comment": "台灣活動（非 jkface 來源）2026。公開報名表/活動頁手工匯入。id 前綴 twff- = 台灣・未來飛翔主辦。",
+  "events": [
+    {
+      "id": "twff-0925",
+      "actress_ja": "伊藤舞雪",
+      "date": "2026-09-25",
+      "kind": "offkai",
+      "title": "未來飛翔｜伊藤舞雪 中秋晚餐會【2026/9/25 19:30-21:00】（預購限定，內含酒水餐點＋拍立得合照）",
+      "venue": "台北市萬華區艋舺大道132號（OGC株式會社）",
+      "url": "https://docs.google.com/forms/d/1173jTvldMglDpmqo01yKRqrxtTRaQ3yx9cZtQLxZZ5I/viewform"
+    },
+    {
+      "id": "twff-0926",
+      "actress_ja": "伊藤舞雪",
+      "date": "2026-09-26",
+      "kind": "photo",
+      "title": "未來飛翔｜伊藤舞雪 中秋攝影會【2026/9/26 四場次】預購3200/場（現場3500）",
+      "venue": "台北市萬華區艋舺大道132號（OGC株式會社）",
+      "url": "https://docs.google.com/forms/d/1173jTvldMglDpmqo01yKRqrxtTRaQ3yx9cZtQLxZZ5I/viewform"
+    }
+  ]
+}
