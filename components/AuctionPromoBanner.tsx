@@ -147,7 +147,7 @@ export default function AuctionPromoBanner() {
     dedupingInterval: 30000,
   });
 
-  const items = data?.ok ? data.items.slice(0, 10) : [];
+  const items = data?.ok ? data.items.slice(0, 20) : [];
   const serverNow = data?.serverNow ?? Date.now();
 
   // 未載入時唔佔位避免跳版；載入失敗/冇貨先用靜態 banner

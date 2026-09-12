@@ -57,7 +57,7 @@ export async function GET() {
       // 只顯示真正拍賣中：status=active 且未完場（時間做雙保險）
       .filter((p) => p?.status === 'active' && p?.auction_end && Date.parse(p.auction_end) > now)
       .sort((a, b) => Date.parse(a.auction_end) - Date.parse(b.auction_end)) // 最快完場排頭
-      .slice(0, 10)
+      .slice(0, 20)
       .map((p) => ({
         id: String(p.id),
         title: String(p.title || p.sku || '拍賣品'),
