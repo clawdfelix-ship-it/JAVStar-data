@@ -7,7 +7,7 @@ export default function SiteFooter() {
     <footer className="mt-12 border-t border-border bg-white/60">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 pb-24 md:pb-8">
         <p className="text-xs text-text-tertiary text-center md:text-left">
-          © {new Date().getFullYear()} J-STAR CALENDAR · 僅供年滿 18 歲人士 · 活動情報以主辦方公布為準
+          © {new Date().getFullYear()} JCHING CALENDAR · 僅供年滿 18 歲人士 · 活動情報以主辦方公布為準
         </p>
         <nav aria-label="法律連結" className="flex items-center gap-4 text-xs text-text-secondary">
           <Link href="/terms" className="hover:text-[rgb(var(--color-wine))] transition-colors">使用條款</Link>

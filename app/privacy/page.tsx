@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: '私隱政策｜J-STAR CALENDAR',
+  title: '私隱政策｜JCHING CALENDAR',
   robots: { index: false, follow: true },
 };
 

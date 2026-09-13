@@ -3,8 +3,8 @@ import Link from 'next/link';
 /**
  * Brand logo — IG-safe: no adult wording anywhere.
  *
- * 2026-09-12 起直接用 Felix 提供嘅原設計切圖（粉紅圓潤實星 + 白卡粉線 + JSTAR/JSTAR CALENDAR）：
- *   withText=true  → /brand-logo-full.png（icon + JSTAR + JSTAR CALENDAR，直向）
+ * 2026-09-14 起換成 JCHING 原設計切圖（粉紅圓潤實星 + 白卡粉線 + JCHING/JCHING CALENDAR）：
+ *   withText=true  → /brand-logo-full.png（icon + JCHING + JCHING CALENDAR，直向）
  *   withText=false → /brand-logo-mark.png（淨 icon，header／compare 用）
  *
  * size = 顯示寬度 px（內部用 CSS var --logo-size 驅動），可用 className 喺
@@ -23,7 +23,7 @@ export default function Logo({
   className?: string;
 }) {
   const src = withText ? '/brand-logo-full.png' : '/brand-logo-mark.png';
-  const alt = 'JSTAR CALENDAR';
+  const alt = 'JCHING CALENDAR'; // (品牌字已喺圖入面)
   const inner = (
     <span
       className={`inline-flex flex-col items-center ${className}`}
@@ -34,7 +34,7 @@ export default function Logo({
         src={src}
         alt={alt}
         width={withText ? 790 : 512}
-        height={withText ? 1200 : 491}
+        height={withText ? 1039 : 447}
         draggable={false}
         style={{
           width: 'var(--logo-size)',
@@ -47,7 +47,7 @@ export default function Logo({
 
   if (!href) return inner;
   return (
-    <Link href={href} aria-label="JSTAR CALENDAR 首頁" className="inline-block transition-transform duration-fast ease-out hover:scale-[1.03] active:scale-[0.98]">
+    <Link href={href} aria-label="JCHING CALENDAR 首頁" className="inline-block transition-transform duration-fast ease-out hover:scale-[1.03] active:scale-[0.98]">
       {inner}
     </Link>
   );

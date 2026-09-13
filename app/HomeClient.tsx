@@ -715,7 +715,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       {/* <DvdRankingSection /> */}
 
       {/* ==========================================
-          J-STAR 拍賣平台廣告位（女優排名 ↔ 每月新作中間）
+          JCHING 拍賣平台廣告位（女優排名 ↔ 每月新作中間）
           ========================================== */}
       <AuctionPromoBanner />
 
@@ -734,7 +734,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             <div>
               <h3 className="font-bold text-text-primary text-lg mb-4 flex items-center gap-2">
                 <span className="text-2xl"><Flower2 className="w-6 h-6 text-pink-400" /></span>
-                J-STAR CALENDAR
+                JCHING CALENDAR
               </h3>
               <p className="text-text-secondary text-sm leading-relaxed">
                 星動行程追蹤平台，一站式追蹤心儀女優嘅最新動態
@@ -764,7 +764,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           
           <div className="border-t border-border mt-8 pt-8 text-center">
             <p className="text-sm text-text-tertiary">
-              © 2026 J-STAR CALENDAR. Made with <Heart className="inline-block w-4 h-4 fill-current align-[-0.15em] mx-0.5 text-[rgb(var(--color-nadeshiko-strong))]" /> in Hong Kong.
+              © 2026 JCHING CALENDAR. Made with <Heart className="inline-block w-4 h-4 fill-current align-[-0.15em] mx-0.5 text-[rgb(var(--color-nadeshiko-strong))]" /> in Hong Kong.
             </p>
           </div>
         </div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import AdminClient from './AdminClient';
 
 export const metadata: Metadata = {
-  title: '活動補充審批｜J-STAR CALENDAR',
+  title: '活動補充審批｜JCHING CALENDAR',
   robots: { index: false, follow: false },
 };
 

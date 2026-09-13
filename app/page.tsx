@@ -3,8 +3,8 @@ import HomeClient from './HomeClient';
 // 首頁 SEO Metadata
 export const metadata = {
   title: {
-    default: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
-    template: '%s | J-STAR CALENDAR',
+    default: 'JCHING CALENDAR｜日本女優活動情報平台 🇭🇰',
+    template: '%s | JCHING CALENDAR',
   },
   description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報。',
   keywords: [
@@ -21,29 +21,29 @@ export const metadata = {
     'AV 情報平台',
     '日本活動情報',
   ],
-  authors: [{ name: 'J-STAR CALENDAR' }],
-  creator: 'J-STAR CALENDAR',
-  publisher: 'J-STAR CALENDAR',
+  authors: [{ name: 'JCHING CALENDAR' }],
+  creator: 'JCHING CALENDAR',
+  publisher: 'JCHING CALENDAR',
   openGraph: {
     type: 'website',
     locale: 'ja_JP',
     alternateLocale: ['zh_HK', 'zh_TW'],
     url: 'https://jav-star-data.vercel.app',
-    siteName: 'J-STAR CALENDAR｜日本女優活動情報平台',
-    title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
+    siteName: 'JCHING CALENDAR｜日本女優活動情報平台',
+    title: 'JCHING CALENDAR｜日本女優活動情報平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
     images: [
       {
         url: 'https://jav-star-data.vercel.app/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'J-STAR CALENDAR - 日本女優活動情報平台',
+        alt: 'JCHING CALENDAR - 日本女優活動情報平台',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
+    title: 'JCHING CALENDAR｜日本女優活動情報平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
     images: ['https://jav-star-data.vercel.app/og-image.png'],
   },
@@ -63,13 +63,13 @@ export const metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "J-STAR CALENDAR",
+  "name": "JCHING CALENDAR",
   "alternateName": "JAVStar-data",
   "url": "https://jav-star-data.vercel.app",
   "description": "星動行程追蹤平台，一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報",
   "publisher": {
     "@type": "Organization",
-    "name": "J-STAR CALENDAR",
+    "name": "JCHING CALENDAR",
     "logo": {
       "@type": "ImageObject",
       "url": "https://jav-star-data.vercel.app/logo.png"

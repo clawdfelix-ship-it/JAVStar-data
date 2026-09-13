@@ -3,8 +3,8 @@ import CompareClient from './CompareClient';
 // Compare Page SEO Metadata
 export const metadata = {
   title: {
-    default: '女優比較 | J-STAR CALENDAR',
-    template: '%s | J-STAR CALENDAR',
+    default: '女優比較 | JCHING CALENDAR',
+    template: '%s | JCHING CALENDAR',
   },
   description: '比較唔同女優嘅活動記錄、投票數、出道年份等資料，輕鬆搵到你心水嘅女神',
 };

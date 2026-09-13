@@ -3,8 +3,8 @@ import type { MetadataRoute } from 'next';
 // PWA manifest — Next.js App Router 會自動喺 <head> 注入 manifest link
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'J-STAR CALENDAR｜日本女優活動情報平台',
-    short_name: 'J-STAR',
+    name: 'JCHING CALENDAR｜日本女優活動情報平台',
+    short_name: 'JCHING',
     description: '一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報',
     start_url: '/',
     display: 'standalone',

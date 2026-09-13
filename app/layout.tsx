@@ -7,7 +7,7 @@ import TopNav from '@/components/TopNav';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
-  title: 'J-STAR CALENDAR｜日本女優活動情報平台 🇭🇰',
+  title: 'JCHING CALENDAR｜日本女優活動情報平台 🇭🇰',
   description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名',
   manifest: '/manifest.webmanifest',
   icons: {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'J-STAR',
+    title: 'JCHING',
     statusBarStyle: 'default',
   },
 };

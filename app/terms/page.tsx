@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: '使用條款｜J-STAR CALENDAR',
+  title: '使用條款｜JCHING CALENDAR',
   robots: { index: false, follow: true },
 };
 
@@ -20,7 +20,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-base font-bold text-text-primary">1. 年齡限制</h2>
           <p>
-            本網站（J-STAR CALENDAR）收錄日本成人影視業相關女優之活動、見面會、攝影會等公開情報，
+            本網站（JCHING CALENDAR）收錄日本成人影視業相關女優之活動、見面會、攝影會等公開情報，
             <strong>僅供年滿 18 歲人士瀏覽</strong>。進入網站即表示你聲明及保證你已年滿 18 歲，
             並符合你所在地區瀏覽相關內容嘅法定年齡要求。未滿 18 歲人士請立即離開。
           </p>

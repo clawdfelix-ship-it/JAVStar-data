@@ -82,7 +82,7 @@ export default function AgeGate() {
                 本網站含成人限定內容
               </h2>
               <p className="text-sm text-text-secondary leading-relaxed mb-1">
-                J-STAR CALENDAR 收錄日本成人影視女優嘅
+                JCHING CALENDAR 收錄日本成人影視女優嘅
                 <span className="font-bold text-[rgb(var(--color-wine))]">活動、見面會情報</span>
                 ，僅供年滿 <span className="font-bold text-[rgb(var(--color-wine))]">18 歲</span> 人士瀏覽。
               </p>

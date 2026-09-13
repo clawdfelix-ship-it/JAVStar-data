@@ -8,7 +8,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { q } = await searchParams;
   return {
-    title: q ? `搜尋「${q}」｜J-STAR CALENDAR` : '搜尋｜J-STAR CALENDAR',
+    title: q ? `搜尋「${q}」｜JCHING CALENDAR` : '搜尋｜JCHING CALENDAR',
     robots: { index: false, follow: true },
   };
 }

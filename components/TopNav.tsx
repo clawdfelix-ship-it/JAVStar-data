@@ -17,10 +17,10 @@ export default function TopNav() {
   return (
     <header className="hidden md:block sticky top-0 z-40 border-b border-border bg-white/80 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/70">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
-        <Link href="/" aria-label="J-STAR CALENDAR 首頁" className="flex items-center gap-2.5 shrink-0">
+        <Link href="/" aria-label="JCHING CALENDAR 首頁" className="flex items-center gap-2.5 shrink-0">
           <Logo size={34} withText={false} href="" />
           <span className="leading-none">
-            <span className="block font-extrabold tracking-tight text-[#2F4053] text-base">J-STAR</span>
+            <span className="block font-extrabold tracking-tight text-[#2F4053] text-base">JCHING</span>
             <span className="block font-light tracking-[0.22em] text-[#5b6b7c] text-[9px] mt-0.5">CALENDAR</span>
           </span>
         </Link>
