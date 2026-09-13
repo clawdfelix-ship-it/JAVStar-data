@@ -107,7 +107,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       locale: 'ja_JP',
       alternateLocale: ['zh_HK', 'zh_TW'],
       url: `https://jav-star-data.vercel.app/actress/${params.id}`,
-      siteName: 'JCHING CALENDAR｜日本女優活動情報平台',
+      siteName: 'JCHING CALENDAR｜追星平台',
       title,
       description,
       images: actress.avatar_url ? [

@@ -3,7 +3,7 @@ import HomeClient from './HomeClient';
 // 首頁 SEO Metadata
 export const metadata = {
   title: {
-    default: 'JCHING CALENDAR｜日本女優活動情報平台 🇭🇰',
+    default: 'JCHING CALENDAR｜追星平台 🇭🇰',
     template: '%s | JCHING CALENDAR',
   },
   description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報。',
@@ -29,21 +29,21 @@ export const metadata = {
     locale: 'ja_JP',
     alternateLocale: ['zh_HK', 'zh_TW'],
     url: 'https://jav-star-data.vercel.app',
-    siteName: 'JCHING CALENDAR｜日本女優活動情報平台',
-    title: 'JCHING CALENDAR｜日本女優活動情報平台 🇭🇰',
+    siteName: 'JCHING CALENDAR｜追星平台',
+    title: 'JCHING CALENDAR｜追星平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
     images: [
       {
         url: 'https://jav-star-data.vercel.app/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'JCHING CALENDAR - 日本女優活動情報平台',
+        alt: 'JCHING CALENDAR - 追星平台',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'JCHING CALENDAR｜日本女優活動情報平台 🇭🇰',
+    title: 'JCHING CALENDAR｜追星平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
     images: ['https://jav-star-data.vercel.app/og-image.png'],
   },
@@ -66,7 +66,7 @@ const jsonLd = {
   "name": "JCHING CALENDAR",
   "alternateName": "JAVStar-data",
   "url": "https://jav-star-data.vercel.app",
-  "description": "星動行程追蹤平台，一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報",
+  "description": "追星平台，一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報",
   "publisher": {
     "@type": "Organization",
     "name": "JCHING CALENDAR",

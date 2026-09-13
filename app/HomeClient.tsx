@@ -737,7 +737,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 JCHING CALENDAR
               </h3>
               <p className="text-text-secondary text-sm leading-relaxed">
-                星動行程追蹤平台，一站式追蹤心儀女優嘅最新動態
+                追星平台，一站式追蹤心儀女優嘅最新動態
               </p>
             </div>
             
