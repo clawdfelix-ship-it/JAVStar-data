@@ -132,6 +132,7 @@ function StaticBanner() {
         <div className="flex-1 min-w-0">
           <h3 className="text-white text-base md:text-xl font-black">Flash Bids 即時拍賣</h3>
           <p className="text-pink-100 text-xs mt-0.5">拍立得・寫真・偶像周邊｜自動出價，唔使守尾場</p>
+          <p className="text-pink-200/70 text-[10px] mt-1">廣告贊助</p>
         </div>
         <span className="shrink-0 inline-flex items-center gap-1.5 bg-white text-[rgb(var(--color-wine))] font-bold text-sm px-4 py-2.5 rounded-xl group-hover:scale-105 transition-transform">
           入場 <ArrowRight className="w-4 h-4" />
@@ -168,7 +169,7 @@ export default function AuctionPromoBanner() {
         {/* 標題列 */}
         <div className="flex items-end justify-between mb-4 gap-3">
           <div>
-            <h2 className="text-lg md:text-2xl font-bold text-text-primary flex items-center gap-2">
+            <h2 className="text-lg md:text-2xl font-bold text-text-primary flex items-center gap-2 flex-wrap">
               <span className="text-xl md:text-2xl">⚡</span>
               正在拍賣
               <a
@@ -179,6 +180,7 @@ export default function AuctionPromoBanner() {
               >
                 FLASH BIDS
               </a>
+              <span className="text-[10px] md:text-[11px] font-normal text-text-tertiary">廣告贊助</span>
             </h2>
             <p className="text-text-tertiary mt-0.5 text-xs">偶像周邊實時競投 • 即刻入 flash-bids.com 出價</p>
           </div>
