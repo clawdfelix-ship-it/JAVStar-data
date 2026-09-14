@@ -16,6 +16,7 @@ import EventSubmissionForm from '@/components/EventSubmissionForm';
 import ActressSearchBox from '@/components/ActressSearchBox';
 import NewReleasesSection from '@/components/NewReleasesSection';
 import AuctionPromoBanner from '@/components/AuctionPromoBanner';
+import JavsmEventsBanner from '@/components/JavsmEventsBanner';
 // 月間DVD排行榜已隱藏（DMM 無法經 VPN 取得數據）。恢復時取消註解：
 // import DvdRankingSection from '@/components/DvdRankingSection';
 import DailyActressBox from '@/components/DailyActressBox';
@@ -385,6 +386,9 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 </p>
               </div>
             </div>
+
+            {/* JavStarMeet 香港活動廣告贊助（Shopify collection 驅動） */}
+            <JavsmEventsBanner />
           </div>
         </div>
       </section>
