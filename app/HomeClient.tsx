@@ -273,10 +273,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   }, [events, calendarRegion]);
 
   // Tab config - Froala Design Blocks style
+  // 「活動列表」tab 2026-09-14 起隱藏（panel 保留；獨立 /events 頁同活動月曆 tab 不受影響）
   const tabs = [
     { id: 'actress' as const, label: '女優排名', icon: Crown, count: stats?.actressCount || 0 },
     { id: 'calendar' as const, label: '活動日曆', icon: Calendar, count: stats?.eventCount || 0 },
-    { id: 'events' as const, label: '活動列表', icon: Ticket, count: filteredEvents.length },
+    // { id: 'events' as const, label: '活動列表', icon: Ticket, count: filteredEvents.length },
   ];
 
   // Tab underline slide (plan 004) — measure active tab position

@@ -10,6 +10,8 @@ export default function SiteFooter() {
           © {new Date().getFullYear()} JCHING CALENDAR · 僅供年滿 18 歲人士 · 活動情報以主辦方公布為準
         </p>
         <nav aria-label="法律連結" className="flex items-center gap-4 text-xs text-text-secondary">
+          <Link href="/contact" className="font-semibold text-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-wine))] transition-colors">廣告查詢 / 合作</Link>
+          <span aria-hidden className="text-text-tertiary">·</span>
           <Link href="/terms" className="hover:text-[rgb(var(--color-wine))] transition-colors">使用條款</Link>
           <span aria-hidden className="text-text-tertiary">·</span>
           <Link href="/privacy" className="hover:text-[rgb(var(--color-wine))] transition-colors">私隱政策</Link>
