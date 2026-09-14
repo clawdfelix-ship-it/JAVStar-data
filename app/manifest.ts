@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'JCHING CALENDAR｜追星平台',
     short_name: 'JCHING',
-    description: '一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報',
+    description: '追星平台 - 一站式追蹤心儀女優嘅最新日港台活動情報',
     start_url: '/',
     display: 'standalone',
     background_color: '#FFF5F7',

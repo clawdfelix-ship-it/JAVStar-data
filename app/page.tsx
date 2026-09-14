@@ -6,7 +6,7 @@ export const metadata = {
     default: 'JCHING CALENDAR｜追星平台 🇭🇰',
     template: '%s | JCHING CALENDAR',
   },
-  description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報。',
+  description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。追星平台 - 一站式追蹤心儀女優嘅最新日港台活動情報。',
   keywords: [
     '女優',
     '女優',
@@ -66,7 +66,7 @@ const jsonLd = {
   "name": "JCHING CALENDAR",
   "alternateName": "JAVStar-data",
   "url": "https://jav-star-data.vercel.app",
-  "description": "追星平台，一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報",
+  "description": "追星平台 - 一站式追蹤心儀女優嘅最新日港台活動情報",
   "publisher": {
     "@type": "Organization",
     "name": "JCHING CALENDAR",

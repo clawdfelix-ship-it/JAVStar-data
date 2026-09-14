@@ -324,7 +324,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             
             {/* Subtitle */}
             <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-8">
-              一站式追蹤心儀女優嘅最新活動、見面會、攝影會情報
+              追星平台 - 一站式追蹤心儀女優嘅最新日港台活動情報
             </p>
 
             {/* Search Bar — 正統女優 typeahead（2026-09-10 搜尋藍圖 Phase 1） */}
@@ -737,7 +737,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                 JCHING CALENDAR
               </h3>
               <p className="text-text-secondary text-sm leading-relaxed">
-                追星平台，一站式追蹤心儀女優嘅最新動態
+                追星平台，一站式追蹤心儀女優嘅最新日港台活動情報
               </p>
             </div>
             
