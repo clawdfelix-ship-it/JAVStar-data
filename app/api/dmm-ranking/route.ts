@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { authorizeDmmRankingWrite } from '@/lib/dmm-ranking-auth';
 
 // Cache 配置
 const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
@@ -85,7 +86,10 @@ export async function GET() {
 }
 
 // POST - 手動更新排行榜
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const unauthorized = authorizeDmmRankingWrite(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const { ranking, source = 'DMM' } = await request.json();
     
