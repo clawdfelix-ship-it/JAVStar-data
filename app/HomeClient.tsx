@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useLayoutEffect, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Crown, Calendar, Ticket, Trophy, BarChart2,
   Heart, Cake, Flower2, ArrowUp, RefreshCw, Check,
@@ -767,7 +768,14 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             </div>
           </div>
           
-          <div className="border-t border-border mt-8 pt-8 text-center">
+          <div className="border-t border-border mt-8 pt-8 space-y-3 text-center">
+            <nav aria-label="法律連結" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-text-secondary">
+              <Link href="/contact" className="font-semibold text-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-wine))] transition-colors">廣告查詢 / 合作</Link>
+              <span aria-hidden className="text-text-tertiary">·</span>
+              <Link href="/terms" className="hover:text-[rgb(var(--color-wine))] transition-colors">使用條款</Link>
+              <span aria-hidden className="text-text-tertiary">·</span>
+              <Link href="/privacy" className="hover:text-[rgb(var(--color-wine))] transition-colors">私隱政策</Link>
+            </nav>
             <p className="text-sm text-text-tertiary">
               © 2026 JCHING CALENDAR. Made with <Heart className="inline-block w-4 h-4 fill-current align-[-0.15em] mx-0.5 text-[rgb(var(--color-nadeshiko-strong))]" /> in Hong Kong.
             </p>

@@ -1,8 +1,16 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 // 全站 footer：以前法律頁連結只喺 AgeGate 入面，confirm 後全站搵唔到
 // （2026-09-10 審計 P2）。桌面/手機都顯示；手機內容要留 bottom-nav 空間。
+// 首頁由 HomeClient 自己渲染更豐富嘅完整 footer（含數據來源/更新時間/法律連結），
+// 所以喺首頁隱藏呢個全域 footer，避免兩個 footer 疊住（2026-09-27 audit P2）。
 export default function SiteFooter() {
+  const pathname = usePathname();
+  if (pathname === '/') return null;
+
   return (
     <footer className="mt-12 border-t border-border bg-white/60">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 pb-24 md:pb-8">
