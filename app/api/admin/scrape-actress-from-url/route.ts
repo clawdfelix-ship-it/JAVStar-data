@@ -1,6 +1,7 @@
 import sql from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
+import { normalizeScrapeActressUrl } from '@/lib/scrape-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,13 +41,19 @@ export async function GET(request: NextRequest) {
     const event = events[0];
     
     // 2. 爬取活動頁面，提取女優資訊
-    const url = event.url || `https://www.av-event.jp/event/${eventId}/`;
-    
-    const html = await fetch(url, {
+    const url = normalizeScrapeActressUrl(event.url, eventId);
+
+    const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
       },
-    }).then(r => r.text());
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upstream fetch failed with status ${response.status}`);
+    }
+
+    const html = await response.text();
     
     // 3. 解析 HTML 提取女優名（簡易正則）
     // av-event.jp 常見格式：女優名連結
@@ -120,9 +127,19 @@ export async function GET(request: NextRequest) {
     
   } catch (error) {
     console.error('Scrape error:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    const isValidationError =
+      message === 'Missing event URL' ||
+      message === 'Invalid event URL' ||
+      message === 'Unsupported event URL protocol' ||
+      message === 'Unsupported event source host' ||
+      message === 'Unsupported event URL path';
+
     return NextResponse.json(
-      { error: '爬取失敗', details: String(error) },
-      { status: 500 }
+      isValidationError
+        ? { error: message }
+        : { error: '爬取失敗', details: message },
+      { status: isValidationError ? 400 : 500 }
     );
   }
 }
