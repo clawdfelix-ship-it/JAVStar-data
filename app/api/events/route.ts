@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const prefecture = searchParams.get('prefecture');
     const eventType = searchParams.get('type');
+    const organizer = searchParams.get('organizer');
     const region = searchParams.get('region');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = Math.min(parseInt(searchParams.get('limit') || '200'), 2000);
@@ -40,9 +41,13 @@ export async function GET(request: NextRequest) {
       : `${sortCol} ${sortDir} NULLS LAST`;
 
     // Region filter
+    // 台灣城市（來源只標「台灣」未註明城市者，匯入時預設歸 '台北'）。
+    // 舊版只 match '台北'，導致高雄/台中場消失、甚至被誤歸日本。
+    const TAIWAN_CITIES = ['台北', '新北', '高雄', '台中', '台南', '桃園', '基隆', '新竹', '嘉義', '屏東', '宜蘭', '花蓮', '台東'];
+    const twList = TAIWAN_CITIES.map(c => `'${c}'`).join(', ');
     const regionClauses: Record<string, string> = {
-      japan: "prefecture IS NOT NULL AND prefecture != '' AND prefecture != '台北' AND prefecture != 'オンライン' AND prefecture NOT LIKE '%香港%'",
-      taiwan: "prefecture = '台北'",
+      japan: `prefecture IS NOT NULL AND prefecture != '' AND prefecture NOT IN (${twList}) AND prefecture != 'オンライン' AND prefecture NOT LIKE '%香港%'`,
+      taiwan: `prefecture IN (${twList})`,
       hk: "prefecture LIKE '%香港%'",
       online: "prefecture = 'オンライン'",
     };
@@ -56,6 +61,7 @@ export async function GET(request: NextRequest) {
       parts.push("e.actress_id IS NOT NULL AND e.actress_id != '0' AND e.actress_id != 'unknown'");
       if (prefecture) parts.push(`e.prefecture = '${prefecture}'`);
       if (eventType) parts.push(`e.event_type = '${eventType}'`);
+      if (organizer) parts.push(`e.organizer = '${organizer.replace(/'/g, "''")}'`);
       if (region && region !== 'all' && regionClauses[region]) {
         parts.push(regionClauses[region]);
       }
@@ -73,6 +79,7 @@ export async function GET(request: NextRequest) {
       parts.push("actress_id IS NOT NULL AND actress_id != '0' AND actress_id != 'unknown'");
       if (prefecture) parts.push(`prefecture = '${prefecture}'`);
       if (eventType) parts.push(`event_type = '${eventType}'`);
+      if (organizer) parts.push(`organizer = '${organizer.replace(/'/g, "''")}'`);
       if (region && region !== 'all' && regionClauses[region]) {
         parts.push(regionClauses[region]);
       }

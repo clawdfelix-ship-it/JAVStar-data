@@ -14,6 +14,7 @@ interface Event {
   datetime: string;
   event_type: string;
   url: string;
+  organizer?: string | null;
   actress_name?: string;
   actress_avatar?: string;
 }
@@ -25,13 +26,14 @@ export default function EventsClient() {
   const [error, setError] = useState<string | null>(null);
   const [prefecture, setPrefecture] = useState('');
   const [eventType, setEventType] = useState('');
+  const [organizer, setOrganizer] = useState('');
   const [region, setRegion] = useState('all');
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEvents();
-  }, [prefecture, eventType, region]);
+  }, [prefecture, eventType, organizer, region]);
 
   useEffect(() => {
     fetch('/api/holidays')
@@ -52,6 +54,7 @@ export default function EventsClient() {
       const params = new URLSearchParams();
       if (prefecture) params.set('prefecture', prefecture);
       if (eventType) params.set('type', eventType);
+      if (organizer) params.set('organizer', organizer);
       if (region && region !== 'all') params.set('region', region);
       // 即將活動有 400+，舊版寫死 200 會由最遲日期降序切走最近一至兩週（連今日都睇唔到）。
       // 拉齊（API 上限 2000）＋升序，最快到嘅活動排最前。
@@ -115,6 +118,8 @@ export default function EventsClient() {
 
   const prefectures = [...new Set(events.map(e => e.prefecture).filter(Boolean))].sort();
   const eventTypes = [...new Set(events.map(e => e.event_type).filter(Boolean))].sort();
+  const organizers = [...new Set(events.map(e => e.organizer).filter(Boolean))] as string[];
+  organizers.sort((a, b) => a.localeCompare(b, 'zh-Hant'));
 
   // Events for calendar (only future events)
   const calendarEvents = events.filter(e => new Date(e.datetime) > new Date());
@@ -191,9 +196,17 @@ export default function EventsClient() {
               <option value="">全部類型</option>
               {eventTypes.map(t => <option key={t} value={t}>{getEventTypeLabel(t)}</option>)}
             </select>
-            {(prefecture || eventType) && (
+            <select
+              value={organizer}
+              onChange={e => setOrganizer(e.target.value)}
+              className="bg-white border border-border text-text-primary text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-primary"
+            >
+              <option value="">全部主辦</option>
+              {organizers.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+            {(prefecture || eventType || organizer) && (
               <button
-                onClick={() => { setPrefecture(''); setEventType(''); }}
+                onClick={() => { setPrefecture(''); setEventType(''); setOrganizer(''); }}
                 className="text-xs text-[rgb(var(--color-nadeshiko-dark))] hover:underline px-2 py-2"
               >
                 清除篩選
@@ -263,6 +276,9 @@ export default function EventsClient() {
                         <div className="font-bold text-text-primary text-sm truncate group-hover:text-primary-dark transition-colors">{ev.title}</div>
                         {ev.actress_name && (
                           <div className="text-xs text-text-tertiary mt-0.5">{ev.actress_name}</div>
+                        )}
+                        {ev.organizer && (
+                          <div className="text-xs text-text-tertiary mt-0.5">🏢 {ev.organizer}</div>
                         )}
                         {ev.prefecture === 'オンライン' ? (
                           <div className="text-xs text-text-tertiary mt-1">🌐 オンライン活動</div>

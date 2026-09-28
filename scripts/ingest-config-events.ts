@@ -31,6 +31,7 @@ interface CfgEvent {
   title: string;
   venue: string;
   url: string;
+  organizer?: string;
 }
 const cfg = JSON.parse(fs.readFileSync(file, 'utf8')) as { events: CfgEvent[] };
 
@@ -44,18 +45,23 @@ async function main() {
     if (!rows[0]) { console.log(`  ✗ ${ev.id} 搵唔到女優 ${ev.actress_ja}，跳過`); continue; }
     const aid = rows[0].id as string;
     touched.add(aid);
-    console.log(`  ${ev.id} ${ev.date} → ${aid} ${rows[0].name_ja}｜${ev.title}`);
+    // organizer：顯式欄位優先，否則由標題開頭【...】抽取
+    const organizer = (ev.organizer || '').trim() || (() => {
+      const m = /^【([^】]+)】/.exec(ev.title || '');
+      return m ? m[1].trim() : '';
+    })();
+    console.log(`  ${ev.id} ${ev.date} → ${aid} ${rows[0].name_ja}｜${organizer || '無主辦'}｜${ev.title}`);
     if (APPLY) {
       await sql`
-        INSERT INTO events (id, actress_id, title, datetime, date_iso, venue, prefecture, event_type, url, created_at)
+        INSERT INTO events (id, actress_id, title, datetime, date_iso, venue, prefecture, event_type, url, organizer, created_at)
         VALUES (${ev.id}, ${aid}, ${ev.title}, ${ev.date}, ${ev.date}::date,
                 ${ev.venue}, ${prefecture},
                 ${['photo','meet','dvd','offkai'].includes(ev.kind) ? ev.kind : 'other'},
-                ${ev.url}, NOW()::text)
+                ${ev.url}, ${organizer || null}, NOW()::text)
         ON CONFLICT (id) DO UPDATE SET
           actress_id = EXCLUDED.actress_id, title = EXCLUDED.title, datetime = EXCLUDED.datetime,
           date_iso = EXCLUDED.date_iso, venue = EXCLUDED.venue, prefecture = EXCLUDED.prefecture,
-          event_type = EXCLUDED.event_type, url = EXCLUDED.url`;
+          event_type = EXCLUDED.event_type, url = EXCLUDED.url, organizer = EXCLUDED.organizer`;
     }
   }
   if (APPLY && touched.size) {
