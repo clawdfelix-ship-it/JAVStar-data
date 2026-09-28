@@ -1,0 +1,37 @@
+{
+  "_source": "yaoyao.728 IG — 2026年10月台灣活動總表（手工匯入）。多日場取首日；多女優場拆獨立列；場地未註明者留空。",
+  "events": [
+    { "id": "tw-oct-02f", "actress_ja": "森日向子", "date": "2026-10-02", "kind": "photo", "title": "【Foraver】森日向子 維多利亞攝影會（10/2-10/4）", "venue": "", "url": "" },
+    { "id": "tw-oct-02a", "actress_ja": "宮西ひかる", "date": "2026-10-02", "kind": "photo", "title": "【TOP女神感謝祭】宮西光 攝影會・見面會・餐會（10/2-10/4）", "venue": "", "url": "" },
+    { "id": "tw-oct-02b", "actress_ja": "水端あさみ", "date": "2026-10-02", "kind": "photo", "title": "【TOP女神感謝祭】水端麻美 攝影會・見面會・餐會（10/2-10/4）", "venue": "", "url": "" },
+
+    { "id": "tw-oct-03a", "actress_ja": "藍芽みずき", "date": "2026-10-03", "kind": "photo", "title": "【Sweet Magic】藍芽水月 互動交流會・獨佔10分鐘・晚餐會・個人攝影會（10/3-10/4）", "venue": "", "url": "" },
+    { "id": "tw-oct-03b", "actress_ja": "乃木蛍", "date": "2026-10-03", "kind": "photo", "title": "【跳進兔子洞】乃木蛍 攝影會・乃木媽媽桑off會・晚餐會（10/3-10/4）", "venue": "", "url": "" },
+    { "id": "tw-oct-03c", "actress_ja": "武藤あやか", "date": "2026-10-03", "kind": "photo", "title": "【Secret9】武藤彩香 攝影會・見面會・餐會（10/3-10/4）", "venue": "", "url": "" },
+    { "id": "tw-oct-03d", "actress_ja": "つばさ舞", "date": "2026-10-03", "kind": "meet", "title": "【Pristine P.Y.】翼舞 一日店長見面會・限定粉絲派對（10/3-10/4）", "venue": "", "url": "" },
+
+    { "id": "tw-oct-09", "actress_ja": "河合あすな", "date": "2026-10-09", "kind": "photo", "title": "【Foraver】河合明日菜 一般攝影會（10/9-10/11）", "venue": "", "url": "" },
+
+    { "id": "tw-oct-10a", "actress_ja": "宮下玲奈", "date": "2026-10-10", "kind": "photo", "title": "【Secret9】宮下玲奈 攝影會・見面會・餐會（10/10-10/11）", "venue": "", "url": "" },
+    { "id": "tw-oct-10b", "actress_ja": "うんぱい", "date": "2026-10-10", "kind": "photo", "title": "【HAVEN TOKYO】Unpai 見面會・攝影會・私密會（10/10-10/11）", "venue": "", "url": "" },
+
+    { "id": "tw-oct-17a", "actress_ja": "桜ゆの", "date": "2026-10-17", "kind": "meet", "title": "【女神超連結】櫻夕乃 台灣粉絲見面會（10/17-10/18）", "venue": "", "url": "" },
+    { "id": "tw-oct-17b", "actress_ja": "奥井千晴", "date": "2026-10-17", "kind": "meet", "title": "【女神超連結】奥井千晴 台灣粉絲見面會（10/17-10/18）", "venue": "", "url": "" },
+    { "id": "tw-oct-17c", "actress_ja": "篠原いよ", "date": "2026-10-17", "kind": "other", "title": "【Foraver】篠原伊代 一番賞（10/17-10/18）", "venue": "", "url": "" },
+    { "id": "tw-oct-17d", "actress_ja": "花音うらら", "date": "2026-10-17", "kind": "photo", "title": "【跳進兔子洞】花音麗 攝影會・女神降臨即售會・晚餐會（10/17-10/18）", "venue": "", "url": "" },
+
+    { "id": "tw-oct-23a", "actress_ja": "愛弓りょう", "date": "2026-10-23", "kind": "photo", "title": "【女優下班後】愛弓涼 VIP盛宴・水果冰涼大冒險・感恩餐會・攝影會・生日宴・送機（10/23-10/26）", "venue": "", "url": "" },
+    { "id": "tw-oct-23b", "actress_ja": "辻井ほのか", "date": "2026-10-23", "kind": "photo", "title": "【女優下班後】辻井穗乃果 VIP盛宴・水果冰涼大冒險・感恩餐會・攝影會・生日宴・送機（10/23-10/26）", "venue": "", "url": "" },
+
+    { "id": "tw-oct-24a", "actress_ja": "中山ふみか", "date": "2026-10-24", "kind": "photo", "title": "【野人文庫】中山文香 攝影會・見面會・餐會（10/24-10/25）", "venue": "", "url": "" },
+    { "id": "tw-oct-24b", "actress_ja": "百永さりな", "date": "2026-10-24", "kind": "photo", "title": "【MaisonX】百永紗里奈 紀念攝影會・秘密宴會・魔力餐會（10/24-10/25）", "venue": "", "url": "" },
+    { "id": "tw-oct-24c", "actress_ja": "一乃あおい", "date": "2026-10-24", "kind": "photo", "title": "【ace】一乃葵 攝影會・見面會・互動會・餐會（10/24-10/25）", "venue": "", "url": "" },
+    { "id": "tw-oct-24d", "actress_ja": "吉澤友貴", "date": "2026-10-24", "kind": "photo", "title": "【12the 高雄場】吉澤友貴 初見特典會・互動見面會・晚宴・攝影會（10/24-10/25）", "venue": "高雄", "url": "" },
+
+    { "id": "tw-oct-30", "actress_ja": "八掛うみ", "date": "2026-10-30", "kind": "photo", "title": "【Foraver】八掛海 一般攝影會（10/30-11/1）", "venue": "", "url": "" },
+
+    { "id": "tw-oct-31a", "actress_ja": "栗山莉緒", "date": "2026-10-31", "kind": "photo", "title": "【HAVEN TOKYO】栗山莉緒 見面會・攝影會・私密會（10/31-11/1）", "venue": "", "url": "" },
+    { "id": "tw-oct-31b", "actress_ja": "輝星きら", "date": "2026-10-31", "kind": "photo", "title": "【野人文庫】輝星綺羅 攝影會・見面會・餐會（10/31-11/1）", "venue": "", "url": "" },
+    { "id": "tw-oct-31c", "actress_ja": "小花のん", "date": "2026-10-31", "kind": "other", "title": "【暮想出版】小花暖 性感睡衣派對（10/31）", "venue": "", "url": "" }
+  ]
+}
