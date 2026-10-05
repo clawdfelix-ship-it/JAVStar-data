@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { getSql, sql } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
+import { replaceRanking } from '@/lib/dmm-ranking.mjs';
 
 // Cache 配置
 const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
@@ -85,16 +87,12 @@ export async function GET() {
 }
 
 // POST - 手動更新排行榜
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const auth = requireAdmin(request);
+  if (auth) return auth;
+
   try {
     const { ranking, source = 'DMM' } = await request.json();
-    
-    if (!ranking || !Array.isArray(ranking)) {
-      return NextResponse.json({
-        success: false,
-        error: 'ranking array required',
-      }, { status: 400 });
-    }
 
     // 確保表存在
     await sql`
@@ -115,30 +113,7 @@ export async function POST(request: Request) {
       )
     `;
     
-    // 先清空舊數據
-    await sql`DELETE FROM dvd_ranking`;
-    
-    // 插入新數據
-    let insertedCount = 0;
-    for (const item of ranking) {
-      await sql`
-        INSERT INTO dvd_ranking 
-        (rank, video_code, title, actress, maker, cover_url, detail_url, is_new, rank_change, source)
-        VALUES (
-          ${item.rank}, 
-          ${item.videoCode || ''}, 
-          ${item.title || ''}, 
-          ${item.actress || ''}, 
-          ${item.maker || ''}, 
-          ${item.coverUrl || ''}, 
-          ${item.detailUrl || ''}, 
-          ${item.isNew ? true : false}, 
-          ${item.rankChange || 'same'}, 
-          ${source}
-        )
-      `;
-      insertedCount++;
-    }
+    const insertedCount = await replaceRanking(getSql() as any, ranking, source);
 
     // 清除 cache
     cachedData = null;
@@ -151,10 +126,11 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error('更新排行榜失敗:', error);
+    const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json({
       success: false,
-      error: String(error),
-    }, { status: 500 });
+      error: message,
+    }, { status: /ranking array/.test(message) ? 400 : 500 });
   }
 }
 
