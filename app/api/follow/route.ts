@@ -35,7 +35,8 @@ async function ensureTables() {
     await sql`ALTER TABLE fan_subscriptions
               ADD CONSTRAINT fan_subs_identity_unique UNIQUE (actress_id, identity_key)`;
   } catch (e: any) {
-    if (e?.code !== '42710' && e?.code !== '42P16') throw e; // 42710 = duplicate_object (constraint already exists)
+    // 42P07 = duplicate_table/relation ("constraint already exists"); tolerate idempotent re-run.
+    if (e?.code !== '42P07' && e?.code !== '42710' && e?.code !== '23505') throw e;
   }
   await sql`
     CREATE TABLE IF NOT EXISTS fan_events (
@@ -169,7 +170,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (e) {
     console.error('follow error', e);
-    return NextResponse.json({ error: 'failed', detail: String((e as Error).message || e) }, { status: 500 });
+    return NextResponse.json({ error: 'failed' }, { status: 500 });
   }
 }
 
