@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (e) {
     console.error('follow error', e);
-    return NextResponse.json({ error: 'failed' }, { status: 500 });
+    return NextResponse.json({ error: 'failed', detail: String((e as Error).message || e) }, { status: 500 });
   }
 }
 
