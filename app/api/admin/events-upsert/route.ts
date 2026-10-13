@@ -3,15 +3,19 @@ import sql from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+function timingEq(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let m = 0;
+  for (let i = 0; i < a.length; i++) m |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return m === 0;
+}
 // 容許 ADMIN_TOKEN 或獨立 INGEST_TOKEN（外部同步腳本用，權限只限事件寫入）。
 function requireIngest(req: NextRequest): NextResponse | null {
   const provided =
     req.headers.get('x-admin-token') ||
     req.headers.get('x-ingest-token');
-  const expected = process.env.ADMIN_TOKEN || process.env.INGEST_TOKEN;
-  const ok =
-    !!provided && !!expected && provided.length === expected.length &&
-    (() => { let m = 0; for (let i = 0; i < provided.length; i++) m |= provided.charCodeAt(i) ^ expected.charCodeAt(i); return m === 0; })();
+  const candidates = [process.env.ADMIN_TOKEN, process.env.INGEST_TOKEN].filter(Boolean) as string[];
+  const ok = !!provided && candidates.some((c) => timingEq(provided, c));
   if (!ok) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   return null;
 }
