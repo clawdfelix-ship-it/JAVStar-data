@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sql, { getSql } from '@/lib/db';
+import sql from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,16 +28,15 @@ async function ensureTables() {
   `;
   await sql`CREATE INDEX IF NOT EXISTS fan_subs_token_idx   ON fan_subscriptions(fan_token)`;
   await sql`CREATE INDEX IF NOT EXISTS fan_subs_actress_idx ON fan_subscriptions(actress_id, status)`;
-  // For ON CONFLICT inference Postgres needs a real unique *constraint* (not a partial unique index).
-  // IF NOT EXISTS not supported for ADD CONSTRAINT; use a DO block for idempotency.
-  await (getSql() as any)(
-    `DO $do$
-     BEGIN
-       IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fan_subs_identity_unique') THEN
-         ALTER TABLE fan_subscriptions ADD CONSTRAINT fan_subs_identity_unique UNIQUE (actress_id, identity_key);
-       END IF;
-     END $do$`,
-  );
+  // For ON CONFLICT inference Postgres needs a real unique *constraint*
+  // (not just a partial unique index). ADD CONSTRAINT has no IF NOT EXISTS,
+  // so swallow the duplicate-object error (42P16) using a tolerant query.
+  try {
+    await sql`ALTER TABLE fan_subscriptions
+              ADD CONSTRAINT fan_subs_identity_unique UNIQUE (actress_id, identity_key)`;
+  } catch (e: any) {
+    if (e?.code !== '42710' && e?.code !== '42P16') throw e; // 42710 = duplicate_object (constraint already exists)
+  }
   await sql`
     CREATE TABLE IF NOT EXISTS fan_events (
       id            BIGSERIAL PRIMARY KEY,
