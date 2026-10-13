@@ -3,6 +3,53 @@ import sql from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+// One-time idempotent DDL so this route works without a separate /api/setup call.
+// Module-level guard means the DDL runs at most once per serverless cold start.
+let _ddlDone = false;
+async function ensureTables() {
+  if (_ddlDone) return;
+  await sql`
+    CREATE TABLE IF NOT EXISTS fan_subscriptions (
+      id              TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      actress_id      TEXT NOT NULL,
+      email           TEXT,
+      tg_handle       TEXT,
+      ig_handle       TEXT,
+      identity_key    TEXT,
+      channel_pref    TEXT NOT NULL DEFAULT 'tg',
+      region_pref     TEXT NOT NULL DEFAULT 'hk',
+      source          TEXT NOT NULL DEFAULT 'jching',
+      fan_token       TEXT,
+      ip_address      TEXT,
+      status          TEXT NOT NULL DEFAULT 'active',
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS fan_subs_identity_uq
+    ON fan_subscriptions(actress_id, identity_key) WHERE identity_key IS NOT NULL`;
+  await sql`CREATE INDEX IF NOT EXISTS fan_subs_actress_idx ON fan_subscriptions(actress_id, status)`;
+  await sql`CREATE INDEX IF NOT EXISTS fan_subs_token_idx   ON fan_subscriptions(fan_token)`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS fan_events (
+      id            BIGSERIAL PRIMARY KEY,
+      fan_token     TEXT,
+      shopify_gid   TEXT,
+      source        TEXT NOT NULL,
+      event_type    TEXT NOT NULL,
+      actress_id    TEXT,
+      event_id      TEXT,
+      payload       JSONB NOT NULL DEFAULT '{}'::jsonb,
+      ip_address    TEXT,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS fan_events_token_idx ON fan_events(fan_token, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS fan_events_gid_idx    ON fan_events(shopify_gid, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS fan_events_type_idx   ON fan_events(event_type, created_at DESC)`;
+  _ddlDone = true;
+}
+
 // 三平台整合 Phase 1：女優「港台場通知」追蹤
 // POST body:
 //   { actress_id, tg_handle?, ig_handle?, email?, channel_pref?, region_pref?, fan_token?, action?: 'follow'|'unfollow' }
@@ -44,6 +91,8 @@ const REGIONS = new Set(['hk', 'taiwan']);
 
 export async function POST(req: NextRequest) {
   try {
+    await ensureTables();
+
     const b = (await req.json()) as Body;
     const actressId = clean(b.actress_id);
     if (!/^\d+$/.test(actressId)) {
@@ -119,17 +168,23 @@ export async function POST(req: NextRequest) {
 
 // GET ?actress_id=&email=|tg_handle=|ig_handle=  → 是否已追蹤
 export async function GET(req: NextRequest) {
-  const sp = req.nextUrl.searchParams;
-  const actressId = clean(sp.get('actress_id'));
-  const email = clean(sp.get('email')).toLowerCase();
-  const tg = clean(sp.get('tg_handle'));
-  const ig = clean(sp.get('ig_handle'));
-  const identity = pickIdentity(email, tg, ig);
-  if (!/^\d+$/.test(actressId) || !identity) {
-    return NextResponse.json({ following: false });
+  try {
+    await ensureTables();
+    const sp = req.nextUrl.searchParams;
+    const actressId = clean(sp.get('actress_id'));
+    const email = clean(sp.get('email')).toLowerCase();
+    const tg = clean(sp.get('tg_handle'));
+    const ig = clean(sp.get('ig_handle'));
+    const identity = pickIdentity(email, tg, ig);
+    if (!/^\d+$/.test(actressId) || !identity) {
+      return NextResponse.json({ following: false });
+    }
+    const rows = await sql`
+      SELECT status FROM fan_subscriptions
+      WHERE actress_id=${actressId} AND identity_key=${identity} LIMIT 1`;
+    return NextResponse.json({ following: (rows as any[])[0]?.status === 'active' });
+  } catch (e) {
+    console.error('follow status error', e);
+    return NextResponse.json({ error: 'failed' }, { status: 500 });
   }
-  const rows = await sql`
-    SELECT status FROM fan_subscriptions
-    WHERE actress_id=${actressId} AND identity_key=${identity} LIMIT 1`;
-  return NextResponse.json({ following: (rows as any[])[0]?.status === 'active' });
 }
