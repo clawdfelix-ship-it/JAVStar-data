@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import VoteButton from '@/components/VoteButton';
+import FollowButton from '@/components/FollowButton';
 import EventCard from '@/components/EventCard';
 import ActivityTimeline from '@/components/ActivityTimeline';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -339,6 +340,15 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                         </div>
                         <div className="mt-2 flex justify-center">
                           <VoteButton actressId={actress.id} initialCount={actress.vote_count} initialVoted={actress.my_voted} size="md" />
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl p-4 text-center border border-border shadow-sm flex flex-col items-center justify-between">
+                        <div>
+                          <div className="text-text-secondary text-xs sm:text-sm font-medium">🔔 港台場</div>
+                          <div className="mt-1 text-[10px] text-text-tertiary">第一時間通知你</div>
+                        </div>
+                        <div className="mt-2 flex justify-center">
+                          <FollowButton actressId={actress.id} size="md" />
                         </div>
                       </div>
                     </div>

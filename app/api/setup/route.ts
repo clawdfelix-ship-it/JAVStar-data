@@ -106,6 +106,51 @@ export async function GET(request: NextRequest) {
       )
     `;
 
+    // 三平台整合 Phase 1：粉絲意圖/身份地基
+    // fan_subscriptions = 「呢位女優有港台場時通知我」頂層漏斗捕獲
+    await sql`
+      CREATE TABLE IF NOT EXISTS fan_subscriptions (
+        id              TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        actress_id      TEXT NOT NULL,
+        email           TEXT,
+        tg_handle       TEXT,
+        ig_handle       TEXT,
+        identity_key    TEXT,
+        channel_pref    TEXT NOT NULL DEFAULT 'tg',
+        region_pref     TEXT NOT NULL DEFAULT 'hk',
+        source          TEXT NOT NULL DEFAULT 'jching',
+        fan_token       TEXT,
+        ip_address      TEXT,
+        status          TEXT NOT NULL DEFAULT 'active',
+        created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`CREATE UNIQUE INDEX IF NOT EXISTS fan_subs_identity_uq
+      ON fan_subscriptions(actress_id, identity_key) WHERE identity_key IS NOT NULL`;
+    await sql`CREATE INDEX IF NOT EXISTS fan_subs_actress_idx ON fan_subscriptions(actress_id, status)`;
+    await sql`CREATE INDEX IF NOT EXISTS fan_subs_token_idx   ON fan_subscriptions(fan_token)`;
+
+    // fan_events = 跨平台行為日誌（jching/shopify/checkin/vvipbot/flashbids），
+    // 初期用匿名 fan_token，轉換後可補 shopify_gid
+    await sql`
+      CREATE TABLE IF NOT EXISTS fan_events (
+        id            BIGSERIAL PRIMARY KEY,
+        fan_token     TEXT,
+        shopify_gid   TEXT,
+        source        TEXT NOT NULL,
+        event_type    TEXT NOT NULL,
+        actress_id    TEXT,
+        event_id      TEXT,
+        payload       JSONB NOT NULL DEFAULT '{}'::jsonb,
+        ip_address    TEXT,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS fan_events_token_idx ON fan_events(fan_token, created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS fan_events_gid_idx    ON fan_events(shopify_gid, created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS fan_events_type_idx   ON fan_events(event_type, created_at DESC)`;
+
     return NextResponse.json({
       success: true,
       message: '✅ Tables created successfully!',
