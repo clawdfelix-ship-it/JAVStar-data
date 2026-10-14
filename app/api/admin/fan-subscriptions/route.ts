@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
       `SELECT s.id, s.actress_id, a.name_ja, a.name_cn,
               s.email, s.tg_handle, s.ig_handle,
               s.channel_pref, s.region_pref, s.status, s.source,
+              to_char(s.created_at AT TIME ZONE 'Asia/Hong_Kong', 'YYYY-MM-DD HH24:MI') AS created_at_hk,
               s.created_at, s.updated_at,
               (SELECT COUNT(*) FROM fan_events e WHERE e.actress_id = s.actress_id) AS events_seen
        FROM fan_subscriptions s
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest) {
         return /[",\n]/.test(x) ? `"${x.replace(/"/g, '""')}"` : x;
       };
       const lines = [head.join(',')].concat(
-        rows.map((r) => [r.actress_id, r.name_ja || r.name_cn, r.status, r.tg_handle, r.ig_handle, r.email, r.channel_pref, r.region_pref, r.created_at].map(esc).join(',')),
+        rows.map((r) => [r.actress_id, r.name_ja || r.name_cn, r.status, r.tg_handle, r.ig_handle, r.email, r.channel_pref, r.region_pref, r.created_at_hk].map(esc).join(',')),
       );
       return new NextResponse('﻿' + lines.join('\n'), {
         headers: {
