@@ -29,6 +29,8 @@ function Row({ sub, token, onReviewed }: { sub: Submission; token: string; onRev
   const [searching, setSearching] = useState(false);
   const [showReject, setShowReject] = useState(false);
   const [note, setNote] = useState('');
+  const [eventType, setEventType] = useState<'meet' | 'photo' | 'other'>('other');
+  const [venue, setVenue] = useState('');
 
   useEffect(() => { search(); /* 首次用女優名自動搜 */ /* eslint-disable-next-line */ }, []);
 
@@ -109,11 +111,31 @@ function Row({ sub, token, onReviewed }: { sub: Submission; token: string; onRev
         )}
       </div>
 
+      {/* 活動類型 + 場地 */}
+      <div className="mt-3 border-t border-border pt-3 grid gap-2 sm:grid-cols-2">
+        <div>
+          <label className="text-xs font-semibold text-text-secondary">活動類型</label>
+          <div className="flex gap-1.5 mt-1">
+            {([['meet', '見面會'], ['photo', '攝影會'], ['other', '其他']] as const).map(([v, l]) => (
+              <button key={v} onClick={() => setEventType(v)}
+                className={`text-xs px-3 py-1.5 rounded-full border min-h-[32px] ${eventType === v ? 'bg-[rgb(var(--color-nadeshiko-dark))] text-white border-transparent' : 'border-border hover:bg-sakura-gray'}`}>
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-semibold text-text-secondary">具體場地（選填）</label>
+          <input value={venue} onChange={(e) => setVenue(e.target.value)} placeholder="例：旺角某某 Studio"
+            className="mt-1 w-full min-h-[40px] px-3 rounded-lg border border-border text-sm" />
+        </div>
+      </div>
+
       {/* 操作 */}
       <div className="mt-3 flex items-center gap-2 flex-wrap">
         <button
           disabled={busy || !/^\d+$/.test(actressId)}
-          onClick={() => call({ action: 'approve', id: sub.id, actressId })}
+          onClick={() => call({ action: 'approve', id: sub.id, actressId, eventType, venue })}
           className="inline-flex items-center gap-1.5 min-h-[40px] px-4 rounded-lg bg-emerald-600 text-white text-sm font-semibold disabled:opacity-40"
         >
           <Check className="w-4 h-4" /> 批准上架

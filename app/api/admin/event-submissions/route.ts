@@ -63,20 +63,33 @@ export async function POST(request: NextRequest) {
 
       // 管理員可微調日期/地點/標題，否則用提交原值
       const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(String(body.eventDate || '')) ? body.eventDate : sub.event_date;
-      const location = String(body.location || sub.location).slice(0, 200);
+      const prefecture = String(body.prefecture || sub.location || '').slice(0, 60);
+      const venue = String(body.venue || '').slice(0, 120);
       const title = String(body.title || sub.content).slice(0, 300);
+      const eventType = ['meet', 'photo', 'other'].includes(body.eventType) ? body.eventType : 'other';
       const eventId = `fans-${id}`;
       const sourceUrl = sub.source_url || '';
+      // 第三方/社群提交統一 organizer='community'（自家主辦先係 javstarmeet），
+      // 保持日曆中立；有外部售票連結一律過 18+ 中繼頁，唔直鏈出站。
+      const gateUrl = sourceUrl
+        ? `/partner?${new URLSearchParams({
+            to: sourceUrl,
+            title: title.slice(0, 120),
+          }).toString()}`
+        : '';
 
       await sql`
-        INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, created_at, date_iso)
-        VALUES (${eventId}, ${actressId}, ${title}, ${eventDate}, '', ${location}, 'other', ${sourceUrl}, now()::text, ${eventDate}::date)
+        INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, organizer, created_at, date_iso)
+        VALUES (${eventId}, ${actressId}, ${title}, ${eventDate}, ${prefecture}, ${venue}, ${eventType}, ${gateUrl}, 'community', now()::text, ${eventDate}::date)
         ON CONFLICT (id) DO UPDATE SET
           actress_id = EXCLUDED.actress_id,
           title = EXCLUDED.title,
           datetime = EXCLUDED.datetime,
+          prefecture = EXCLUDED.prefecture,
           venue = EXCLUDED.venue,
+          event_type = EXCLUDED.event_type,
           url = EXCLUDED.url,
+          organizer = EXCLUDED.organizer,
           date_iso = EXCLUDED.date_iso
       `;
 

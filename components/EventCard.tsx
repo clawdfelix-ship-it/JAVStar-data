@@ -9,6 +9,7 @@ interface EventCardProps {
   datetime: string;
   event_type: string;
   url: string;
+  organizer?: string | null;
   actress_name?: string;
   actress_avatar?: string;
   showActress?: boolean;
@@ -102,6 +103,7 @@ function EventCardComponent({
   datetime, 
   event_type, 
   url,
+  organizer,
   actress_name,
   actress_avatar,
   showActress = true,
@@ -110,13 +112,11 @@ function EventCardComponent({
   const today = isToday(datetime);
   const tomorrow = isTomorrow(datetime);
 
-  return (
-    <a 
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`fdb-card block p-4 ${!upcoming ? 'opacity-60' : ''}`}
-    >
+  // 有連結先做可點卡片；相對（站內 /partner 中繼頁）同頁開，外部先開新分頁。
+  const hasLink = !!url;
+  const external = /^https?:\/\//.test(url);
+  const Inner = (
+    <>
       {/* Top Row: Date + Type + Status */}
       <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
         <div className="flex items-center gap-2">
@@ -129,24 +129,31 @@ function EventCardComponent({
               {formatTime(datetime)}
             </span>
           </div>
-          
+
           {today && (
-            <span className="fdb-badge bg-gradient-to-r from-red-100 to-red-50 text-red-600 border border-red-200 pulse-animation flex items-center gap-1">
+            <span className="fdb-badge bg-gradient-to-r from-red-100 to-red-5 text-red-600 border border-red-200 pulse-animation flex items-center gap-1">
               <Flame className="w-3 h-3" />
               <span>今日</span>
             </span>
           )}
           {tomorrow && (
-            <span className="fdb-badge bg-gradient-to-r from-amber-100 to-amber-50 text-amber-600 border border-amber-200 flex items-center gap-1">
+            <span className="fdb-badge bg-gradient-to-r from-amber-100 to-amber-5 text-amber-600 border border-amber-200 flex items-center gap-1">
               <Zap className="w-3 h-3" />
               <span>聽日</span>
             </span>
           )}
         </div>
-        
-        <span className="fdb-badge fdb-badge-primary">
-          {getEventTypeLabel(event_type, title)}
-        </span>
+
+        <div className="flex items-center gap-1.5">
+          {organizer === 'community' && (
+            <span className="fdb-badge bg-sakura-gray/40 text-text-tertiary border border-border" title="粉絲/第三方主辦提交，經審核">
+              合作夥伴
+            </span>
+          )}
+          <span className="fdb-badge fdb-badge-primary">
+            {getEventTypeLabel(event_type, title)}
+          </span>
+        </div>
       </div>
 
       {/* Venue Location */}
@@ -170,8 +177,8 @@ function EventCardComponent({
       {showActress && actress_name && (
         <div className="flex items-center gap-2 mb-3 p-2.5 bg-sakura-gray/20 rounded-lg">
           {actress_avatar ? (
-            <img 
-              src={actress_avatar} 
+            <img
+              src={actress_avatar}
               alt={actress_name}
               className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-sm"
               loading="lazy"
@@ -194,9 +201,22 @@ function EventCardComponent({
           #{id.length > 8 ? id.slice(0, 8) : id}
         </span>
         <span className="text-xs text-[rgb(var(--color-wine))] font-medium flex items-center gap-1">
-          詳情 →
+          {hasLink ? '詳情 →' : '情報參考'}
         </span>
       </div>
+    </>
+  );
+
+  if (!hasLink) {
+    return <div className={`fdb-card block p-4 ${!upcoming ? 'opacity-60' : ''}`}>{Inner}</div>;
+  }
+  return (
+    <a
+      href={url}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      className={`fdb-card block p-4 ${!upcoming ? 'opacity-60' : ''}`}
+    >
+      {Inner}
     </a>
   );
 }
