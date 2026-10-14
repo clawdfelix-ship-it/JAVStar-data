@@ -53,10 +53,11 @@ if (EXECUTE && !jc.INGEST_TOKEN) {
   process.exit(1);
 }
 
-// 中文商品標題女優名 -> JCHING actress id + 日文顯示名。新增女優時加一行。
+// 中文商品標題女優名 -> JCHING actress id + 日文顯示名 + Shopify collection handle。
+// 新增女優時加一行；collection 為店鋪「一女優一 collection（smart, rule tag=女優名）」。
 const ACTRESS_MAP = {
-  '篠原伊代': { id: '192328', ja: '篠原いよ' },
-  '松永明里': { id: '839276', ja: '松永あかり' },
+  '篠原伊代': { id: '192328', ja: '篠原いよ', collection: '篠原伊代' },
+  '松永明里': { id: '839276', ja: '松永あかり', collection: '松永明里' },
 };
 
 const SESSION_LABEL = {
@@ -125,7 +126,9 @@ function buildEvents(products) {
       const title = g.kind === 'flash'
         ? `${g.ja} ${label} ${dm}`
         : `${g.ja} ${label} ${dm}`;
-      const to = `https://www.javstarmeet.com/search?q=${encodeURIComponent(g.cn)}`;
+      const to = g.collection
+        ? `https://www.javstarmeet.com/collections/${encodeURIComponent(g.collection)}`
+        : `https://www.javstarmeet.com/search?q=${encodeURIComponent(g.cn)}`;
       const gateTitle = `${g.ja} ${label}（${dm}）`;
       const url = `/partner?${new URLSearchParams({ to, title: gateTitle }).toString()}`;
       return {
