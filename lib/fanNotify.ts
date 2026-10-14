@@ -1,4 +1,5 @@
 import sql from '@/lib/db';
+import { hasIngestToken } from '@/lib/token-auth';
 
 // ─────────────────────────────────────────────────────────────
 // JCHING 港台場通知閉環（Telegram）
@@ -63,15 +64,6 @@ export function randomCode(bytes = 9): string {
   return randomBytes(bytes).toString('base64url').slice(0, 12);
 }
 
-// constant-time token check shared by bot-facing endpoints
-export function timingEq(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let m = 0;
-  for (let i = 0; i < a.length; i++) m |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return m === 0;
-}
 export function ingestAuthed(req: Request): boolean {
-  const provided = req.headers.get('x-ingest-token') || req.headers.get('x-admin-token');
-  const cands = [process.env.INGEST_TOKEN, process.env.ADMIN_TOKEN].filter(Boolean) as string[];
-  return !!provided && cands.some((c) => timingEq(provided, c));
+  return hasIngestToken(req.headers);
 }

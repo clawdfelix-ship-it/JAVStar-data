@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
-import { ensureFanNotifyTables, ingestAuthed, randomCode } from '@/lib/fanNotify';
+import { ensureFanNotifyTables, randomCode } from '@/lib/fanNotify';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +9,8 @@ export const dynamic = 'force-dynamic';
 // POST { event_id } → { pull_code, recipients, title, url, ... }
 // 冪等：同一 event_id 若已有未拉取批次，重用；已拉取則報錯（要人手 reissue）。
 export async function POST(req: NextRequest) {
-  if (!ingestAuthed(req)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     await ensureFanNotifyTables();
     const b = await req.json();

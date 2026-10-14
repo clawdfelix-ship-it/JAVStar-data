@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-function timingEq(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let m = 0;
-  for (let i = 0; i < a.length; i++) m |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return m === 0;
-}
-// accept ADMIN_TOKEN (UI login) or the scoped INGEST_TOKEN (sync/ops scripts)
-function authed(req: NextRequest): boolean {
-  const provided = req.headers.get('x-admin-token') || req.headers.get('x-ingest-token');
-  const cands = [process.env.ADMIN_TOKEN, process.env.INGEST_TOKEN].filter(Boolean) as string[];
-  return !!provided && cands.some((c) => timingEq(provided, c));
-}
-
 export async function GET(req: NextRequest) {
-  if (!authed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const denied = requireAdmin(req);
+  if (denied) return denied;
 
   try {
     const sp = req.nextUrl.searchParams;
@@ -92,7 +81,8 @@ export async function GET(req: NextRequest) {
 
 // Admin：永久刪除一條追蹤（清理壞/測試記錄）。DELETE ?actress_id=&identity_key=
 export async function DELETE(req: NextRequest) {
-  if (!authed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const sp = req.nextUrl.searchParams;
     const actressId = (sp.get('actress_id') || '').trim();
