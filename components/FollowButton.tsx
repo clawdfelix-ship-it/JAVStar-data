@@ -36,6 +36,29 @@ export default function FollowButton({ actressId, size = 'md', className = '' }:
   const [tw, setTw] = useState(false);
   const [err, setErr] = useState('');
   const [done, setDone] = useState(false);
+  const [tgLinking, setTgLinking] = useState(false);
+
+  // 一鍵 Telegram：開 bind-code，跳去 bot deep-link（bot 回報 chat_id 自動綁定）
+  const tgOneTap = useCallback(async () => {
+    setErr('');
+    setTgLinking(true);
+    try {
+      const region = [hk ? 'hk' : '', tw ? 'taiwan' : ''].filter(Boolean).join(',') || 'hk';
+      const res = await fetch('/api/fan/bind-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actress_id: actressId, region_pref: region.split(',')[0] }),
+      });
+      const d = await res.json();
+      if (!res.ok || !d.deeplink) throw new Error(d.error || 'failed');
+      window.open(d.deeplink, '_blank', 'noopener');
+      setDone(true);
+    } catch {
+      setErr('開啟 Telegram 失敗，可改用下面手動填 username');
+    } finally {
+      setTgLinking(false);
+    }
+  }, [actressId, hk, tw]);
 
   useEffect(() => {
     try {
@@ -151,12 +174,25 @@ export default function FollowButton({ actressId, size = 'md', className = '' }:
                 </div>
 
                 {channel === 'tg' && (
-                  <input
-                    value={tg}
-                    onChange={(e) => setTg(e.target.value)}
-                    placeholder="@username 或電話"
-                    className="w-full rounded-lg border border-[rgba(var(--color-sakura-gray),0.6)] px-3 py-2 text-sm outline-none focus:border-[rgb(var(--color-nadeshiko-dark))]"
-                  />
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={tgOneTap}
+                      disabled={tgLinking}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#229ED9] py-2.5 text-sm font-bold text-white transition active:scale-[0.98] disabled:opacity-50"
+                    >
+                      {tgLinking ? '開啟中…' : '✈️ 一鍵用 Telegram 訂閱'}
+                    </button>
+                    <div className="flex items-center gap-2 text-[10px] text-[rgb(var(--color-umenezumi-light))]/40">
+                      <span className="h-px flex-1 bg-[rgba(var(--color-sakura-gray),0.6)]" />或手動填<span className="h-px flex-1 bg-[rgba(var(--color-sakura-gray),0.6)]" />
+                    </div>
+                    <input
+                      value={tg}
+                      onChange={(e) => setTg(e.target.value)}
+                      placeholder="@username 或電話"
+                      className="w-full rounded-lg border border-[rgba(var(--color-sakura-gray),0.6)] px-3 py-2 text-sm outline-none focus:border-[rgb(var(--color-nadeshiko-dark))]"
+                    />
+                  </div>
                 )}
                 {channel === 'ig' && (
                   <input

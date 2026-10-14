@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { ShieldCheck, Loader2, Download, Bell, Copy, Check } from 'lucide-react';
+import { ShieldCheck, Loader2, Download, Bell, Copy, Check, Send } from 'lucide-react';
 
 interface Sub {
   id: string;
@@ -17,6 +17,10 @@ interface Sub {
   created_at: string;
 }
 interface Count { actress_id: string; name: string; active: number; }
+interface NotifyEvent {
+  id: string; title: string; date_iso: string; venue: string | null; prefecture: string | null;
+  tg_recipients: number; batch_pending: boolean; batch_sent: boolean;
+}
 
 export default function FansAdminClient() {
   const [token, setToken] = useState('');
@@ -27,6 +31,9 @@ export default function FansAdminClient() {
   const [rows, setRows] = useState<Sub[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState('');
+  const [events, setEvents] = useState<NotifyEvent[]>([]);
+  const [busyId, setBusyId] = useState('');
+  const [codes, setCodes] = useState<Record<string, string>>({});
 
   const loadCounts = useCallback(async (tk: string) => {
     const r = await fetch('/api/admin/fan-subscriptions', { headers: { 'x-admin-token': tk } });
@@ -36,6 +43,11 @@ export default function FansAdminClient() {
       setRows(d.data || []);
     }
     return r.status;
+  }, []);
+
+  const loadEvents = useCallback(async (tk: string) => {
+    const r = await fetch('/api/admin/notify-events', { headers: { 'x-admin-token': tk } });
+    if (r.ok) setEvents((await r.json()).events || []);
   }, []);
 
   const loadActress = useCallback(async (id: string, tk: string) => {
@@ -52,7 +64,21 @@ export default function FansAdminClient() {
     if (t) { setToken(t); setAuthed(true); }
   }, []);
 
-  useEffect(() => { if (authed) { loadCounts(token); } }, [authed, token, loadCounts]);
+  useEffect(() => { if (authed) { loadCounts(token); loadEvents(token); } }, [authed, token, loadCounts, loadEvents]);
+
+  async function createBatch(ev: NotifyEvent) {
+    setBusyId(ev.id);
+    try {
+      const r = await fetch('/api/admin/notify-create', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ event_id: ev.id }),
+      });
+      const d = await r.json();
+      if (!r.ok) { alert(d.error || '建立失敗'); return; }
+      setCodes((c) => ({ ...c, [ev.id]: d.pull_code }));
+      loadEvents(token);
+    } finally { setBusyId(''); }
+  }
 
   function login() {
     if (token.trim()) { sessionStorage.setItem('admin_token', token.trim()); setAuthed(true); }
@@ -114,6 +140,43 @@ export default function FansAdminClient() {
           </div>
         )}
       </div>
+
+      {/* Telegram 開票通知批次 */}
+      {events.length > 0 && (
+        <div className="bg-white rounded-2xl border p-4 mb-4">
+          <p className="text-xs font-semibold text-text-tertiary mb-1">Telegram 開票通知（自家場）</p>
+          <p className="text-[10px] text-text-tertiary mb-3">撳「產生發送碼」後，喺 VVIP bot 打 <code>/fanpull &lt;碼&gt;</code> 就會逐個發送。碼單次有效。</p>
+          <div className="space-y-2">
+            {events.map((ev) => (
+              <div key={ev.id} className="rounded-xl border p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-text-primary leading-snug">{ev.title}</p>
+                    <p className="text-[11px] text-text-tertiary mt-0.5">
+                      {String(ev.date_iso).slice(0, 10)} · {ev.venue || ev.prefecture || ''} · 可發 {ev.tg_recipients} 人
+                      {ev.batch_sent && <span className="ml-1 text-green-600 font-semibold">（已發送）</span>}
+                    </p>
+                  </div>
+                  <button onClick={() => createBatch(ev)} disabled={busyId === ev.id || ev.tg_recipients === 0}
+                    className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-[#229ED9] text-white disabled:opacity-40">
+                    {busyId === ev.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                    產生發送碼
+                  </button>
+                </div>
+                {codes[ev.id] && (
+                  <div className="mt-2 flex items-center gap-2 rounded-lg bg-pink-50 px-2.5 py-2">
+                    <code className="text-xs font-bold text-pink-700 break-all">/fanpull {codes[ev.id]}</code>
+                    <button onClick={() => copy(`/fanpull ${codes[ev.id]}`, 'pull-' + ev.id)}
+                      className="ml-auto shrink-0 text-pink-600">
+                      {copied === 'pull-' + ev.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* actions */}
       <div className="flex gap-2 mb-4 flex-wrap">
