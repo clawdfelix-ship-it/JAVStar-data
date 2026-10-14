@@ -89,3 +89,23 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
   }
 }
+
+// Admin：永久刪除一條追蹤（清理壞/測試記錄）。DELETE ?actress_id=&identity_key=
+export async function DELETE(req: NextRequest) {
+  if (!authed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const sp = req.nextUrl.searchParams;
+    const actressId = (sp.get('actress_id') || '').trim();
+    const identity = (sp.get('identity_key') || '').trim();
+    if (!/^\d+$/.test(actressId) || !/^[a-z]{1,8}:[A-Za-z0-9_.@+-]{1,100}$/.test(identity)) {
+      return NextResponse.json({ error: 'bad request' }, { status: 400 });
+    }
+    const sql = getSql();
+    const del = await sql`DELETE FROM fan_subscriptions
+      WHERE actress_id=${actressId} AND identity_key=${identity} RETURNING id`;
+    return NextResponse.json({ deleted: (del as any[]).length });
+  } catch (e) {
+    console.error('fan-subscriptions delete', e);
+    return NextResponse.json({ error: 'failed' }, { status: 500 });
+  }
+}

@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
              (
                SELECT count(*) FROM fan_subscriptions s
                WHERE s.actress_id = e.actress_id AND s.status='active'
-                 AND s.identity_key LIKE 'tg:%'
+                 AND s.identity_key LIKE 'tgchat:%'
                  AND (',' || s.region_pref || ',') LIKE
                      CASE WHEN e.prefecture LIKE '%台%' THEN '%,taiwan,%' ELSE '%,hk,%' END
              )::int AS tg_recipients,

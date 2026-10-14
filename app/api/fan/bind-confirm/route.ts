@@ -29,13 +29,14 @@ export async function POST(req: NextRequest) {
     }
     const row = (upd as any[])[0];
 
-    // 同步落 fan_subscriptions：以 tg chat 作為持久身份，channel=tg、active。
-    // identity_key 用 tg:<chatId>，避免同人多碼重複；tg_handle 僅供顯示。
+    // identity_key 用 tgchat:<chatId>（有真 chat_id 先可以 bot 推送）；
+    // 與手動填表嘅 t:<handle>（無 chat_id、不能直接推送）分開。tg_handle 僅供顯示。
     const handle = String(b.tg_handle || '').replace(/^@/, '').trim();
+    const identity = 'tgchat:' + chatId;
     await sql`
       INSERT INTO fan_subscriptions
         (actress_id, tg_handle, identity_key, channel_pref, region_pref, source, status)
-      VALUES (${row.actress_id}, ${handle || ('tg:' + chatId)}, ${'tg:' + chatId},
+      VALUES (${row.actress_id}, ${handle || ('tg:' + chatId)}, ${identity},
               'tg', ${row.region_pref}, 'jching-tg', 'active')
       ON CONFLICT (actress_id, identity_key)
       DO UPDATE SET

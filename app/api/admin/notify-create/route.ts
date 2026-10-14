@@ -26,13 +26,13 @@ export async function POST(req: NextRequest) {
     const dateStr = e.date_iso instanceof Date ? e.date_iso.toISOString().slice(0, 10) : String(e.date_iso).slice(0, 10);
 
     // 受眾：channel 含 tg、active、追蹤該女優、地區偏好包含本場地區；
-    // chat_id 以 identity_key='tg:<id>' 還原（bind-confirm 寫法）。
+    // chat_id 以 identity_key='tgchat:<id>' 還原（bind-confirm 寫法）。
     const recips = await sql`
       SELECT DISTINCT split_part(s.identity_key, ':', 2)::bigint AS chat_id
       FROM fan_subscriptions s
       WHERE s.actress_id=${e.actress_id}
         AND s.status='active'
-        AND s.identity_key LIKE 'tg:%'
+        AND s.identity_key LIKE 'tgchat:%'
         AND (',' || s.region_pref || ',') LIKE ${'%,' + region + ',%'}`;
     const chats = (recips as any[]).map((r) => r.chat_id).filter(Boolean);
     if (chats.length === 0) {
