@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-// Admin: list/export fan subscriptions (「港台場通知我」名單)。
-// Header x-admin-token required.
-// GET /api/admin/fan-subscriptions
-//   ?actress_id=     (optional; omit = all, grouped counts included)
-//   &status=active   (default active; use 'all' for every status)
-//   &format=csv      (download CSV instead of JSON)
-//   &region=hk|taiwan (optional match on region_pref containing value)
+function timingEq(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let m = 0;
+  for (let i = 0; i < a.length; i++) m |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return m === 0;
+}
+// accept ADMIN_TOKEN (UI login) or the scoped INGEST_TOKEN (sync/ops scripts)
+function authed(req: NextRequest): boolean {
+  const provided = req.headers.get('x-admin-token') || req.headers.get('x-ingest-token');
+  const cands = [process.env.ADMIN_TOKEN, process.env.INGEST_TOKEN].filter(Boolean) as string[];
+  return !!provided && cands.some((c) => timingEq(provided, c));
+}
+
 export async function GET(req: NextRequest) {
-  const denied = requireAdmin(req);
-  if (denied) return denied;
+  if (!authed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const sp = req.nextUrl.searchParams;
