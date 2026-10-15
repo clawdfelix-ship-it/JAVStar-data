@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import EventSubmissionForm from '@/components/EventSubmissionForm';
+import { getEventHref } from '@/lib/event-utils';
 import CalendarMonth from './CalendarMonth';
 
 interface Event {
@@ -249,51 +250,77 @@ export default function EventsClient() {
                   )}
                 </h2>
                 <div className="space-y-2">
-                  {dayEvents.map(ev => (
-                    <a
-                      key={ev.id}
-                      href={ev.url || `https://www.av-event.jp/event/${ev.id}/`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-4 bg-white border border-border rounded-xl p-4 hover:border-primary transition-colors group"
-                    >
-                      {/* Time / weekday — source has no start time for date-only events */}
-                      <div className="text-center min-w-[60px]">
-                        <div className="text-primary-dark font-bold text-sm">
-                          {new Date(ev.datetime.includes('T') ? ev.datetime : ev.datetime + 'T00:00:00+09:00').toLocaleDateString('ja-JP', { weekday: 'short' })}
+                  {dayEvents.map(ev => {
+                    const href = getEventHref(ev);
+                    const cardClass = href
+                      ? 'flex items-center gap-4 bg-white border border-border rounded-xl p-4 hover:border-primary transition-colors group'
+                      : 'flex items-center gap-4 bg-white border border-border rounded-xl p-4 opacity-80';
+
+                    const content = (
+                      <>
+                        {/* Time / weekday — source has no start time for date-only events */}
+                        <div className="text-center min-w-[60px]">
+                          <div className="text-primary-dark font-bold text-sm">
+                            {new Date(ev.datetime.includes('T') ? ev.datetime : ev.datetime + 'T00:00:00+09:00').toLocaleDateString('ja-JP', { weekday: 'short' })}
+                          </div>
                         </div>
-                      </div>
-                      {/* Event info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-xs px-2 py-0.5 rounded border font-medium ${getEventTypeColor(ev.event_type)}`}>
-                            {getEventTypeLabel(ev.event_type)}
-                          </span>
-                          {isToday(ev.datetime) && (
-                            <span className="text-xs px-2 py-0.5 rounded border font-bold" style={{backgroundColor:'rgb(var(--color-nadeshiko-dark))', color:'white'}}>今日</span>
+                        {/* Event info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs px-2 py-0.5 rounded border font-medium ${getEventTypeColor(ev.event_type)}`}>
+                              {getEventTypeLabel(ev.event_type)}
+                            </span>
+                            {isToday(ev.datetime) && (
+                              <span className="text-xs px-2 py-0.5 rounded border font-bold" style={{backgroundColor:'rgb(var(--color-nadeshiko-dark))', color:'white'}}>今日</span>
+                            )}
+                          </div>
+                          <div className="font-bold text-text-primary text-sm truncate group-hover:text-primary-dark transition-colors">{ev.title}</div>
+                          {ev.actress_name && (
+                            <div className="text-xs text-text-tertiary mt-0.5">{ev.actress_name}</div>
+                          )}
+                          {ev.organizer && (
+                            <div className="text-xs text-text-tertiary mt-0.5">🏢 {ev.organizer}</div>
+                          )}
+                          {ev.prefecture === 'オンライン' ? (
+                            <div className="text-xs text-text-tertiary mt-1">🌐 オンライン活動</div>
+                          ) : (
+                            <div className="text-xs text-text-tertiary mt-1">📍 {ev.venue || ev.prefecture}{ev.venue && ev.prefecture && ev.venue !== ev.prefecture ? ` · ${ev.prefecture}` : ''}</div>
+                          )}
+                          {!href && (
+                            <div className="text-xs text-text-tertiary mt-1">主辦方未提供外部連結</div>
                           )}
                         </div>
-                        <div className="font-bold text-text-primary text-sm truncate group-hover:text-primary-dark transition-colors">{ev.title}</div>
-                        {ev.actress_name && (
-                          <div className="text-xs text-text-tertiary mt-0.5">{ev.actress_name}</div>
+                        {/* External link icon */}
+                        {href && (
+                          <div className="text-text-tertiary group-hover:text-primary-dark transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </div>
                         )}
-                        {ev.organizer && (
-                          <div className="text-xs text-text-tertiary mt-0.5">🏢 {ev.organizer}</div>
-                        )}
-                        {ev.prefecture === 'オンライン' ? (
-                          <div className="text-xs text-text-tertiary mt-1">🌐 オンライン活動</div>
-                        ) : (
-                          <div className="text-xs text-text-tertiary mt-1">📍 {ev.venue || ev.prefecture}{ev.venue && ev.prefecture && ev.venue !== ev.prefecture ? ` · ${ev.prefecture}` : ''}</div>
-                        )}
-                      </div>
-                      {/* External link icon */}
-                      <div className="text-text-tertiary group-hover:text-primary-dark transition-colors">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </div>
-                    </a>
-                  ))}
+                      </>
+                    );
+
+                    if (!href) {
+                      return (
+                        <div key={ev.id} className={cardClass}>
+                          {content}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <a
+                        key={ev.id}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cardClass}
+                      >
+                        {content}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             ))}

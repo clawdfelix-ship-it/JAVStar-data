@@ -1,4 +1,5 @@
 import { sql, getSql } from '@/lib/db';
+import { TAIWAN_CITIES, escapeSqlLiteral } from '@/lib/event-utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET /api/events - List events.
@@ -43,7 +44,6 @@ export async function GET(request: NextRequest) {
     // Region filter
     // 台灣城市（來源只標「台灣」未註明城市者，匯入時預設歸 '台北'）。
     // 舊版只 match '台北'，導致高雄/台中場消失、甚至被誤歸日本。
-    const TAIWAN_CITIES = ['台北', '新北', '高雄', '台中', '台南', '桃園', '基隆', '新竹', '嘉義', '屏東', '宜蘭', '花蓮', '台東'];
     const twList = TAIWAN_CITIES.map(c => `'${c}'`).join(', ');
     const regionClauses: Record<string, string> = {
       japan: `prefecture IS NOT NULL AND prefecture != '' AND prefecture NOT IN (${twList}) AND prefecture != 'オンライン' AND prefecture NOT LIKE '%香港%'`,
@@ -52,6 +52,10 @@ export async function GET(request: NextRequest) {
       online: "prefecture = 'オンライン'",
     };
 
+    const safePrefecture = prefecture ? escapeSqlLiteral(prefecture) : '';
+    const safeEventType = eventType ? escapeSqlLiteral(eventType) : '';
+    const safeOrganizer = organizer ? escapeSqlLiteral(organizer) : '';
+
     // Build base WHERE conditions.
     // Date filtering uses normalized `date_iso` (DATE) compared against CURRENT_DATE;
     // rows with an unparseable date (date_iso IS NULL) are garbage and excluded.
@@ -59,9 +63,9 @@ export async function GET(request: NextRequest) {
       const parts: string[] = ['e.date_iso IS NOT NULL'];
       if (!pastFilter) parts.push('e.date_iso >= CURRENT_DATE');
       parts.push("e.actress_id IS NOT NULL AND e.actress_id != '0' AND e.actress_id != 'unknown'");
-      if (prefecture) parts.push(`e.prefecture = '${prefecture}'`);
-      if (eventType) parts.push(`e.event_type = '${eventType}'`);
-      if (organizer) parts.push(`e.organizer = '${organizer.replace(/'/g, "''")}'`);
+      if (safePrefecture) parts.push(`e.prefecture = '${safePrefecture}'`);
+      if (safeEventType) parts.push(`e.event_type = '${safeEventType}'`);
+      if (safeOrganizer) parts.push(`e.organizer = '${safeOrganizer}'`);
       if (region && region !== 'all' && regionClauses[region]) {
         parts.push(regionClauses[region]);
       }
@@ -77,9 +81,9 @@ export async function GET(request: NextRequest) {
       const parts: string[] = ['date_iso IS NOT NULL'];
       if (!pastFilter) parts.push('date_iso >= CURRENT_DATE');
       parts.push("actress_id IS NOT NULL AND actress_id != '0' AND actress_id != 'unknown'");
-      if (prefecture) parts.push(`prefecture = '${prefecture}'`);
-      if (eventType) parts.push(`event_type = '${eventType}'`);
-      if (organizer) parts.push(`organizer = '${organizer.replace(/'/g, "''")}'`);
+      if (safePrefecture) parts.push(`prefecture = '${safePrefecture}'`);
+      if (safeEventType) parts.push(`event_type = '${safeEventType}'`);
+      if (safeOrganizer) parts.push(`organizer = '${safeOrganizer}'`);
       if (region && region !== 'all' && regionClauses[region]) {
         parts.push(regionClauses[region]);
       }

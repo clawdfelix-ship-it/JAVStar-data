@@ -25,6 +25,7 @@ import Logo from '@/components/Logo';
 import { useActresses } from '@/hooks/useActresses';
 import { useEvents } from '@/hooks/useEvents';
 import { useStats } from '@/hooks/useStats';
+import { TAIWAN_CITIES } from '@/lib/event-utils';
 
 // ====================
 // Type Definitions
@@ -260,9 +261,9 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       const p = e.prefecture || '';
       switch (calendarRegion) {
         case 'japan':
-          return p !== '' && p !== '台北' && p !== 'オンライン' && !p.includes('香港');
+          return p !== '' && !TAIWAN_CITIES.includes(p as (typeof TAIWAN_CITIES)[number]) && p !== 'オンライン' && !p.includes('香港');
         case 'taiwan':
-          return p === '台北';
+          return TAIWAN_CITIES.includes(p as (typeof TAIWAN_CITIES)[number]);
         case 'hk':
           return p.includes('香港');
         case 'online':

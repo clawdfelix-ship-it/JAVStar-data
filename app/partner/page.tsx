@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { normalizePartnerTarget } from '@/lib/event-utils';
 
 // 合作夥伴場次中繼頁（18+ 確認）。
 // JCHING 日曆保持中立：活動卡只連到呢個站內頁，確認年齡＋離站後先跳外部售票。
@@ -13,7 +14,7 @@ function GateInner() {
   const [leaving, setLeaving] = useState(false);
 
   // 簡單防濫用：to 必須係 http(s)
-  const safeTo = /^https?:\/\//.test(to) ? to : '';
+  const safeTo = normalizePartnerTarget(to);
 
   useEffect(() => {
     if (!leaving || !safeTo) return;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { buildPartnerGateUrl, normalizeSubmissionPrefecture } from '@/lib/event-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
 
       // 管理員可微調日期/地點/標題，否則用提交原值
       const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(String(body.eventDate || '')) ? body.eventDate : sub.event_date;
-      const prefecture = String(body.prefecture || sub.location || '').slice(0, 60);
+      const prefecture = normalizeSubmissionPrefecture(String(body.prefecture || sub.location || '')).slice(0, 60);
       const venue = String(body.venue || '').slice(0, 120);
       const title = String(body.title || sub.content).slice(0, 300);
       const eventType = ['meet', 'photo', 'other'].includes(body.eventType) ? body.eventType : 'other';
@@ -71,12 +72,7 @@ export async function POST(request: NextRequest) {
       const sourceUrl = sub.source_url || '';
       // 第三方/社群提交統一 organizer='community'（自家主辦先係 javstarmeet），
       // 保持日曆中立；有外部售票連結一律過 18+ 中繼頁，唔直鏈出站。
-      const gateUrl = sourceUrl
-        ? `/partner?${new URLSearchParams({
-            to: sourceUrl,
-            title: title.slice(0, 120),
-          }).toString()}`
-        : '';
+      const gateUrl = buildPartnerGateUrl(sourceUrl, title);
 
       await sql`
         INSERT INTO events (id, actress_id, title, datetime, prefecture, venue, event_type, url, organizer, created_at, date_iso)
