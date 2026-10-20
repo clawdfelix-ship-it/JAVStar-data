@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth';
 import { sql } from '@/lib/db';
 
 // Cache 配置
@@ -85,7 +86,10 @@ export async function GET() {
 }
 
 // POST - 手動更新排行榜
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const { ranking, source = 'DMM' } = await request.json();
     
