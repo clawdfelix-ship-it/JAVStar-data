@@ -71,7 +71,8 @@ export default async function EventDetailPage({
   if (!row) notFound();
 
   const program = (row.program_json || null) as Record<string, any> | null;
-  const actress = row.name_cn || row.name_ja || '';
+  // 注意：DB name_cn 試過係垃圾值（「古賀まつな【旧名】」），唔可信；女優名統一用日文顯示名。
+  const actress = row.name_ja || row.name_cn || '';
 
   return (
     <main className="min-h-screen bg-[#0d0b08] text-stone-100">

@@ -190,14 +190,22 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
           
           {/* Action buttons */}
           <div className="mt-6 flex gap-3">
+            {event.id && (
+              <a
+                href={`/events/${encodeURIComponent(String(event.id))}`}
+                className="fdb-btn fdb-btn-primary flex-1"
+              >
+                活動詳情
+              </a>
+            )}
             {event.url && (
               <a 
                 href={event.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="fdb-btn fdb-btn-primary flex-1"
+                className="fdb-btn fdb-btn-outline flex-1"
               >
-                查看原文
+                前往購票
               </a>
             )}
             <button 

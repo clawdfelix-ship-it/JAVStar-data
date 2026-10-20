@@ -62,11 +62,34 @@ if (!Array.isArray(doc.events)) {
 let picked = doc.events;
 if (ONLY) picked = picked.filter((e) => e.event_id === ONLY);
 
+// upsert 必填 actress_id + date（YYYY-MM-DD）。
+// id 格式 javstar-<actressId>-<YYYYMMDD>-<kind>，可拆；同時支援顯式 date 欄。
+function idParts(id) {
+  const m = String(id).match(/^javstar-(\d+)-(\d{4})(\d{2})(\d{2})-/);
+  return m ? { actress_id: m[1], date: `${m[2]}-${m[3]}-${m[4]}` } : null;
+}
+
 // 每筆組出 upsert payload。核心欄位由現有 API row 帶返，program 直接掛上去。
 const out = [];
 for (const ev of picked) {
+  const parts = idParts(ev.event_id) || {};
+  const actress_id = String(doc.actress?.id || parts.actress_id || '');
+  const date = ev.date || parts.date || '';
+  if (!/^\d+$/.test(actress_id) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    console.error(`✗ ${ev.event_id}: 缺有效 actress_id/date（actress_id=${actress_id}, date=${date}），跳過`);
+    process.exit(1);
+  }
   out.push({
     id: ev.event_id,
+    actress_id,
+    date,
+    // 核心欄位先留空，下面由現有 JCHING row 回填，避免改動 DB 現有分類值
+    title: '',
+    prefecture: '',
+    venue: '',
+    event_type: undefined,
+    url: undefined,
+    organizer: undefined,
     program: {
       title: ev.title,
       venue: ev.venue,
@@ -90,6 +113,26 @@ for (const ev of picked) {
       id_check: ev.id_check,
     },
   });
+}
+
+// execute 前：由現有 JCHING row 回填核心欄，保留 DB 現有 title/venue/prefecture/event_type/url/organizer
+if (EXECUTE) {
+  const listRes = await fetch(`${BASE}/api/events?limit=2000&past=1`);
+  const existing = (await listRes.json()).data || [];
+  const byId = new Map(existing.map((r) => [String(r.id), r]));
+  for (const o of out) {
+    const r = byId.get(o.id);
+    if (!r) {
+      console.error(`✗ ${o.id}: JCHING 搵唔到現有活動，唔可以只寫 program（會當新建空白場）。請先 sync 活動。`);
+      process.exit(1);
+    }
+    o.title = r.title || o.id;
+    o.prefecture = r.prefecture || '香港';
+    o.venue = r.venue || '';
+    o.event_type = r.event_type;
+    o.url = r.url || '';
+    o.organizer = r.organizer || 'javstarmeet';
+  }
 }
 
 console.log('來源：', FILE);

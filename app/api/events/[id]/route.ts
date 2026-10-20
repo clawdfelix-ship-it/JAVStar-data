@@ -37,7 +37,7 @@ export async function GET(
         organizer: row.organizer,
         date_iso: iso,
         actress_id: row.actress_id,
-        actress_name: row.name_cn || row.name_ja,
+        actress_name: row.name_ja || row.name_cn,
         actress_ja: row.name_ja,
         actress_avatar: row.avatar_url,
         program: row.program_json || null,
