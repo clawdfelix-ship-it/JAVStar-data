@@ -4,6 +4,23 @@
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { weeklyEvents, parseArgs } from './jching-events.mjs';
+
+const args = parseArgs();
+// 資料源：JCHING 公開 API。--from/--to 指定週（YYYY-MM-DD），預設 HKT 今週（週一起）。
+// --region hk,taiwan（預設）；輸出檔可係第一個 positional（唔以 -- 開頭者）
+const outArg = args._[0];
+const week = await weeklyEvents({
+  from: args.from, to: args.to, region: args.region || 'hk,taiwan',
+  actressId: args['actress-id'], base: args.base,
+});
+const { days, total, cityCount, from, to } = week;
+const fmtRange = (a, b) =>
+  `${a.slice(0, 7).replace('-', '.')}.${a.slice(8)} — ${b.slice(5).replace('-', '.')}`;
+const citySummary = Object.entries(cityCount)
+  .sort((x, y) => y[1] - x[1]).map(([c, n]) => `${c} ${n}`).join('　·　');
+const hkCount = cityCount['香港'] || 0;
+const rangeLabel = fmtRange(from, to);
 
 const D = '/Users/siulungchan/.hermes/profiles/it/cache/scratch';
 const fonts = [
@@ -17,24 +34,6 @@ const C = {
   ink:'#3D2B0A', sub:'#8A5A28', muted:'#6E6048', line:'#E0D3B0', dotEmpty:'#CDBF9E',
 };
 
-const days = [
-  { md:'10/19', wd:'一', evs:[] },
-  { md:'10/20', wd:'二', evs:[] },
-  { md:'10/21', wd:'三', evs:[] },
-  { md:'10/22', wd:'四', evs:[] },
-  { md:'10/23', wd:'五', evs:[
-      {a:'辻井ほのか', org:'女優下班後', city:'台北', kind:'攝影會'},
-      {a:'愛弓りょう',   org:'女優下班後', city:'台北', kind:'攝影會'},
-  ]},
-  { md:'10/24', wd:'六', evs:[
-      {a:'一乃あおい', org:'ace',      city:'台北', kind:'見面會'},
-      {a:'百永さりな', org:'MaisonX',  city:'台北', kind:'攝影會'},
-      {a:'中山ふみか', org:'野人文庫', city:'台北', kind:'見面會'},
-      {a:'吉澤友貴',   org:'12the',    city:'高雄', kind:'見面會'},
-  ]},
-  { md:'10/25', wd:'日', evs:[] },
-];
-
 const h = (t,p={},...c)=>({type:t,props:{...p,children:c.flat()}});
 
 // 一條事件列（flex row，軸點居中）
@@ -45,7 +44,7 @@ const EventRow = e =>
       h('div',{style:{width:14,height:14,borderRadius:999,background:C.rose,
         border:`3px solid ${C.bg}`}})),
     // 女優（固定寬 250，唔縮）
-    h('div',{style:{width:252,fontSize:26,fontWeight:700,color:C.ink,flexShrink:0}},e.a),
+    h('div',{style:{width:252,fontSize:26,fontWeight:700,color:C.ink,flexShrink:0}},e.actress),
     // 主辦（彈性，最小寬）
     h('div',{style:{flex:'1 1 0',fontSize:17,fontWeight:400,color:C.sub,
       overflow:'hidden',whiteSpace:'nowrap'}},e.org),
@@ -111,12 +110,12 @@ const tree = h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
   h('div',{style:{display:'flex',alignItems:'center',marginTop:52,marginLeft:56}},
     h('div',{style:{width:8,height:40,background:C.rose,borderRadius:2,marginRight:16}}),
     h('div',{style:{fontSize:19,fontWeight:700,color:C.roseDeep,letterSpacing:2}},
-      '2026.10.19 — 10.25　港台場週曆'),
+      `${rangeLabel}　港台場週曆`),
   ),
   h('div',{style:{marginLeft:56,marginTop:12,fontSize:60,fontWeight:700,
     color:C.goldInk,letterSpacing:3,lineHeight:1}},'本週女優活動'),
   h('div',{style:{marginLeft:56,marginTop:12,fontSize:21,fontWeight:400,color:C.sub}},
-    '香港 · 台灣共 6 場　·　台北 5　·　高雄 1'),
+    total ? `香港 · 台灣共 ${total} 場${citySummary ? '　·　' + citySummary : ''}` : '本週港台暫無公佈場次'),
 
   // 表頭
   h('div',{style:{marginTop:34,paddingRight:56}},
@@ -151,6 +150,6 @@ const tree = h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
 
 const svg = await satori(tree,{width:W,height:H,fonts});
 const png = new Resvg(svg,{fitTo:{mode:'width',value:W}}).render().asPng();
-const out = process.argv[2] || '/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_week_oct19_25_v3.png';
+const out = outArg || `/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_week_${from}_${to}.png`;
 writeFileSync(out,png);
 console.log('saved',out,png.length);

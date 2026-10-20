@@ -3,6 +3,25 @@
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { findEvent, toIntroEvent, parseArgs } from './jching-events.mjs';
+
+const args = parseArgs();
+const outArg = args._[0];
+
+// 資料源：JCHING API 一場活動。
+// 鎖定：--event-id（最穩）或 --actress-id 192328 --date 2026-11-21 --type photo
+//       或 --title-has 旺角快閃
+// 完整地址/場次摘要 API 冇，放 ~/.config/jching-poster.json（唔入 repo）
+const row = await findEvent({
+  eventId: args['event-id'],
+  actressId: args['actress-id'] || '192328',
+  date: args.date || '2026-11-21',
+  type: args.type || 'photo',
+  titleHas: args['title-has'],
+  base: args.base,
+});
+const ev = toIntroEvent(row);
+const actressId = ev.actressId;
 
 const D = '/Users/siulungchan/.hermes/profiles/it/cache/scratch';
 const fonts = [
@@ -14,21 +33,13 @@ const C={bg:'#F0F0D8',gold:'#F0C078',goldDk:'#E0A050',goldInk:'#7C5022',
   rose:'#C75B5B',roseDeep:'#A03E3E',roseBg:'#FBE6E6',ink:'#3D2B0A',sub:'#8A5A28',line:'#E0D3B0'};
 
 // talent 半身宣傳相：用 sharp 預裁好 face-centered 直向 474×1000（scripts/precrop-portrait.mjs）
-const PRE='/Users/siulungchan/.hermes/profiles/it/cache/scratch/promo_192328_portrait.jpg';
-const RAW='/Users/siulungchan/projects/JAVStar-data/public/actress-promos/192328.jpg';
+// 相路徑跟 JCHING actress_id，唔再 hardcode
+const REPO='/Users/siulungchan/projects/JAVStar-data';
+const PRE=`${D}/promo_${actressId}_portrait.jpg`;
+const RAW=`${REPO}/public/actress-promos/${actressId}.jpg`;
 const photo = existsSync(PRE)
   ? `data:image/jpeg;base64,${readFileSync(PRE).toString('base64')}`
   : existsSync(RAW) ? `data:image/jpeg;base64,${readFileSync(RAW).toString('base64')}` : null;
-
-const ev = {
-  type:'香港粉絲攝影會',
-  actress:'篠原伊代',
-  sessions:'3 場攝影會 ＋ 旺角快閃',
-  date:'2026.11.21（六）',
-  venue:'旺角西洋菜南街 70-72 號 3 樓',
-  org:'JAVStarMeet',
-  hashtag:'#JAVStarMeet　#篠原伊代',
-};
 
 const h=(t,p={},...c)=>({type:t,props:{...p,children:c.flat()}});
 
@@ -53,12 +64,12 @@ const tree=h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
       background:C.rose,fontSize:17,fontWeight:700,color:'#fff',letterSpacing:1}},ev.date),
 
     h('div',{style:{marginTop:30,fontSize:48,fontWeight:700,color:C.ink,
-      letterSpacing:1,lineHeight:1.14}},ev.type),
+      letterSpacing:1,lineHeight:1.14}},ev.typeLabel),
     h('div',{style:{marginTop:14,display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
       h('div',{style:{fontSize:33,fontWeight:700,color:C.goldInk,letterSpacing:4}},ev.actress),
-      h('div',{style:{padding:'4px 11px',borderRadius:7,background:C.gold,
-        fontSize:14,fontWeight:700,color:'#3D2B0A'}},'3 Sessions')),
-    h('div',{style:{marginTop:8,fontSize:18,fontWeight:400,color:C.sub}},ev.sessions),
+      ev.sessions ? h('div',{style:{padding:'4px 11px',borderRadius:7,background:C.gold,
+        fontSize:14,fontWeight:700,color:'#3D2B0A'}},ev.sessionsChip || 'Special') : null),
+    ev.sessions ? h('div',{style:{marginTop:8,fontSize:18,fontWeight:400,color:C.sub}},ev.sessions) : null,
 
     h('div',{style:{marginTop:24,height:2,background:C.line,borderRadius:1}}),
 
@@ -84,12 +95,12 @@ const tree=h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
         ? h('img',{src:photo,width:474,height:1000,
             style:{objectFit:'fill',objectPosition:'center'}})
         : h('div',{style:{width:474,height:1000,display:'flex',alignItems:'center',justifyContent:'center',
-            fontSize:140,color:C.gold}},'篠')),
+            fontSize:140,color:C.gold}},(ev.actressJa||ev.actress||'?').slice(0,1))),
   ),
 );
 
 const svg=await satori(tree,{width:W,height:H,fonts});
 const png=new Resvg(svg,{fitTo:{mode:'width',value:W}}).render().asPng();
-const out=process.argv[2]||'/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_event_intro_A2.png';
+const out=outArg||`/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_event_intro_${actressId}_${row.id}.png`;
 writeFileSync(out,png);
-console.log('saved',out,png.length,'photo:',photo?'promo':'fallback');
+console.log('saved',out,png.length,'event:',row.id,'photo:',photo?'promo':'fallback');
