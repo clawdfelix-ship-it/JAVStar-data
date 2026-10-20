@@ -75,3 +75,43 @@ export function ingestAuthed(req: Request): boolean {
   const cands = [process.env.INGEST_TOKEN, process.env.ADMIN_TOKEN].filter(Boolean) as string[];
   return !!provided && cands.some((c) => timingEq(provided, c));
 }
+
+// 由 events.program_json 組一行簡短開票摘要（場次/票價/限額），供 Telegram 開票通知用。
+// 設計：簡短（Telegram 唔好太長）、唔標加購細項、冇 program 時回 ''。
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function formatProgramBrief(program: any): string {
+  if (!program || typeof program !== 'object') return '';
+  const lines: string[] = [];
+
+  // 攝影會：列出場次（時間 + 價 + 限額）
+  if (Array.isArray(program.sessions) && program.sessions.length) {
+    const seen = new Set<string>();
+    for (const s of program.sessions) {
+      if (!s || typeof s !== 'object') continue;
+      const price = typeof s.price === 'number' ? `$${s.price}` : '';
+      const cap = s.capacity_text ? String(s.capacity_text) : '';
+      const label = [s.slot, s.time].filter(Boolean).join(' ');
+      const line = `・${label}${price ? ' ' + price : ''}${cap ? '（' + cap + '）' : ''}`.trim();
+      if (line !== '・' && !seen.has(line)) { seen.add(line); lines.push(line); }
+    }
+  }
+
+  // OFF 會：單一時間 + 票價 + 限量
+  if (program.kind === 'off' || (program.time && program.capacity_text && !program.sessions)) {
+    const price = typeof program.price === 'number' ? `$${program.price}` : '';
+    lines.push(`・${[program.time, price, program.capacity_text].filter(Boolean).join(' ')}`);
+  }
+
+  // 快閃：套餐價
+  if (program.package && typeof program.package.price === 'number') {
+    lines.push(`・${program.package.name || '快閃套餐'} $${program.package.price}`);
+  }
+
+  // 見面會：入場票價 + 場數
+  if (program.entry_ticket && typeof program.entry_ticket.price === 'number') {
+    const n = Array.isArray(program.sessions) ? `${program.sessions.length} 場` : '';
+    lines.push(`・入場券 $${program.entry_ticket.price}${n ? '（' + n + '，特典券現場加購）' : ''}`);
+  }
+
+  return lines.slice(0, 6).join('\n');
+}
