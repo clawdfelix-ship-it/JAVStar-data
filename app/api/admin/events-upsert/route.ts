@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sql from '@/lib/db';
+import sql, { getSql } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,9 +33,17 @@ function requireIngest(req: NextRequest): NextResponse | null {
 //   event_type?: string;       // meet | photo | other
 //   url?: string;              // 站內中繼頁 /partner?to=... 或外部
 //   organizer?: string;        // e.g. 'javstarmeet'
+//   program?: object;          // 可選：結構化節目詳情（schedule/sessions/addons/rules），存 program_json
 // }>, mode?: 'upsert'|'dry' }
 //
 // 冪等：以 events.id 做 ON CONFLICT UPDATE。mode 'dry' 只回報將寫入嘅列。
+
+// 冪等加節目詳情欄位（idempotent，可重入）
+async function ensureProgramColumn() {
+  await (getSql() as any).query(
+    'ALTER TABLE events ADD COLUMN IF NOT EXISTS program_json jsonb'
+  );
+}
 
 type InEvent = {
   id: string;
@@ -47,6 +55,7 @@ type InEvent = {
   event_type?: string;
   url?: string;
   organizer?: string;
+  program?: unknown;
 };
 
 const TYPES = new Set(['meet', 'photo', 'other']);
@@ -56,6 +65,7 @@ export async function POST(req: NextRequest) {
   if (denied) return denied;
 
   try {
+    await ensureProgramColumn();
     const body = await req.json();
     const mode = body?.mode === 'dry' ? 'dry' : 'upsert';
     const list: InEvent[] = Array.isArray(body?.events) ? body.events : [];
@@ -63,7 +73,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'events[] required' }, { status: 400 });
     }
 
-    const cleaned: Array<InEvent & { datetime: string }> = [];
+    const cleaned: Array<InEvent & { datetime: string; programJson: string | null }> = [];
     for (const e of list) {
       if (!e.id || !/^[a-zA-Z0-9_\-]+$/.test(e.id)) {
         return NextResponse.json({ error: `bad id: ${e.id}` }, { status: 400 });
@@ -89,6 +99,9 @@ export async function POST(req: NextRequest) {
         event_type: TYPES.has(e.event_type || '') ? e.event_type! : 'meet',
         url: (e.url || '').slice(0, 600),
         organizer: (e.organizer || 'javstarmeet').slice(0, 60),
+        programJson: e.program && typeof e.program === 'object'
+          ? JSON.stringify(e.program)
+          : null,
       });
     }
 
@@ -97,20 +110,43 @@ export async function POST(req: NextRequest) {
     }
 
     for (const e of cleaned) {
-      await sql`
-        INSERT INTO events (id, actress_id, title, venue, prefecture, datetime, date_iso, event_type, url, organizer, created_at)
-        VALUES (${e.id}, ${e.actress_id}, ${e.title}, ${e.venue || ''}, ${e.prefecture},
-                ${e.datetime}, ${e.date}::date, ${e.event_type}, ${e.url || ''}, ${e.organizer}, now())
-        ON CONFLICT (id) DO UPDATE SET
-          actress_id=EXCLUDED.actress_id,
-          title=EXCLUDED.title,
-          venue=EXCLUDED.venue,
-          prefecture=EXCLUDED.prefecture,
-          datetime=EXCLUDED.datetime,
-          date_iso=EXCLUDED.date_iso,
-          event_type=EXCLUDED.event_type,
-          url=EXCLUDED.url,
-          organizer=EXCLUDED.organizer`;
+      // program 為 null 時唔覆寫（避免清走已寫入嘅詳情）；用兩個 statement 分流
+      if (e.programJson) {
+        await (getSql() as any).query(
+          `INSERT INTO events (id, actress_id, title, venue, prefecture, datetime, date_iso, event_type, url, organizer, program_json, created_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7::date,$8,$9,$10,$11::jsonb,now())
+           ON CONFLICT (id) DO UPDATE SET
+             actress_id=EXCLUDED.actress_id,
+             title=EXCLUDED.title,
+             venue=EXCLUDED.venue,
+             prefecture=EXCLUDED.prefecture,
+             datetime=EXCLUDED.datetime,
+             date_iso=EXCLUDED.date_iso,
+             event_type=EXCLUDED.event_type,
+             url=EXCLUDED.url,
+             organizer=EXCLUDED.organizer,
+             program_json=EXCLUDED.program_json`,
+          [e.id, e.actress_id, e.title, e.venue || '', e.prefecture, e.datetime,
+           e.date, e.event_type, e.url || '', e.organizer, e.programJson]
+        );
+      } else {
+        await (getSql() as any).query(
+          `INSERT INTO events (id, actress_id, title, venue, prefecture, datetime, date_iso, event_type, url, organizer, created_at)
+           VALUES ($1,$2,$3,$4,$5,$6,$7::date,$8,$9,$10,now())
+           ON CONFLICT (id) DO UPDATE SET
+             actress_id=EXCLUDED.actress_id,
+             title=EXCLUDED.title,
+             venue=EXCLUDED.venue,
+             prefecture=EXCLUDED.prefecture,
+             datetime=EXCLUDED.datetime,
+             date_iso=EXCLUDED.date_iso,
+             event_type=EXCLUDED.event_type,
+             url=EXCLUDED.url,
+             organizer=EXCLUDED.organizer`,
+          [e.id, e.actress_id, e.title, e.venue || '', e.prefecture, e.datetime,
+           e.date, e.event_type, e.url || '', e.organizer]
+        );
+      }
     }
 
     return NextResponse.json({ success: true, upserted: cleaned.length, ids: cleaned.map((e) => e.id) });
