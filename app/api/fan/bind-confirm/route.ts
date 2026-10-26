@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
 import { ensureFanNotifyTables, ingestAuthed } from '@/lib/fanNotify';
+import { confirmFanBinding } from '@/lib/fanBindings';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,34 +18,17 @@ export async function POST(req: NextRequest) {
     if (!/^[A-Za-z0-9_-]{8,20}$/.test(code) || !Number.isInteger(chatId)) {
       return NextResponse.json({ error: 'bad request' }, { status: 400 });
     }
-    const upd = await sql`
-      UPDATE fan_tg_links
-      SET chat_id=${chatId}, status='bound', consumed_at=now()
-      WHERE bind_code=${code}
-        AND status='pending'
-        AND expires_at > now()
-      RETURNING actress_id, region_pref`;
-    if ((upd as any[]).length === 0) {
+    const handle = String(b.tg_handle || '').replace(/^@/, '').trim();
+    const actressId = await confirmFanBinding(sql as any, {
+      bindCode: code,
+      chatId,
+      tgHandle: handle || undefined,
+    });
+    if (!actressId) {
       return NextResponse.json({ error: '碼已使用或過期，請喺網頁重新撳一次' }, { status: 404 });
     }
-    const row = (upd as any[])[0];
 
-    // identity_key 用 tgchat:<chatId>（有真 chat_id 先可以 bot 推送）；
-    // 與手動填表嘅 t:<handle>（無 chat_id、不能直接推送）分開。tg_handle 僅供顯示。
-    const handle = String(b.tg_handle || '').replace(/^@/, '').trim();
-    const identity = 'tgchat:' + chatId;
-    await sql`
-      INSERT INTO fan_subscriptions
-        (actress_id, tg_handle, identity_key, channel_pref, region_pref, source, status)
-      VALUES (${row.actress_id}, ${handle || ('tg:' + chatId)}, ${identity},
-              'tg', ${row.region_pref}, 'jching-tg', 'active')
-      ON CONFLICT (actress_id, identity_key)
-      DO UPDATE SET
-        tg_handle=COALESCE(NULLIF(EXCLUDED.tg_handle,''), fan_subscriptions.tg_handle),
-        channel_pref='tg', region_pref=EXCLUDED.region_pref,
-        status='active', updated_at=now()`;
-
-    return NextResponse.json({ ok: true, actress_id: row.actress_id });
+    return NextResponse.json({ ok: true, actress_id: actressId });
   } catch (e) {
     console.error('bind-confirm', e);
     return NextResponse.json({ error: 'failed' }, { status: 500 });
