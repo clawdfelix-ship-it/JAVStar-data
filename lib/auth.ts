@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkToken, isAdminToken } from '@/lib/token-check';
 
 /**
  * 輕量鑑權把關 —— 防止 admin / setup / seed / debug / cron 等
@@ -11,25 +12,10 @@ import { NextRequest, NextResponse } from 'next/server';
  * 避免「忘記設 secret = 大門常開」。
  */
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) {
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return mismatch === 0;
-}
-
-function checkToken(provided: string | null, expected: string | undefined): boolean {
-  if (!expected) return false; // 未設定 secret → fail-closed
-  if (!provided) return false;
-  return timingSafeEqual(provided, expected);
-}
-
 /** 回傳 null = 通過；回傳 NextResponse = 拒絕（直接 return 給客戶端） */
 export function requireAdmin(request: NextRequest): NextResponse | null {
   const token = request.headers.get('x-admin-token');
-  if (!checkToken(token, process.env.ADMIN_TOKEN)) {
+  if (!isAdminToken(token)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   return null;

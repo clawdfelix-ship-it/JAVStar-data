@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "scrape:events": "tsx scripts/scrape-events.ts",
