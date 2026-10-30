@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { getSql } from '@/lib/db';
+import { ensureNewsTables } from '@/lib/news/ingest';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -13,6 +14,7 @@ export const runtime = 'nodejs';
 export async function GET(request: NextRequest) {
   const unauthorized = requireAdmin(request);
   if (unauthorized) return unauthorized;
+  await ensureNewsTables();
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status') || 'pending';
@@ -36,6 +38,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const unauthorized = requireAdmin(request);
   if (unauthorized) return unauthorized;
+  await ensureNewsTables();
 
   let body: { id?: number; action?: string };
   try {

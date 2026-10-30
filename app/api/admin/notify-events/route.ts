@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
-import { ensureFanNotifyTables, ingestAuthed } from '@/lib/fanNotify';
+import { requireAdmin } from '@/lib/auth';
+import { ensureFanNotifyTables } from '@/lib/fanNotify';
 
 export const dynamic = 'force-dynamic';
 
 // Admin 後台用：列出未來自家（javstarmeet）場，連同可發 TG 通知嘅訂閱人數同批次狀態。
 // GET /api/admin/notify-events
 export async function GET(req: NextRequest) {
-  if (!ingestAuthed(req)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) return unauthorized;
   try {
     await ensureFanNotifyTables();
     const rows = await sql`

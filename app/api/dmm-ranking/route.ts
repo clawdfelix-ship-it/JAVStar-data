@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { getSql, sql } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
+import { replaceDmmRanking, type RankingPayloadItem } from '@/lib/dmm-ranking';
 
 // Cache 配置
 const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 小時
@@ -85,7 +87,10 @@ export async function GET() {
 }
 
 // POST - 手動更新排行榜
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
   try {
     const { ranking, source = 'DMM' } = await request.json();
     
@@ -115,30 +120,11 @@ export async function POST(request: Request) {
       )
     `;
     
-    // 先清空舊數據
-    await sql`DELETE FROM dvd_ranking`;
-    
-    // 插入新數據
-    let insertedCount = 0;
-    for (const item of ranking) {
-      await sql`
-        INSERT INTO dvd_ranking 
-        (rank, video_code, title, actress, maker, cover_url, detail_url, is_new, rank_change, source)
-        VALUES (
-          ${item.rank}, 
-          ${item.videoCode || ''}, 
-          ${item.title || ''}, 
-          ${item.actress || ''}, 
-          ${item.maker || ''}, 
-          ${item.coverUrl || ''}, 
-          ${item.detailUrl || ''}, 
-          ${item.isNew ? true : false}, 
-          ${item.rankChange || 'same'}, 
-          ${source}
-        )
-      `;
-      insertedCount++;
-    }
+    const insertedCount = await replaceDmmRanking(
+      getSql() as ReturnType<typeof getSql> & { transaction: (queries: unknown[]) => Promise<unknown> },
+      ranking as RankingPayloadItem[],
+      String(source || 'DMM'),
+    );
 
     // 清除 cache
     cachedData = null;

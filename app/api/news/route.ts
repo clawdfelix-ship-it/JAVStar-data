@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
+import { ensureNewsTables } from '@/lib/news/ingest';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 // Public news feed: only published items. Never expose pending/rejected queue.
 export async function GET(request: NextRequest) {
+  await ensureNewsTables();
+
   const { searchParams } = new URL(request.url);
   const limit = Math.min(Number(searchParams.get('limit') || '60'), 200);
   const category = searchParams.get('category');

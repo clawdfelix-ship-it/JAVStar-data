@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
+import { matchesToken } from '@/lib/token-auth';
 
 export const dynamic = 'force-dynamic';
 
-function timingEq(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let m = 0;
-  for (let i = 0; i < a.length; i++) m |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return m === 0;
-}
-// accept ADMIN_TOKEN (UI login) or the scoped INGEST_TOKEN (sync/ops scripts)
+// Only the interactive admin UI may access subscription exports and deletions.
 function authed(req: NextRequest): boolean {
-  const provided = req.headers.get('x-admin-token') || req.headers.get('x-ingest-token');
-  const cands = [process.env.ADMIN_TOKEN, process.env.INGEST_TOKEN].filter(Boolean) as string[];
-  return !!provided && cands.some((c) => timingEq(provided, c));
+  return matchesToken(req.headers.get('x-admin-token'), process.env.ADMIN_TOKEN);
 }
 
 export async function GET(req: NextRequest) {
