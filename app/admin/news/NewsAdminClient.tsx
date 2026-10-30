@@ -9,10 +9,13 @@ type NewsRow = {
   source_name: string;
   source_url: string;
   title_ja: string;
+  title_zh: string | null;
   summary_ja: string | null;
+  summary_zh: string | null;
   category: string;
   is_adult: boolean;
   status: string;
+  translation_status: string;
   published_at: string | null;
   created_at: string;
 };
@@ -65,14 +68,24 @@ function Row({ row, token, onChanged }: { row: NewsRow; token: string; onChanged
         </span>
         <span className="font-semibold text-text-secondary">{row.source_name}</span>
         {row.is_adult && <span className="rounded-full bg-red-50 px-2 py-0.5 font-semibold text-red-500">18+</span>}
+        {row.translation_status === 'translated' ? (
+          <span className="rounded-full bg-green-50 px-2 py-0.5 font-semibold text-green-600">已譯中文</span>
+        ) : (
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-600">未譯</span>
+        )}
         <span>{row.published_at ? new Date(row.published_at).toLocaleString('zh-HK') : '無發布時間'}</span>
         <a href={row.source_url} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-1 text-pink-600">
           原文 <ExternalLink className="h-3 w-3" />
         </a>
       </div>
 
-      <h2 className="text-sm font-bold leading-snug text-text-primary">{row.title_ja}</h2>
-      {row.summary_ja && <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-text-secondary">{row.summary_ja}</p>}
+      <h2 className="text-sm font-bold leading-snug text-text-primary">{row.title_zh || row.title_ja}</h2>
+      {row.summary_zh && <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">{row.summary_zh}</p>}
+      <details className="mt-1.5 text-[11px] text-text-tertiary">
+        <summary className="cursor-pointer select-none">日文原文</summary>
+        <p className="mt-1 font-medium">{row.title_ja}</p>
+        {row.summary_ja && <p className="mt-1 leading-relaxed">{row.summary_ja}</p>}
+      </details>
 
       {error && <p className="mt-2 text-xs text-red-600">操作失敗：{error}</p>}
 

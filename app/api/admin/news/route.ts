@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
 
   const where = filter === 'all' ? '' : 'WHERE status = $1';
   const rows = (await getSql().query(
-    `SELECT id, source_key, source_name, source_url, title_ja, summary_ja,
-            category, is_adult, status, published_at, created_at
+    `SELECT id, source_key, source_name, source_url, title_ja, title_zh, summary_ja, summary_zh,
+            category, is_adult, status, translation_status, published_at, created_at
        FROM news_items ${where}
       ORDER BY published_at DESC NULLS LAST, created_at DESC
       LIMIT $${filter === 'all' ? '1' : '2'}`,

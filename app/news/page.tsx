@@ -7,7 +7,10 @@ type NewsItem = {
   source_name: string;
   source_url: string;
   title: string;
+  title_ja: string | null;
+  title_zh: string | null;
   summary_ja: string | null;
+  summary_zh: string | null;
   category: string;
   is_adult: boolean;
   published_at: string | null;
@@ -112,8 +115,11 @@ export default function NewsPage() {
               <time>{formatDate(item.published_at)}</time>
             </div>
             <h2 className="font-semibold leading-snug">{item.title}</h2>
-            {item.summary_ja && (
-              <p className="mt-2 line-clamp-2 text-sm text-gray-600">{item.summary_ja}</p>
+            {(item.summary_zh || item.summary_ja) && (
+              <p className="mt-2 line-clamp-2 text-sm text-gray-600">{item.summary_zh || item.summary_ja}</p>
+            )}
+            {item.title_zh && item.title_ja && item.title_ja !== item.title && (
+              <p className="mt-1.5 line-clamp-1 text-[11px] text-gray-400">{item.title_ja}</p>
             )}
           </a>
         ))}
