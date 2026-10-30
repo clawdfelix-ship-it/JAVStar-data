@@ -1,5 +1,6 @@
 import React from 'react';
 import { Flame, Zap, MapPin } from 'lucide-react';
+import { formatEventDateLabel, formatEventTime as formatSourceEventTime, getEventDateSource } from '@/lib/eventDate';
 
 interface EventCardProps {
   id: string;
@@ -7,6 +8,7 @@ interface EventCardProps {
   venue: string;
   prefecture: string;
   datetime: string;
+  date_iso?: string;
   event_type: string;
   url: string;
   organizer?: string | null;
@@ -73,22 +75,11 @@ function formatDateTime(datetime: string): string {
 }
 
 function formatTime(datetime: string): string {
-  // date-only events (YYYY-MM-DD) have no real start time in the source data;
-  // showing a fabricated 09:00 is misleading. Show the weekday instead.
-  if (!datetime.includes('T')) {
-    const date = safeNewDate(datetime);
-    return date.toLocaleDateString('ja-JP', { weekday: 'short' });
-  }
-  const date = safeNewDate(datetime);
-  return date.toLocaleTimeString('ja-JP', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatSourceEventTime(datetime);
 }
 
 function formatDateShort(datetime: string): string {
-  const date = safeNewDate(datetime);
-  return date.toLocaleDateString('ja-JP', {
+  return formatEventDateLabel(datetime, {
     month: 'numeric',
     day: 'numeric',
     weekday: 'short',
@@ -101,6 +92,7 @@ function EventCardComponent({
   venue, 
   prefecture, 
   datetime, 
+  date_iso,
   event_type, 
   url,
   organizer,
@@ -108,6 +100,7 @@ function EventCardComponent({
   actress_avatar,
   showActress = true,
 }: EventCardProps) {
+  const sourceDate = getEventDateSource({ datetime, date_iso });
   const upcoming = isUpcoming(datetime);
   const today = isToday(datetime);
   const tomorrow = isTomorrow(datetime);
@@ -123,10 +116,10 @@ function EventCardComponent({
           {/* Date Box - NIPPON COLORS style */}
           <div className="flex flex-col items-center justify-center bg-nadeshiko-light/20 rounded-lg px-3 py-2 min-w-[65px]">
             <span className="text-xs text-[rgb(var(--color-wine))] font-medium">
-              {formatDateShort(datetime)}
+              {formatDateShort(sourceDate)}
             </span>
             <span className="font-mono text-sm font-bold text-[rgb(var(--color-wine))]">
-              {formatTime(datetime)}
+              {formatTime(sourceDate)}
             </span>
           </div>
 

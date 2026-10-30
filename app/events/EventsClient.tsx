@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Logo from '@/components/Logo';
 import EventSubmissionForm from '@/components/EventSubmissionForm';
 import CalendarMonth from './CalendarMonth';
+import { formatEventDateLabel, formatEventTime, formatEventWeekday, getEventDateSource, getEventTimeZoneLabel } from '@/lib/eventDate';
 
 interface Event {
   id: string;
@@ -12,6 +13,7 @@ interface Event {
   venue: string;
   prefecture: string;
   datetime: string;
+  date_iso?: string | null;
   event_type: string;
   url: string;
   organizer?: string | null;
@@ -73,8 +75,7 @@ export default function EventsClient() {
   }
 
   function formatDate(d: string) {
-    const date = new Date(d.includes('T') ? d : d + 'T00:00:00+09:00');
-    return date.toLocaleDateString('ja-JP', {
+    return formatEventDateLabel(d, {
       month: 'short', day: 'numeric', weekday: 'short',
     });
   }
@@ -106,7 +107,7 @@ export default function EventsClient() {
   // Group events by date
   const grouped: Record<string, Event[]> = {};
   events.forEach(ev => {
-    const dateKey = ev.datetime.split('T')[0];
+    const dateKey = getEventDateSource(ev).split('T')[0].split(' ')[0];
     if (!grouped[dateKey]) grouped[dateKey] = [];
     grouped[dateKey].push(ev);
   });
@@ -238,7 +239,7 @@ export default function EventsClient() {
               <div key={dateKey}>
                 <h2 className="text-sm font-bold text-text-secondary mb-3 flex items-center gap-2 flex-wrap">
                   <span className={`w-2 h-2 rounded-full ${dayEvents.some(e => isToday(e.datetime)) ? 'bg-primary-dark' : 'bg-sakura-gray'}`} />
-                  {new Date(dateKey + 'T00:00:00').toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'long' })}
+                  {formatEventDateLabel(dateKey, { month: 'long', day: 'numeric', weekday: 'long' })}
                   {holidays[dateKey] && (
                     <span className="text-xs px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 rounded font-medium">
                       🇭🇰 {holidays[dateKey]}
@@ -260,8 +261,14 @@ export default function EventsClient() {
                       {/* Time / weekday — source has no start time for date-only events */}
                       <div className="text-center min-w-[60px]">
                         <div className="text-primary-dark font-bold text-sm">
-                          {new Date(ev.datetime.includes('T') ? ev.datetime : ev.datetime + 'T00:00:00+09:00').toLocaleDateString('ja-JP', { weekday: 'short' })}
+                          {formatEventWeekday(getEventDateSource(ev))}
                         </div>
+                        <div className="text-xs text-text-tertiary mt-1">
+                          {formatEventTime(getEventDateSource(ev))}
+                        </div>
+                        {getEventTimeZoneLabel(getEventDateSource(ev)) && (
+                          <div className="text-[10px] text-text-tertiary">{getEventTimeZoneLabel(getEventDateSource(ev))}</div>
+                        )}
                       </div>
                       {/* Event info */}
                       <div className="flex-1 min-w-0">

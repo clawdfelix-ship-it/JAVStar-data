@@ -1,15 +1,14 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, startOfWeek, endOfWeek, addMonths, subMonths, parseISO, differenceInDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, startOfWeek, endOfWeek, addMonths, subMonths, differenceInDays } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
+import { formatEventDateLabel, formatEventTime, getEventDateKey, getEventDateSource, getEventTimeZoneLabel, getICSDateLines, parseEventDate } from '@/lib/eventDate';
 
 function safeNewDate(dateStr: string | undefined | null): Date {
   if (!dateStr) return new Date(0);
-  try {
-    const d = parseISO(dateStr);
-    return isNaN(d.getTime()) ? new Date(0) : d;
-  } catch { return new Date(0); }
+  const d = parseEventDate(dateStr);
+  return isNaN(d.getTime()) ? new Date(0) : d;
 }
 
 // Best available date for an event: raw `datetime` may contain fullwidth digits
@@ -47,9 +46,9 @@ interface EventCalendarProps {
 
 const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
 
-function generateICS(event: DayEvent): string {
-  const dt = bestEventDate(event);
-  const dtEnd = new Date(dt.getTime() + 2 * 60 * 60 * 1000);
+export function generateICS(event: DayEvent): string {
+  const source = getEventDateSource(event);
+  const timing = getICSDateLines(source);
   const formatICS = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const uid = `${event.id}@av-intelligence.local`;
   const summary = event.title || 'AV Event';
@@ -58,8 +57,7 @@ function generateICS(event: DayEvent): string {
   return [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//JCHING CALENDAR//Event//EN',
     'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
-    `UID:${uid}`, `DTSTAMP:${formatICS(new Date())}`, `DTSTART:${formatICS(dt)}`,
-    `DTEND:${formatICS(dtEnd)}`, `SUMMARY:${summary}`,
+    `UID:${uid}`, `DTSTAMP:${formatICS(new Date())}`, ...timing, `SUMMARY:${summary}`,
     description ? `DESCRIPTION:${description}` : '',
     location ? `LOCATION:${location}` : '',
     event.url ? `URL:${event.url}` : '',
@@ -76,8 +74,9 @@ function downloadICS(event: DayEvent) {
   URL.revokeObjectURL(a.href);
 }
 
-function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => void }) {
+export function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => void }) {
   const eventDate = bestEventDate(event);
+  const sourceDate = getEventDateSource(event);
   const daysUntil = differenceInDays(eventDate, new Date());
   
   useEffect(() => {
@@ -140,7 +139,7 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
               <div>
                 <div className="text-xs text-text-secondary">日期</div>
                 <div className="text-text-primary font-medium">
-                  {format(eventDate, 'yyyy年MM月dd日 (E)', { locale: zhTW })}
+                  {formatEventDateLabel(sourceDate, { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' }, 'zh-HK')}
                 </div>
               </div>
             </div>
@@ -150,8 +149,11 @@ function EventDetailModal({ event, onClose }: { event: DayEvent; onClose: () => 
               <div>
                 <div className="text-xs text-text-secondary">時間</div>
                 <div className="text-text-primary font-medium font-mono">
-                  {format(eventDate, 'HH:mm')}
+                  {formatEventTime(sourceDate)}
                 </div>
+                {getEventTimeZoneLabel(sourceDate) && (
+                  <div className="text-xs text-text-tertiary">{getEventTimeZoneLabel(sourceDate)}</div>
+                )}
               </div>
             </div>
             
@@ -237,7 +239,8 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
     const map = new Map<string, DayEvent[]>();
     const actressMap = new Map<string, Set<string>>();
     events.forEach(ev => {
-      const dateKey = format(bestEventDate(ev), 'yyyy-MM-dd');
+      const dateKey = getEventDateKey(getEventDateSource(ev));
+      if (!dateKey) return;
       if (!map.has(dateKey)) { 
         map.set(dateKey, []); 
         actressMap.set(dateKey, new Set()); 
@@ -400,7 +403,7 @@ export default function EventCalendar({ events, onDayClick }: EventCalendarProps
                       </div>
                     </div>
                     <div className="text-xs text-[rgb(var(--color-wine))] font-mono whitespace-nowrap bg-nadeshiko-light/30 px-2 py-1 rounded-md font-semibold">
-                      {format(bestEventDate(ev), 'HH:mm')}
+                      {formatEventTime(getEventDateSource(ev))}
                     </div>
                   </div>
                 ))}
