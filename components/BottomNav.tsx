@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, CalendarDays, GitCompareArrows } from 'lucide-react';
+import { Home, CalendarDays, GitCompareArrows, Newspaper } from 'lucide-react';
 
 const items = [
   { href: '/', label: '首頁', icon: Home, match: (p: string) => p === '/' },
   { href: '/events', label: '活動', icon: CalendarDays, match: (p: string) => p.startsWith('/events') },
+  { href: '/news', label: '情報', icon: Newspaper, match: (p: string) => p.startsWith('/news') },
   { href: '/compare', label: '比較', icon: GitCompareArrows, match: (p: string) => p.startsWith('/compare') },
 ];
 
@@ -18,7 +19,7 @@ export default function BottomNav() {
       aria-label="底部導航"
       className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border bg-white/85 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/70 pb-[env(safe-area-inset-bottom)]"
     >
-      <div className="grid grid-cols-3 max-w-md mx-auto">
+      <div className="grid grid-cols-4 max-w-md mx-auto">
         {items.map((it) => {
           const active = it.match(pathname);
           const Icon = it.icon;

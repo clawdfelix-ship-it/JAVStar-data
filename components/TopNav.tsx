@@ -9,6 +9,7 @@ import Logo from './Logo';
 const items = [
   { href: '/', label: '首頁', match: (p: string) => p === '/' },
   { href: '/events', label: '活動月曆', match: (p: string) => p.startsWith('/events') },
+  { href: '/news', label: '女優情報', match: (p: string) => p.startsWith('/news') },
   { href: '/compare', label: '女優比較', match: (p: string) => p.startsWith('/compare') },
 ];
 
