@@ -11,6 +11,7 @@ type NewsItem = {
   title_zh: string | null;
   summary_ja: string | null;
   summary_zh: string | null;
+  image_url: string | null;
   category: string;
   is_adult: boolean;
   published_at: string | null;
@@ -99,31 +100,68 @@ export default function NewsPage() {
 
       <div className="grid gap-3">
         {items.map((item) => (
-          <a
-            key={item.id}
-            href={item.source_url}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="block rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md"
-          >
-            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-              <span className="rounded-full bg-gray-100 px-2 py-0.5">
-                {CATEGORY_LABEL[item.category] || item.category}
-              </span>
-              <span>{item.source_name}</span>
-              {item.is_adult && <span className="rounded-full bg-red-50 px-2 py-0.5 text-red-500">18+</span>}
-              <time>{formatDate(item.published_at)}</time>
-            </div>
-            <h2 className="font-semibold leading-snug">{item.title}</h2>
-            {(item.summary_zh || item.summary_ja) && (
-              <p className="mt-2 line-clamp-2 text-sm text-gray-600">{item.summary_zh || item.summary_ja}</p>
-            )}
-            {item.title_zh && item.title_ja && item.title_ja !== item.title && (
-              <p className="mt-1.5 line-clamp-1 text-[11px] text-gray-400">{item.title_ja}</p>
-            )}
-          </a>
+          <NewsCard key={item.id} item={item} />
         ))}
       </div>
     </main>
+  );
+}
+
+function NewsCard({ item }: { item: NewsItem }) {
+  // Adult covers are blurred until the reader taps to reveal (public page, no age gate).
+  const [revealed, setRevealed] = useState(false);
+  const blurred = item.is_adult && !revealed;
+
+  return (
+    <a
+      href={item.source_url}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="flex gap-4 rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md"
+    >
+      {item.image_url && (
+        <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg bg-gray-100 sm:h-28 sm:w-40">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.image_url}
+            alt=""
+            loading="lazy"
+            className={`h-full w-full object-cover transition duration-300 ${blurred ? 'scale-110 blur-2xl' : ''}`}
+          />
+          {blurred && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setRevealed(true);
+              }}
+              className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 bg-black/35 text-[11px] font-semibold text-white"
+            >
+              <span className="rounded bg-red-600 px-1.5 py-0.5">18+</span>
+              <span>點擊顯示封面</span>
+            </button>
+          )}
+        </div>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+          <span className="rounded-full bg-gray-100 px-2 py-0.5">
+            {CATEGORY_LABEL[item.category] || item.category}
+          </span>
+          <span>{item.source_name}</span>
+          {item.is_adult && <span className="rounded-full bg-red-50 px-2 py-0.5 text-red-500">18+</span>}
+          <time>{formatDate(item.published_at)}</time>
+        </div>
+        <h2 className="font-semibold leading-snug">{item.title}</h2>
+        {(item.summary_zh || item.summary_ja) && (
+          <p className="mt-2 line-clamp-2 text-sm text-gray-600">{item.summary_zh || item.summary_ja}</p>
+        )}
+        {item.title_zh && item.title_ja && item.title_ja !== item.title && (
+          <p className="mt-1.5 line-clamp-1 text-[11px] text-gray-400">{item.title_ja}</p>
+        )}
+      </div>
+    </a>
   );
 }

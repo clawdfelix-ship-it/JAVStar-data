@@ -12,6 +12,7 @@ type NewsRow = {
   title_zh: string | null;
   summary_ja: string | null;
   summary_zh: string | null;
+  image_url: string | null;
   category: string;
   is_adult: boolean;
   status: string;
@@ -78,6 +79,18 @@ function Row({ row, token, onChanged }: { row: NewsRow; token: string; onChanged
           原文 <ExternalLink className="h-3 w-3" />
         </a>
       </div>
+
+      {row.image_url && (
+        <a href={row.image_url} target="_blank" rel="noreferrer" className="mb-2 block w-fit">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={row.image_url}
+            alt=""
+            loading="lazy"
+            className="h-24 w-32 rounded-lg border border-gray-200 object-cover"
+          />
+        </a>
+      )}
 
       <h2 className="text-sm font-bold leading-snug text-text-primary">{row.title_zh || row.title_ja}</h2>
       {row.summary_zh && <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">{row.summary_zh}</p>}
