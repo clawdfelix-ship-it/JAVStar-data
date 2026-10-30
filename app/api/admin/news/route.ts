@@ -54,7 +54,26 @@ export async function POST(request: NextRequest) {
   }
 
   const nextStatus = action === 'approve' ? 'published' : 'rejected';
-  const rows = (await getSql().query(
+  const sql = getSql();
+  await sql.query(
+    `CREATE TABLE IF NOT EXISTS news_moderation_log (
+       id BIGSERIAL PRIMARY KEY,
+       news_id BIGINT NOT NULL,
+       action TEXT NOT NULL CHECK (action IN ('approve','reject')),
+       from_status TEXT,
+       to_status TEXT NOT NULL,
+       actor TEXT NOT NULL DEFAULT 'admin',
+       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+     )`
+  );
+  const before = (await sql.query(
+    `SELECT status FROM news_items WHERE id = $1`,
+    [id]
+  )) as Array<{ status: string }>;
+  if (!before.length) return NextResponse.json({ error: 'news item not found' }, { status: 404 });
+  const fromStatus = before[0].status;
+
+  const rows = (await sql.query(
     `UPDATE news_items
         SET status = $1, updated_at = NOW()
       WHERE id = $2
@@ -62,6 +81,12 @@ export async function POST(request: NextRequest) {
     [nextStatus, id]
   )) as Array<{ id: number; status: string; title_ja: string }>;
 
-  if (!rows.length) return NextResponse.json({ error: 'news item not found' }, { status: 404 });
+  // Audit trail: record prior status so accidental bulk changes are traceable.
+  await sql.query(
+    `INSERT INTO news_moderation_log (news_id, action, from_status, to_status, actor)
+     VALUES ($1, $2, $3, $4, 'admin')`,
+    [id, action, fromStatus, nextStatus]
+  );
+
   return NextResponse.json({ success: true, item: rows[0] });
 }

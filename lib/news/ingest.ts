@@ -61,8 +61,8 @@ export async function upsertPendingNewsItems(items: NormalizedNewsItem[]): Promi
         author, image_url, category, is_adult, status, translation_status,
         raw_names, match_confidence, content_hash, raw_json, published_at
       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'pending','not_translated','[]'::jsonb,0,$11,$12::jsonb,$13)
-       ON CONFLICT (source_url) DO UPDATE SET updated_at = NOW()
-       RETURNING (xmax = 0) AS inserted`,
+       ON CONFLICT (source_url) DO NOTHING
+       RETURNING TRUE AS inserted`,
       [
         item.sourceKey,
         item.sourceName,
