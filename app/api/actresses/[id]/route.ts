@@ -5,6 +5,7 @@ const sql = getSql();
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAllEvents } from '@/lib/matching-validator';
 import { getClientIp } from '@/lib/client-ip';
+import { getNormalizedEventDate } from '@/lib/eventDate';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -46,8 +47,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const todayStr = new Date().toISOString().slice(0, 10);
     const yearStr = todayStr.slice(0, 4);
     const monthStr = todayStr.slice(0, 7);
-    const eventDate = (e: any): string =>
-      e.date_iso ? new Date(e.date_iso).toISOString().slice(0, 10) : '';
+    const eventDate = (e: any): string => getNormalizedEventDate(e.date_iso) || '';
 
     const totalEvents = validEvents.length;
     const thisYearEvents = validEvents.filter(e => eventDate(e) >= `${yearStr}-01-01`).length;

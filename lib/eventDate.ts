@@ -1,6 +1,20 @@
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
 const DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2}))?/;
 
+/** Normalize a SQL DATE value without treating it as a timestamp to shift. */
+export function getNormalizedEventDate(value: string | Date | null | undefined): string | null {
+  if (!value) return null;
+  if (value instanceof Date) {
+    // node-postgres parses DATE at local midnight. Recover that calendar date
+    // with local getters; toISOString() moves it into the previous day at UTC+8.
+    if (Number.isNaN(value.getTime())) return null;
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+  }
+  const match = value.trim().match(DATE_ONLY);
+  return match && isValidCalendarDate(Number(match[1]), Number(match[2]), Number(match[3]))
+    ? `${match[1]}-${match[2]}-${match[3]}` : null;
+}
+
 export function isDateOnly(value: string): boolean {
   return DATE_ONLY.test(value.trim());
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { formatEventTime, getEventDateKey, getEventDateSource, getEventTimeZoneLabel, parseEventDate } from '@/lib/eventDate';
 
 interface TimelineEvent {
   id: string;
@@ -8,6 +9,7 @@ interface TimelineEvent {
   venue: string;
   prefecture: string;
   datetime: string;
+  date_iso?: string | null;
   event_type: string;
   url: string;
 }
@@ -26,7 +28,7 @@ export default function ActivityTimeline({ events, maxItems }: ActivityTimelineP
   const groupedEvents = useMemo(() => {
     // 先按日期排序（最新在前）
     const sorted = [...events].sort((a, b) => 
-      new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+      getEventDateSource(b).localeCompare(getEventDateSource(a))
     );
 
     // 限制顯示數量
@@ -36,8 +38,9 @@ export default function ActivityTimeline({ events, maxItems }: ActivityTimelineP
     const groups: { [key: string]: TimelineEvent[] } = {};
     
     limited.forEach(event => {
-      const date = new Date(event.datetime);
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const dateKey = getEventDateKey(getEventDateSource(event));
+      if (!dateKey) return;
+      const key = dateKey.slice(0, 7);
       
       if (!groups[key]) {
         groups[key] = [];
@@ -62,17 +65,11 @@ export default function ActivityTimeline({ events, maxItems }: ActivityTimelineP
   }
 
   function formatEventDate(datetime: string): string {
-    const date = new Date(datetime);
-    const day = date.getDate();
-    const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-    const weekDay = weekDays[date.getDay()];
-    const time = date.toLocaleTimeString('ja-JP', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false 
-    });
-    
-    return `${day}日 (${weekDay}) ${time}`;
+    const date = parseInt(getEventDateKey(datetime)?.slice(-2) || '', 10);
+    const weekday = ['日', '一', '二', '三', '四', '五', '六'][parseEventDate(datetime).getUTCDay()];
+    const timeZone = getEventTimeZoneLabel(datetime);
+    if (!date || Number.isNaN(parseEventDate(datetime).getTime())) return '日期待確認・時間待公布';
+    return `${date}日 (${weekday}) ${formatEventTime(datetime)}${timeZone ? `・${timeZone}` : ''}`;
   }
 
   function getEventTypeIcon(eventType: string): string {
@@ -144,7 +141,7 @@ export default function ActivityTimeline({ events, maxItems }: ActivityTimelineP
                       {/* 日期 + 時間 */}
                       <div className="flex items-center gap-2 mb-2">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-nadeshiko-light/30 text-[rgb(var(--color-wine))] rounded-lg text-sm font-semibold">
-                          📍 {formatEventDate(event.datetime)}
+                          📅 {formatEventDate(getEventDateSource(event))}
                         </span>
                         <span className="text-text-tertiary text-sm">
                           {event.prefecture}

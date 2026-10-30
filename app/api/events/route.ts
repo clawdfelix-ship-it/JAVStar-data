@@ -1,5 +1,6 @@
 import { sql, getSql } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { getNormalizedEventDate } from '@/lib/eventDate';
 
 // GET /api/events - List events.
 // Default: only upcoming (datetime >= now). Pass ?past=1 to include past events.
@@ -105,9 +106,7 @@ export async function GET(request: NextRequest) {
     // `datetime` too so the calendar, list and home views all place events on the
     // right day. Rows without a parseable date were already filtered out above.
     const enrichedEvents = eventsResult.map(event => {
-      const isoDate = event.date_iso
-        ? new Date(event.date_iso).toISOString().slice(0, 10)
-        : null;
+      const isoDate = getNormalizedEventDate(event.date_iso);
       return {
         ...event,
         datetime: isoDate || event.datetime,

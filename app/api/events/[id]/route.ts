@@ -1,5 +1,6 @@
 import { getSql } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { getNormalizedEventDate } from '@/lib/eventDate';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,7 @@ export async function GET(
     const row = (rows as any[])[0];
     if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 });
 
-    const iso = row.date_iso ? new Date(row.date_iso).toISOString().slice(0, 10) : null;
+    const iso = getNormalizedEventDate(row.date_iso);
     return NextResponse.json({
       data: {
         id: row.id,

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { sql } from '@/lib/db';
+import { getNormalizedEventDate } from '@/lib/eventDate';
 import ActressClient from './ActressClient';
 
 // 服務端直接查詢數據庫 (更快、更穩定、唔依賴環境變數)
@@ -27,7 +28,7 @@ async function fetchActressServer(id: string) {
 
     // 3. 計算統計數據。日期一律以 date_iso（YYYY-MM-DD）做字串比較。
     const eventList = (events as any[]).map(e => {
-      const iso = e.date_iso ? new Date(e.date_iso).toISOString().slice(0, 10) : '';
+      const iso = getNormalizedEventDate(e.date_iso) || '';
       return { ...e, datetime: iso || e.datetime, date_iso: iso || null };
     });
     const todayStr = new Date().toISOString().slice(0, 10);

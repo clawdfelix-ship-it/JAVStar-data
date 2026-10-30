@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import EventCard from '../components/EventCard';
+import ActivityTimeline from '../components/ActivityTimeline';
 import { EventDetailModal, generateICS } from '../components/EventCalendar';
 import {
   formatEventDateLabel,
@@ -11,6 +12,7 @@ import {
   getEventTimeZoneLabel,
   getEventDateKey,
   getEventDateSource,
+  getNormalizedEventDate,
   getICSEventDates,
   getICSDateLines,
   parseEventDate,
@@ -56,6 +58,44 @@ test('calendar detail also shows unknown time for the original live payload', ()
   const html = renderToStaticMarkup(React.createElement(EventDetailModal, { event: liveDateOnlyEvent, onClose: () => {} }));
   assert.match(html, /時間待公布/);
   assert.doesNotMatch(html, /00:00|08:00|09:00/);
+});
+
+test('actress timeline never invents a time from the live date-only HK event', () => {
+  const hkEvent = {
+    ...liveDateOnlyEvent,
+    id: 'javstar-hk-1031-88266-meet-1',
+    title: '谷梓 見面會（Sixtoy）',
+    prefecture: '香港',
+    event_type: 'meet',
+    actress_name: '谷あづさ',
+  };
+  const html = renderToStaticMarkup(React.createElement(ActivityTimeline, { events: [hkEvent] }));
+  assert.match(html, /31日 \(六\)/);
+  assert.match(html, /時間待公布/);
+  assert.doesNotMatch(html, /00:00|08:00|09:00/);
+});
+
+test('date-only multi-day source remains on its stated start date without duplication', () => {
+  const event = {
+    ...liveDateOnlyEvent,
+    title: '【HAVEN TOKYO】栗山莉緒 見面會・攝影會・私密會（10/31-11/1）',
+  };
+  const html = renderToStaticMarkup(React.createElement(ActivityTimeline, { events: [event] }));
+  assert.equal(getEventDateKey(getEventDateSource(event)), '2026-10-31');
+  assert.match(html, /2026年 10月/);
+  assert.doesNotMatch(html, /2026年 11月/);
+  assert.match(html, /時間待公布/);
+});
+
+test('normalizing DB date values preserves the source calendar day across host timezones', () => {
+  const cases: Array<[string | Date, string]> = [
+    ['2026-10-31', '2026-10-31'],
+    // node-postgres DATE parser returns local midnight, not a UTC instant.
+    [new Date(2026, 9, 31), '2026-10-31'],
+  ];
+  for (const [value, expected] of cases) {
+    assert.equal(getNormalizedEventDate(value), expected);
+  }
 });
 
 test('date-only ICS is all-day, without a fabricated two-hour timed session', () => {
