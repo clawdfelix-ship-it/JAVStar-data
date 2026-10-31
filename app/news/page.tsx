@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AGE_GATE_EVENT, isAgeConfirmedToday } from '@/lib/ageGate';
 
 type NewsItem = {
   id: number;
@@ -108,8 +109,24 @@ export default function NewsPage() {
 }
 
 function NewsCard({ item }: { item: NewsItem }) {
-  // Adult covers are blurred until the reader taps to reveal (public page, no age gate).
-  const [revealed, setRevealed] = useState(false);
+  // Adult covers are blurred until either:
+  //  (a) the visitor confirmed the global 18+ age gate today, or
+  //  (b) they tap this specific cover.
+  const [gateOk, setGateOk] = useState(false);
+  const [manual, setManual] = useState(false);
+
+  useEffect(() => {
+    const sync = () => setGateOk(isAgeConfirmedToday());
+    sync();
+    window.addEventListener(AGE_GATE_EVENT, sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener(AGE_GATE_EVENT, sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+
+  const revealed = gateOk || manual;
   const blurred = item.is_adult && !revealed;
 
   return (
@@ -134,7 +151,7 @@ function NewsCard({ item }: { item: NewsItem }) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setRevealed(true);
+                setManual(true);
               }}
               className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 bg-black/35 text-[11px] font-semibold text-white"
             >

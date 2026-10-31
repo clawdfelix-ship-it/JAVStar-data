@@ -2,16 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { ShieldAlert, Lock } from 'lucide-react';
+import { AGE_GATE_EVENT, AGE_GATE_STORAGE_KEY, hkDateString } from '@/lib/ageGate';
 
 // 18禁年齡閘門：所有人當日第一次進站都要確認一次。
 // 用香港時區（UTC+8）嘅日期做 key，過咗午夜要再確認。
-const STORAGE_KEY = 'jstar-…date';
-
-function hkDateString(d: Date) {
-  // 直接用 +8 偏移，唔依賴用戶機時區
-  const hk = new Date(d.getTime() + 8 * 60 * 60 * 1000);
-  return hk.toISOString().slice(0, 10); // YYYY-MM-DD
-}
+const STORAGE_KEY = AGE_GATE_STORAGE_KEY;
 
 export default function AgeGate() {
   // mount 前唔渲染，避免 SSR hydration 唔夾
@@ -41,6 +36,12 @@ export default function AgeGate() {
     }
     document.body.style.overflow = '';
     setState('ok');
+    // Notify other surfaces (e.g. news covers) to lift adult restrictions today.
+    try {
+      window.dispatchEvent(new Event(AGE_GATE_EVENT));
+    } catch {
+      /* older browsers without Event ctor — reload still picks up the flag */
+    }
   }
 
   function deny() {
