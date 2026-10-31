@@ -94,11 +94,16 @@ export function extractArticleBody(rawHtml: string): string {
 }
 
 function cleanBody(text: string): string {
-  return text
+  let out = text
     // strip affiliate/PR boilerplate commonly repeated on these sources
-    .replace(/※当サイト[^。]*?(アフィリエイト|広告リンク)[^。]*。/g, '')
-    .replace(/【PR】[^】]*】/g, '')
+    .replace(/※当サイト[^。]*?(アフィリエイト|広告リンク)[^。]*。/g, '');
+  // A leading PR line. Keep this NON-greedy and bounded: a PR pitch ends at the
+  // first sentence terminator, NOT at the next 】 (the PR label often contains no
+  // closing 】, so 【PR】[^】]*】 would swallow thousands of chars of real body).
+  out = out.replace(/^[\s【PR】]*【PR】[^。！？!?]{0,120}[。！？!?]?/g, '');
+  out = out
     .replace(/続きを読む/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+  return out;
 }
