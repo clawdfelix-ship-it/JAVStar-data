@@ -1,4 +1,5 @@
 import { getSql } from '@/lib/db';
+import { fetchArticleBody } from './article';
 
 const OPENROUTER_BASE = process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
 const MODEL = process.env.NEWS_TRANSLATE_MODEL || 'deepseek/deepseek-chat';
@@ -22,28 +23,43 @@ function extractJson(text: string): { title_zh?: string; summary_zh?: string } |
 export async function translateJapaneseNews(input: {
   title: string;
   summary?: string | null;
+  article?: string | null;
 }): Promise<{ titleZh: string; summaryZh: string | null }> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error('OPENROUTER_API_KEY is not configured');
 
-  const summary = (input.summary || '').slice(0, 600);
+  const rssSummary = (input.summary || '').slice(0, 600);
+  // Richer context from the source page body (capped); used only to write a summary.
+  const article = (input.article || '').slice(0, 2500);
+  const hasBody = article.trim().length >= 80;
   const body = JSON.stringify({
     model: MODEL,
     temperature: 0.1,
     messages: [
       {
         role: 'system',
-        content: [
-          '你負責將日本 AV／寫真／藝能情報翻譯成香港繁體中文。',
-          '只輸出 JSON，格式：{"title_zh":"...","summary_zh":"..."}。',
-          'title_zh 係一句自然嘅香港繁體中文標題，保留女優、作品、組合原名。',
-          'summary_zh 係 1-2 句、最多 80 個中文字嘅客觀短簡介；如果原文冇摘要，用標題濃縮，唔好加自己意見。',
-          '唔好輸出 JSON 以外任何文字，唔好解釋。',
-        ].join('\n'),
+        content: hasBody
+          ? [
+              '你負責將日本 AV／寫真／藝能情報整理成香港繁體中文。',
+              '只輸出 JSON，格式：{"title_zh":"...","summary_zh":"..."}。',
+              'title_zh 係一句自然嘅香港繁體中文標題，保留女優、作品、組合原名。',
+              'summary_zh 依據提供嘅日文正文，寫一段約 150-250 個中文字嘅客觀內容摘要：講清人物／事件／日期地點／重點，',
+              '用港式繁體中文、語句通順；只概括事實，唔好加入原文冇嘅資料或自己意見，唔好逐句翻譯、唔好複製長句。',
+              '唔好輸出 JSON 以外任何文字，唔好解釋。',
+            ].join('\n')
+          : [
+              '你負責將日本 AV／寫真／藝能情報翻譯成香港繁體中文。',
+              '只輸出 JSON，格式：{"title_zh":"...","summary_zh":"..."}。',
+              'title_zh 係一句自然嘅香港繁體中文標題，保留女優、作品、組合原名。',
+              'summary_zh 係 1-2 句、最多 80 個中文字嘅客觀短簡介；如果原文冇摘要，用標題濃縮，唔好加自己意見。',
+              '唔好輸出 JSON 以外任何文字，唔好解釋。',
+            ].join('\n'),
       },
       {
         role: 'user',
-        content: `日文標題：${input.title}\n日文摘要：${summary || '（無）'}`,
+        content: hasBody
+          ? `日文標題：${input.title}\n日文簡述：${rssSummary || '（無）'}\n日文正文（參考，唔好全文照抄）：\n${article}`
+          : `日文標題：${input.title}\n日文摘要：${rssSummary || '（無）'}`,
       },
     ],
   });
@@ -81,7 +97,7 @@ export async function translateJapaneseNews(input: {
 
   return {
     titleZh: stripThinking(parsed.title_zh).slice(0, 200),
-    summaryZh: parsed.summary_zh ? stripThinking(parsed.summary_zh).slice(0, 300) : null,
+    summaryZh: parsed.summary_zh ? stripThinking(parsed.summary_zh).slice(0, 600) : null,
   };
 }
 
@@ -92,24 +108,38 @@ export type TranslateNewsResult = {
   sampleTitles: string[];
 };
 
-export async function translatePendingNewsItems(limit = 30): Promise<TranslateNewsResult> {
+// limit: max rows. includeTranslated=true also re-summarises rows that already
+// have title_zh (used to upgrade short summaries with article-body context).
+export async function translatePendingNewsItems(
+  limit = 30,
+  opts: { includeTranslated?: boolean } = {}
+): Promise<TranslateNewsResult> {
   const sql = getSql();
+  const where = opts.includeTranslated
+    ? `COALESCE(translation_status, 'not_translated') <> 'failed'`
+    : `COALESCE(translation_status, 'not_translated') <> 'translated'
+        AND COALESCE(title_zh, '') = ''`;
   const items = (await sql.query(
-    `SELECT id, title_ja, summary_ja
+    `SELECT id, title_ja, summary_ja, source_url
        FROM news_items
-      WHERE COALESCE(translation_status, 'not_translated') <> 'translated'
-        AND COALESCE(title_zh, '') = ''
+      WHERE ${where}
       ORDER BY published_at DESC NULLS LAST, id DESC
       LIMIT $1`,
     [limit]
-  )) as Array<{ id: number; title_ja: string; summary_ja: string | null }>;
+  )) as Array<{ id: number; title_ja: string; summary_ja: string | null; source_url: string }>;
 
   const result: TranslateNewsResult = { translated: 0, failed: 0, errors: [], sampleTitles: [] };
 
   // Sequential to avoid provider rate limits; daily batch is small.
   for (const item of items) {
     try {
-      const translated = await translateJapaneseNews({ title: item.title_ja, summary: item.summary_ja });
+      // Pull the source page body for a richer, longer summary (best effort).
+      const articleBody = await fetchArticleBody(item.source_url);
+      const translated = await translateJapaneseNews({
+        title: item.title_ja,
+        summary: item.summary_ja,
+        article: articleBody,
+      });
       await sql.query(
         `UPDATE news_items
             SET title_zh = $1,

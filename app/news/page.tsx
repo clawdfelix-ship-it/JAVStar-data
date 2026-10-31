@@ -173,7 +173,9 @@ function NewsCard({ item }: { item: NewsItem }) {
         </div>
         <h2 className="font-semibold leading-snug">{item.title}</h2>
         {(item.summary_zh || item.summary_ja) && (
-          <p className="mt-2 line-clamp-2 text-sm text-gray-600">{item.summary_zh || item.summary_ja}</p>
+          <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-gray-600">
+            {item.summary_zh || item.summary_ja}
+          </p>
         )}
         {item.title_zh && item.title_ja && item.title_ja !== item.title && (
           <p className="mt-1.5 line-clamp-1 text-[11px] text-gray-400">{item.title_ja}</p>
