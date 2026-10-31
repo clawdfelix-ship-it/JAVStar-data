@@ -64,23 +64,30 @@ export function extractArticleBody(rawHtml: string): string {
 
   // Best-to-weakest main-content selectors across our sources
   // (dxbeppin-r = WordPress Cocoon `.entry-content`; livedoor blog = `.article-body`).
+  // Cocoon renders several small `.entry-content` cards (related posts), so for the
+  // generic class selectors pick the element with the LONGEST text, not .first().
   const selectors = [
-    '.entry-content',
+    'article .entry-content',
     '.article-body',
     '.article-body-inner',
     '.main-text',
     '[itemprop="articleBody"]',
+    '.entry-content',
     'article',
     '.content',
     'main',
   ];
 
   for (const sel of selectors) {
-    const el = $(sel).first();
-    if (!el.length) continue;
-    const text = el.text().replace(/\s+/g, ' ').trim();
-    if (text.length >= 120) {
-      return cleanBody(text).slice(0, 2500);
+    const nodes = $(sel);
+    if (!nodes.length) continue;
+    let best = '';
+    nodes.each((_, node) => {
+      const text = $(node).text().replace(/\s+/g, ' ').trim();
+      if (text.length > best.length) best = text;
+    });
+    if (best.length >= 120) {
+      return cleanBody(best).slice(0, 2500);
     }
   }
   return '';
