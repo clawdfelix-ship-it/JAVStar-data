@@ -65,18 +65,18 @@ export default function NewsPage() {
   const categories = [...new Set(items.map((item) => item.category))];
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">女優情報</h1>
-        <p className="mt-1 text-sm text-gray-500">
+    <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-8">
+      <div className="mb-5 sm:mb-6">
+        <h1 className="text-xl font-bold sm:text-2xl">女優情報</h1>
+        <p className="mt-1 text-xs text-gray-500 sm:text-sm">
           收錄日本 AV／寫真媒體公開情報，只顯示已審核內容，點標題前往原文。
         </p>
       </div>
 
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-4 -mx-3 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
         <button
           onClick={() => setCategory('')}
-          className={`rounded-full border px-3 py-1 text-sm ${!category ? 'bg-black text-white' : 'bg-white'}`}
+          className={`shrink-0 rounded-full border px-3 py-1 text-xs whitespace-nowrap sm:text-sm ${!category ? 'bg-black text-white' : 'bg-white'}`}
         >
           全部
         </button>
@@ -84,7 +84,7 @@ export default function NewsPage() {
           <button
             key={key}
             onClick={() => setCategory(key)}
-            className={`rounded-full border px-3 py-1 text-sm ${category === key ? 'bg-black text-white' : 'bg-white'}`}
+            className={`shrink-0 rounded-full border px-3 py-1 text-xs whitespace-nowrap sm:text-sm ${category === key ? 'bg-black text-white' : 'bg-white'}`}
           >
             {CATEGORY_LABEL[key] || key}
           </button>
@@ -131,9 +131,9 @@ function NewsCard({ item }: { item: NewsItem }) {
   const blurred = item.is_adult && !revealed;
 
   return (
-    <article className="flex gap-4 rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md">
+    <article className="flex flex-col gap-3 rounded-xl border bg-white p-3 shadow-sm transition hover:shadow-md sm:flex-row sm:gap-4 sm:p-4">
       {item.image_url && (
-        <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg bg-gray-100 sm:h-28 sm:w-40">
+        <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden rounded-lg bg-gray-100 sm:aspect-auto sm:h-28 sm:w-40">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={item.image_url}
@@ -159,7 +159,7 @@ function NewsCard({ item }: { item: NewsItem }) {
       )}
 
       <div className="min-w-0 flex-1">
-        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-gray-500">
+        <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
           <span className="rounded-full bg-gray-100 px-2 py-0.5">
             {CATEGORY_LABEL[item.category] || item.category}
           </span>
@@ -167,13 +167,13 @@ function NewsCard({ item }: { item: NewsItem }) {
           {item.is_adult && <span className="rounded-full bg-red-50 px-2 py-0.5 text-red-500">18+</span>}
           <time>{formatDate(item.published_at)}</time>
         </div>
-        <h2 className="font-semibold leading-snug">
+        <h2 className="text-[15px] font-semibold leading-snug sm:text-base">
           <a href={item.source_url} target="_blank" rel="noreferrer noopener" className="hover:underline">
             {item.title}
           </a>
         </h2>
         {(item.summary_zh || item.summary_ja) && (
-          <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-gray-600">
+          <p className="mt-1.5 line-clamp-3 text-[13px] leading-relaxed text-gray-600 sm:mt-2 sm:line-clamp-4 sm:text-sm">
             {item.summary_zh || item.summary_ja}
           </p>
         )}
@@ -181,21 +181,21 @@ function NewsCard({ item }: { item: NewsItem }) {
           <p className="mt-1.5 line-clamp-1 text-[11px] text-gray-400">{item.title_ja}</p>
         )}
 
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="mt-2.5 flex items-center gap-3 sm:mt-3">
           <a
             href={item.source_url}
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1 text-[11px] font-medium text-gray-700 hover:bg-gray-50"
+            className="text-[11px] font-medium text-gray-500 underline-offset-2 hover:text-gray-800 hover:underline"
           >
-            查看日文原文
+            打開原文 ↗
           </a>
           <button
             type="button"
             onClick={() => setShowTips((v) => !v)}
-            className="inline-flex items-center gap-1 rounded-lg border border-pink-200 bg-pink-50 px-2.5 py-1 text-[11px] font-semibold text-pink-700 hover:bg-pink-100"
+            className="text-[11px] font-medium text-pink-600 underline-offset-2 hover:text-pink-800 hover:underline"
           >
-            怎樣用瀏覽器翻譯？
+            {showTips ? '收合翻譯提示' : '用瀏覽器翻譯？'}
           </button>
         </div>
 
@@ -204,17 +204,17 @@ function NewsCard({ item }: { item: NewsItem }) {
             <p className="mb-1.5 font-semibold text-text-primary">原文係日文，點一下就可以用瀏覽器翻譯：</p>
             <ul className="list-disc space-y-1 pl-4">
               <li>
-                <b>Chrome / Edge</b>：撳地址列右邊嘅「文A」圖示 → 選「繁體中文」。
+                <b>Chrome / Edge（電腦）</b>：撳地址列右邊嘅「文A」圖示 → 選「繁體中文」。
               </li>
               <li>
-                <b>Safari</b>：撳底部「Aa」→「顯示翻譯」→「繁體中文」。
+                <b>Safari（iPhone）</b>：撳左下角「Aa」→「顯示翻譯」→「繁體中文」。
               </li>
               <li>
-                <b>手機 Chrome</b>：撳右上角「⋮」→「翻譯」。
+                <b>Chrome（手機）</b>：撳右上角「⋮」→「翻譯」。
               </li>
             </ul>
             <p className="mt-1.5 text-gray-500">
-              提示：第一次撳可能需要等幾秒 Google 翻譯載入；翻譯後整頁都會變中文。
+              第一次撳可能要等幾秒，翻譯後整頁都會變中文。
             </p>
           </div>
         )}
