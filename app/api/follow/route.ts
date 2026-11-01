@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
+import { canManageExistingSubscription } from '@/lib/followAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,6 +75,11 @@ type Body = {
   action?: 'follow' | 'unfollow';
 };
 
+type ExistingSubscription = {
+  fan_token: string | null;
+  status: string;
+};
+
 function clean(s: unknown): string {
   return String(s ?? '').trim().replace(/^@/, '');
 }
@@ -133,6 +139,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'actress not found' }, { status: 404 });
     }
 
+    const existing = identityKey
+      ? ((await sql`
+          SELECT fan_token, status FROM fan_subscriptions
+          WHERE actress_id=${actressId} AND identity_key=${identityKey} LIMIT 1`
+        ) as ExistingSubscription[])[0]
+      : undefined;
+
+    if (existing && !canManageExistingSubscription(existing.fan_token, fanToken)) {
+      return NextResponse.json(
+        { error: '請喺原本開啟通知嘅裝置管理呢個訂閱' },
+        { status: 403 }
+      );
+    }
+
     if (action === 'unfollow' && identityKey) {
       await sql`
         UPDATE fan_subscriptions
@@ -183,14 +203,19 @@ export async function GET(req: NextRequest) {
     const email = clean(sp.get('email')).toLowerCase();
     const tg = clean(sp.get('tg_handle'));
     const ig = clean(sp.get('ig_handle'));
+    const fanToken = clean(sp.get('fan_token'));
     const identity = pickIdentity(email, tg, ig);
     if (!/^\d+$/.test(actressId) || !identity) {
       return NextResponse.json({ following: false });
     }
     const rows = await sql`
-      SELECT status FROM fan_subscriptions
+      SELECT status, fan_token FROM fan_subscriptions
       WHERE actress_id=${actressId} AND identity_key=${identity} LIMIT 1`;
-    return NextResponse.json({ following: (rows as any[])[0]?.status === 'active' });
+    const row = (rows as ExistingSubscription[])[0];
+    return NextResponse.json({
+      following:
+        row?.status === 'active' && canManageExistingSubscription(row.fan_token, fanToken),
+    });
   } catch (e) {
     console.error('follow status error', e);
     return NextResponse.json({ error: 'failed' }, { status: 500 });

@@ -17,6 +17,8 @@ import {
   getICSDateLines,
   parseEventDate,
 } from '../lib/eventDate';
+import { normalizeEmailSubscription, upsertEmailSubscription } from '../lib/emailSubscriptions';
+import { canManageExistingSubscription } from '../lib/followAuth';
 
 // Captured from live /api/events on 2026-10-31. The source row is date-only:
 // { id: 'tw-oct-31a', datetime: '2026-10-31', date_iso: '2026-10-31', prefecture: '台北' }
@@ -147,4 +149,37 @@ test('generated timed ICS keeps offset instants and timezone-less source times',
   const tokyo = generateICS({ ...liveDateOnlyEvent, datetime: '2026-10-31T18:30:00+09:00' });
   assert.match(tokyo, /DTSTART:20261031T093000Z/);
   assert.match(tokyo, /DTEND:20261031T113000Z/);
+});
+
+test('email subscribe path writes a durable upsert instead of silently dropping the request', async () => {
+  const calls: Array<{ sql: string; values: unknown[] }> = [];
+  const mockSql = async (strings: TemplateStringsArray, ...values: unknown[]) => {
+    calls.push({ sql: strings.join('__VALUE__'), values });
+    return [];
+  };
+
+  const record = await upsertEmailSubscription(
+    { email: ' User@Example.com ', actress_name: 'NIA', source: 'homepage' },
+    mockSql,
+  );
+
+  assert.deepEqual(record, {
+    email: 'user@example.com',
+    actress_name: 'NIA',
+    source: 'homepage',
+  });
+  assert.equal(calls.length, 3);
+  assert.match(calls[2].sql, /INSERT INTO email_subscriptions/);
+  assert.deepEqual(calls[2].values, ['user@example.com', 'NIA', 'homepage']);
+});
+
+test('email subscribe path rejects malformed addresses before reporting success', () => {
+  assert.throws(() => normalizeEmailSubscription({ email: 'not-an-email' }), /Invalid email/);
+});
+
+test('existing follow subscriptions can only be managed with the original fan token', () => {
+  assert.equal(canManageExistingSubscription('fan-token-1', 'fan-token-1'), true);
+  assert.equal(canManageExistingSubscription('fan-token-1', 'fan-token-2'), false);
+  assert.equal(canManageExistingSubscription('fan-token-1', ''), false);
+  assert.equal(canManageExistingSubscription(null, 'fan-token-1'), false);
 });
