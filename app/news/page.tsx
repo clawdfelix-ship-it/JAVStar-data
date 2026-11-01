@@ -39,30 +39,63 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
+const PAGE_SIZE = 10;
+
 export default function NewsPage() {
   const [items, setItems] = useState<NewsItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const [error, setError] = useState('');
+
+  // Reset to first page whenever the category filter changes.
+  useEffect(() => {
+    setPage(1);
+  }, [category]);
+
+  // Lightweight fetch of all category keys (ids only would be ideal, but the feed
+  // only returns rows; use a large limit solely to derive the chip list).
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/news?limit=200`, { signal: controller.signal })
+      .then((res) => res.json())
+      .then((data) => {
+        const keys = [...new Set((data.data || []).map((x: NewsItem) => x.category))] as string[];
+        setCategories(keys);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    const query = category ? `?category=${category}&limit=100` : '?limit=100';
-    fetch(`/api/news${query}`, { signal: controller.signal })
+    const qs = new URLSearchParams({
+      page: String(page),
+      page_size: String(PAGE_SIZE),
+    });
+    if (category) qs.set('category', category);
+    fetch(`/api/news?${qs.toString()}`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then((data) => setItems(data.data || []))
+      .then((data) => {
+        setItems(data.data || []);
+        setTotalPages(data.total_pages || 1);
+        setTotal(data.total ?? (data.data || []).length);
+        setError('');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      })
       .catch((err) => {
         if (err.name !== 'AbortError') setError(err.message);
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [category]);
-
-  const categories = [...new Set(items.map((item) => item.category))];
+  }, [category, page]);
 
   return (
     <main className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-8">
@@ -104,6 +137,29 @@ export default function NewsPage() {
           <NewsCard key={item.id} item={item} />
         ))}
       </div>
+
+      {!loading && !error && totalPages > 1 && (
+        <nav className="mt-6 flex items-center justify-center gap-3 text-sm" aria-label="新聞分頁">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="rounded-lg border px-3 py-1.5 font-medium disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            上一頁
+          </button>
+          <span className="tabular-nums text-gray-600">
+            {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="rounded-lg border px-3 py-1.5 font-medium disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            下一頁
+          </button>
+          <span className="ml-1 hidden text-xs text-gray-400 sm:inline">共 {total} 篇</span>
+        </nav>
+      )}
     </main>
   );
 }
