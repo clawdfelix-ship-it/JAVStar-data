@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { getSql } from '@/lib/db';
+import { fetchCoverImage } from '@/lib/news/cover';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -77,9 +78,23 @@ export async function POST(request: NextRequest) {
     `UPDATE news_items
         SET status = $1, updated_at = NOW()
       WHERE id = $2
-      RETURNING id, status, title_ja`,
+      RETURNING id, status, title_ja, source_url, COALESCE(image_url,'') AS image_url`,
     [nextStatus, id]
-  )) as Array<{ id: number; status: string; title_ja: string }>;
+  )) as Array<{ id: number; status: string; title_ja: string; source_url: string; image_url: string }>;
+
+  // On publish, guarantee a cover is resolved immediately from the source page's
+  // og:image, so newly-approved items never appear without one while waiting for cron.
+  let coverFilled = false;
+  if (action === 'approve' && rows[0] && !rows[0].image_url) {
+    const cover = await fetchCoverImage(rows[0].source_url);
+    if (cover) {
+      await sql.query(
+        `UPDATE news_items SET image_url = $1, updated_at = NOW() WHERE id = $2`,
+        [cover, id]
+      );
+      coverFilled = true;
+    }
+  }
 
   // Audit trail: record prior status so accidental bulk changes are traceable.
   await sql.query(
@@ -88,5 +103,5 @@ export async function POST(request: NextRequest) {
     [id, action, fromStatus, nextStatus]
   );
 
-  return NextResponse.json({ success: true, item: rows[0] });
+  return NextResponse.json({ success: true, item: rows[0], coverFilled });
 }
