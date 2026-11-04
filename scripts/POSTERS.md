@@ -61,3 +61,30 @@ node scripts/precrop-portrait.mjs --id 192328
 - embed Noto Sans TC（Regular/Bold），唔用系統 fallback，杜絕亂碼
 - satori flexbox 排版，唔用 absolute 估字寬
 - 標主辦（JAVStarMeet）同資訊平台（JCHING）、唔出價錢、底部固定「如有更多活動，歡迎提供資訊」
+
+## Instagram 自動發佈（@jching.calendar）
+
+憑證：`~/.hermes/profiles/javstar-ops/secrets/.meta_ig_config.json`（600，含無過期 `long_page_token`、`ig_user_id=17841473724752270`）。
+圖片 hosting：Vercel Blob store `jching-ig`（public），token 喺專案 `.env.local` 嘅 `BLOB_READ_WRITE_TOKEN`。
+
+| Script | 用途 |
+|---|---|
+| `ig-setup-longtoken.mjs` | 一次性：short token 換無過期 Page token（互動輸入 App Secret，唔經對話） |
+| `ig-publish.mjs` | 本地海報 → 自動上 Blob → IG container → 發佈；支援單圖／carousel（`--images` ≥2）／Reel（`--reel`） |
+
+```bash
+# 預覽（建 container 但唔出帖）——本地檔會自動上 Blob
+node scripts/ig-publish.mjs --image /path/poster.png --caption "..." --dry-run
+
+# 正式發佈（刪 --dry-run）
+node scripts/ig-publish.mjs --image /path/poster.png --caption "..."
+
+# 多圖 carousel
+node scripts/ig-publish.mjs --images a.png b.png c.png --caption "..."
+```
+
+- 每日 API 發佈上限 100 帖；carousel 計 1 帖
+- IG Graph API **唔支援刪帖**，出錯要人手喺 IG app 刪
+- 本地檔統一上 Blob `ig/YYYY-MM-DD-<檔名>`，HTTP URL 直接傳則跳過上傳
+- 手動試跑期間：每週先生週曆 → `--dry-run` 預覽 → 確認先正式發
+
