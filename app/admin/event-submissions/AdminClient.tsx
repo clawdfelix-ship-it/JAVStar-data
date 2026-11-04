@@ -168,9 +168,9 @@ function Row({ sub, token, onReviewed }: { sub: Submission; token: string; onRev
   );
 }
 
-export default function EventSubmissionsAdmin() {
-  const [token, setToken] = useState('');
-  const [authed, setAuthed] = useState(false);
+export default function EventSubmissionsAdmin({ embeddedToken }: { embeddedToken?: string }) {
+  const [token, setToken] = useState(embeddedToken ?? '');
+  const [authed, setAuthed] = useState(!!embeddedToken);
   const [tab, setTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [rows, setRows] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);

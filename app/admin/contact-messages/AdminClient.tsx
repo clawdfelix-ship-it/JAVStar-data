@@ -87,9 +87,9 @@ const TABS = [
   { key: 'all', label: '全部' },
 ];
 
-export default function ContactAdminClient() {
-  const [token, setToken] = useState('');
-  const [authed, setAuthed] = useState(false);
+export default function ContactAdminClient({ embeddedToken }: { embeddedToken?: string }) {
+  const [token, setToken] = useState(embeddedToken ?? '');
+  const [authed, setAuthed] = useState(!!embeddedToken);
   const [authErr, setAuthErr] = useState('');
   const [tab, setTab] = useState('new');
   const [rows, setRows] = useState<Message[] | null>(null);

@@ -22,9 +22,9 @@ interface NotifyEvent {
   tg_recipients: number; batch_pending: boolean; batch_sent: boolean;
 }
 
-export default function FansAdminClient() {
-  const [token, setToken] = useState('');
-  const [authed, setAuthed] = useState(false);
+export default function FansAdminClient({ embeddedToken }: { embeddedToken?: string }) {
+  const [token, setToken] = useState(embeddedToken ?? '');
+  const [authed, setAuthed] = useState(!!embeddedToken);
   const [authErr, setAuthErr] = useState('');
   const [actressId, setActressId] = useState('');
   const [counts, setCounts] = useState<Count[]>([]);

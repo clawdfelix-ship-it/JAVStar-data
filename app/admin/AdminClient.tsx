@@ -4,12 +4,18 @@ import { useEffect, useState } from 'react';
 import { ShieldCheck, LogOut } from 'lucide-react';
 import NewsAdminClient from './news/NewsAdminClient';
 import PhotobooksAdminClient from './photobooks/PhotobooksAdminClient';
+import EventSubmissionsAdmin from './event-submissions/AdminClient';
+import FansAdminClient from './fans/AdminClient';
+import ContactAdminClient from './contact-messages/AdminClient';
 
-type Section = 'news' | 'photobooks';
+type Section = 'news' | 'photobooks' | 'submissions' | 'fans' | 'contact';
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: 'news', label: '女優情報' },
   { key: 'photobooks', label: '寫真集' },
+  { key: 'submissions', label: '活動報料' },
+  { key: 'fans', label: '粉絲' },
+  { key: 'contact', label: '訊息' },
 ];
 
 export default function UnifiedAdminClient() {
@@ -72,12 +78,12 @@ export default function UnifiedAdminClient() {
         </button>
       </div>
 
-      <div className="mb-4 flex gap-2 rounded-xl bg-gray-100 p-1">
+      <div className="mb-4 flex gap-1.5 overflow-x-auto rounded-xl bg-gray-100 p-1 scrollbar-hide">
         {SECTIONS.map((s) => (
           <button
             key={s.key}
             onClick={() => setSection(s.key)}
-            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
+            className={`shrink-0 flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
               section === s.key ? 'bg-white text-pink-600 shadow-sm' : 'text-text-secondary'
             }`}
           >
@@ -86,8 +92,11 @@ export default function UnifiedAdminClient() {
         ))}
       </div>
 
-      {section === 'news' ? <NewsAdminClient embeddedToken={token} /> : null}
-      {section === 'photobooks' ? <PhotobooksAdminClient embeddedToken={token} /> : null}
+      {section === 'news' && <NewsAdminClient embeddedToken={token} />}
+      {section === 'photobooks' && <PhotobooksAdminClient embeddedToken={token} />}
+      {section === 'submissions' && <EventSubmissionsAdmin embeddedToken={token} />}
+      {section === 'fans' && <FansAdminClient embeddedToken={token} />}
+      {section === 'contact' && <ContactAdminClient embeddedToken={token} />}
     </main>
   );
 }
