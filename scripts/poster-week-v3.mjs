@@ -27,7 +27,8 @@ const fonts = [
   { name: 'Noto', data: readFileSync(`${D}/NotoSansTC-Regular.otf`), weight: 400 },
   { name: 'Noto', data: readFileSync(`${D}/NotoSansTC-Bold.otf`), weight: 700 },
 ];
-const W = 1080, H = 1080;
+// 2026 IG feed 新規格：4:5 直式 1080×1350（舊 1:1 1080×1080 已退居次要）
+const W = 1080, H = 1350;
 const C = {
   bg:'#F0F0D8', gold:'#F0C078', goldLine:'#E0A050', goldInk:'#7C5022',
   rose:'#C75B5B', roseDeep:'#A03E3E', roseBg:'#FBE6E6',
@@ -123,7 +124,8 @@ const tree = h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
 
   // 時間軸 + 日子（用一條獨立垂直線疊喺軸點中心）
   h('div',{style:{flex:'1 1 0',display:'flex',flexDirection:'column',
-    marginTop:10,marginLeft:56,marginRight:56,position:'relative'}},
+    justifyContent:'space-between',
+    marginTop:18,marginLeft:56,marginRight:56,position:'relative'}},
     // 垂直線：左 offset = 日期120 + 軸中心(18) - 線半寬(1.5)
     h('div',{style:{position:'absolute',left:136.5,top:8,bottom:8,width:3,
       background:`linear-gradient(180deg, ${C.goldLine}, ${C.gold})`,
