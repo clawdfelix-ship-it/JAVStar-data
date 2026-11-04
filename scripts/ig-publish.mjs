@@ -84,7 +84,9 @@ async function main() {
     console.warn("⚠️  目標帳號係", cfg.ig_username, "，唔係 jching.calendar，確認先好繼續");
   }
 
-  const caption = arg("--caption") ?? "";
+  const caption = arg("--caption-file")
+    ? readFileSync(resolve(arg("--caption-file")), "utf8").trim()
+    : arg("--caption") ?? "";
   const single = arg("--image");
   const multi = args("--images");
   const reel = arg("--reel");
