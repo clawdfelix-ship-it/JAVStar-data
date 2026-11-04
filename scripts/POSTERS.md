@@ -94,3 +94,9 @@ node scripts/ig-publish.mjs --images a.png b.png c.png --caption "..."
 - 過渡做法：caption 用已核實嘅官方 `@handle` 純文字（觀眾可自行搜尋）；要可點擊 tag 只能人手喺 IG app 出，或申請 `instagram_business_discovery` 標準存取（App Review，需隱私政策等，數日）
 - 海報依賴 `satori`＋`@resvg/resvg-js`（已入 package.json），sharp 用於預裁
 
+### 內容合規（防封號，2026-11 Felix 指示）
+- caption 同 hashtag **唔可以出現「AV」「成人」「色情」「18禁」「R18」等敏感字**；女優統一叫「女優」，活動用「攝影會／見面會／寫真展」
+- 安全 hashtag 池：`#JCHING #女優活動 #本週週曆 #台北攝影會 #攝影會 #見面會`（唔加 #AV女優）
+- 出帖前 script／人工都要過一次敏感字檢查
+- IG Graph API **唔支援更新 caption 亦唔支援刪帖**（`POST /{media}` 回 `#3 Unknown method`）；出錯或要改文只能人手喺 IG app 處理，所以 `--dry-run` 預覽係最後把關，正式發前一定要核對 caption
+
