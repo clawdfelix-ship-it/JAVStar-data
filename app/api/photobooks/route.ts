@@ -35,7 +35,12 @@ export async function GET(request: NextRequest) {
               cover_url, source_url, release_date, price_jpy, order_note
          FROM photobooks
         WHERE ${conds.join(' AND ')}
-        ORDER BY release_date DESC NULLS LAST, created_at DESC
+        ORDER BY
+          -- 預售新刊 hanmoto 暫未有封面（URL 404），排喺已有真圖嘅書後面
+          (release_date IS NOT NULL AND release_date <= CURRENT_DATE) DESC,
+          cover_url IS NOT NULL DESC,
+          release_date DESC NULLS LAST,
+          created_at DESC
         LIMIT $${params.length - 1} OFFSET $${params.length}`,
       params
     )) as Array<Record<string, unknown>>;

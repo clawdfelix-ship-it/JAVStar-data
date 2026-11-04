@@ -16,6 +16,10 @@
     {
       "path": "/api/cron/ingest-news",
       "schedule": "30 23 * * *"
+    },
+    {
+      "path": "/api/cron/ingest-photobooks",
+      "schedule": "45 23 * * *"
     }
   ]
 }
