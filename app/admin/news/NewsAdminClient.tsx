@@ -129,9 +129,9 @@ function Row({ row, token, onChanged }: { row: NewsRow; token: string; onChanged
   );
 }
 
-export default function NewsAdminClient() {
-  const [token, setToken] = useState('');
-  const [authed, setAuthed] = useState(false);
+export default function NewsAdminClient({ embeddedToken }: { embeddedToken?: string }) {
+  const [token, setToken] = useState(embeddedToken ?? '');
+  const [authed, setAuthed] = useState(!!embeddedToken);
   const [authErr, setAuthErr] = useState('');
   const [tab, setTab] = useState('pending');
   const [rows, setRows] = useState<NewsRow[] | null>(null);

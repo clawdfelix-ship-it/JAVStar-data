@@ -726,7 +726,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       <AuctionPromoBanner />
 
       {/* ==========================================
-          每月新作 - New Releases Section (footer 上面)
+          女優寫真集 - Photobooks (footer 上面，取代舊 JavLibrary 每月新作)
           ========================================== */}
       <NewReleasesSection />
 
