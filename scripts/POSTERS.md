@@ -88,3 +88,9 @@ node scripts/ig-publish.mjs --images a.png b.png c.png --caption "..."
 - 本地檔統一上 Blob `ig/YYYY-MM-DD-<檔名>`，HTTP URL 直接傳則跳過上傳
 - 手動試跑期間：每週先生週曆 → `--dry-run` 預覽 → 確認先正式發
 
+### 帳號標籤（@tag）限制（2026-11 實測）
+- 新 Meta App 預設**開發模式**，`business_discovery` 一律回 `#10 Application does not have permission`（連查自己都 fail），未過 App Review 前**攞唔到任何 IG 帳號內部 ID**
+- 冇 ID 就用唔到 `user_tags`（可點擊帳號標籤）；caption 入面打純文字 `@handle` 只顯示文字、**唔會變連結**
+- 過渡做法：caption 用已核實嘅官方 `@handle` 純文字（觀眾可自行搜尋）；要可點擊 tag 只能人手喺 IG app 出，或申請 `instagram_business_discovery` 標準存取（App Review，需隱私政策等，數日）
+- 海報依賴 `satori`＋`@resvg/resvg-js`（已入 package.json），sharp 用於預裁
+
