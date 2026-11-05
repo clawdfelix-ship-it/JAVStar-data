@@ -1,0 +1,15 @@
+{
+  "_comment": "女優事務所官方 profile 對照（圖源 = 官網公開宣傳照）。新事務所要在 fetch-agency-promo.mjs 加 adapter。",
+  "t-powers": {
+    "597844": { "name_ja": "七ツ森りり", "profile_url": "https://www.t-powers.co.jp/talent/%E4%B8%83%E3%83%84%E6%A3%AE%E3%82%8A%E3%82%8A/" },
+    "14008":  { "name_ja": "大槻ひびき", "profile_url": "https://www.t-powers.co.jp/talent/%E5%A4%A7%E6%A7%BB%E3%81%B2%E3%81%B3%E3%81%8D/" },
+    "71250":  { "name_ja": "桜空もも", "profile_url": "https://www.t-powers.co.jp/talent/%E6%A1%9C%E7%A9%BA%E3%82%82%E3%82%82/" },
+    "876195": { "name_ja": "MINAMO", "profile_url": "https://www.t-powers.co.jp/talent/minamo/" },
+    "533604": { "name_ja": "涼森れむ", "profile_url": "https://www.t-powers.co.jp/talent/%E6%B6%BC%E6%A3%AE%E3%82%8C%E3%82%80/" },
+    "717941": { "name_ja": "八掛うみ", "profile_url": "https://www.t-powers.co.jp/talent/%E5%85%AB%E6%8E%9B%E3%81%86%E3%81%BF/" },
+    "269581": { "name_ja": "七嶋舞", "profile_url": "https://www.t-powers.co.jp/talent/%E4%B8%83%E5%B6%8B%E8%88%9E/" },
+    "955286": { "name_ja": "楪カレン", "profile_url": "https://www.t-powers.co.jp/talent/%E6%A5%AA%E3%82%AB%E3%83%AC%E3%83%B3/" },
+    "945093": { "name_ja": "河北彩花", "profile_url": "https://www.t-powers.co.jp/talent/kawakitasaika/" },
+    "502570": { "name_ja": "吉高寧々", "profile_url": "https://www.t-powers.co.jp/talent/yoshitakanene/" }
+  }
+}

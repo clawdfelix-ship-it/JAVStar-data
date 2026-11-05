@@ -1,4 +1,44 @@
 {
+  "14008": {
+    "name_ja": "大槻ひびき",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/%E5%A4%A7%E6%A7%BB%E3%81%B2%E3%81%B3%E3%81%8D/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2013/11/01.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:02:58.812Z"
+  },
+  "71250": {
+    "name_ja": "桜空もも",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/%E6%A1%9C%E7%A9%BA%E3%82%82%E3%82%82/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2017/04/01.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:02:59.157Z"
+  },
+  "269581": {
+    "name_ja": "七嶋舞",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/%E4%B8%83%E5%B6%8B%E8%88%9E/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2024/07/02.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:02:59.451Z"
+  },
+  "502570": {
+    "name_ja": "吉高寧々",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/yoshitakanene/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2026/01/22.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:02:59.673Z"
+  },
+  "533604": {
+    "name_ja": "涼森れむ",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/%E6%B6%BC%E6%A3%AE%E3%82%8C%E3%82%80/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2019/03/01.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:02:59.926Z"
+  },
   "597844": {
     "name_ja": "七ツ森りり",
     "agency": "T-POWERS",
@@ -6,5 +46,37 @@
     "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2020/07/02.jpg",
     "license": "事務所官方公開 profile 宣傳照",
     "fetched_via": "scripts/fetch-agency-promo (demo C)"
+  },
+  "717941": {
+    "name_ja": "八掛うみ",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/%E5%85%AB%E6%8E%9B%E3%81%86%E3%81%BF/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2020/10/11.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:03:00.180Z"
+  },
+  "876195": {
+    "name_ja": "MINAMO",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/minamo/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2021/05/01.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:03:00.413Z"
+  },
+  "945093": {
+    "name_ja": "河北彩花",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/kawakitasaika/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2025/12/22.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:03:00.638Z"
+  },
+  "955286": {
+    "name_ja": "楪カレン",
+    "agency": "t-powers",
+    "source_page": "https://www.t-powers.co.jp/talent/%E6%A5%AA%E3%82%AB%E3%83%AC%E3%83%B3/",
+    "image_url": "https://www.t-powers.co.jp/wp2021/wp-content/uploads/2021/08/01.jpg",
+    "license": "事務所官方公開 profile 宣傳照",
+    "fetched_at": "2026-11-05T04:03:00.880Z"
   }
 }
