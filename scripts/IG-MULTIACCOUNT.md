@@ -12,7 +12,13 @@
 | `~/.hermes/profiles/javstar-ops/secrets/.meta_ig_config.json` | App 層：`app_id`/`app_secret`/`long_user_token`（60 日，可列所有專頁） |
 | `~/.hermes/profiles/javstar-ops/secrets/ig-accounts.json` | **帳號登記庫（600）**：每帳號 page token、IG id、username、Blob 前綴 |
 
-登記庫路徑可用環境變數 `IG_ACCOUNTS_FILE` 覆寫，方便其他 Hermes profile／agent 指向同一檔案共用。
+登記庫路徑可用環境變數 `IG_ACCOUNTS_FILE` 覆寫，方便其他 Hermes profile／agent 指向同一檔案共用。**跨 agent 標準做法**係統一用共享位置：
+
+```bash
+export IG_ACCOUNTS_FILE="$HOME/JAVStar/shared/secrets/ig-accounts.json"
+```
+
+每個帳號嘅內容風格、caption 規則、hashtag、合規紅線由獨立 playbook 管理：`~/JAVStar/shared/ig-account-playbooks/<key>.md`（見全域 skill `ig-multipost`，內附模板）。
 
 ## 開通新帳號（一次性）
 
