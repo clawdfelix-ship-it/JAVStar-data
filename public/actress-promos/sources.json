@@ -229,5 +229,25 @@
     "orientation": "portrait",
     "source_tier": "user_provided",
     "fetched_at": "2026-11-05T16:20:44.665807"
+  },
+  "19506": {
+    "name_ja": "めぐり",
+    "agency": "(待補)",
+    "source_page": "(用戶提供活動/寫真相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供",
+    "orientation": "portrait",
+    "source_tier": "user_provided",
+    "fetched_at": "2026-11-05T16:48:54.136337"
+  },
+  "973203": {
+    "name_ja": "西宮ゆめ",
+    "agency": "(待補)",
+    "source_page": "(用戶提供活動/寫真相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供",
+    "orientation": "portrait",
+    "source_tier": "user_provided",
+    "fetched_at": "2026-11-05T16:48:54.137202"
   }
 }
