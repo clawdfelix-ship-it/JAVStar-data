@@ -8,8 +8,8 @@
 |---|---|
 | `jching-events.mjs` | 共用資料層：拉 API、週曆分組、單場查詢、展示資料組裝 |
 | `poster-week-v3.mjs` | 1080×1350 港台場週曆（4:5 直式，flex 時間軸；2026 IG 新規格） |
-| `poster-event-intro-A2.mjs` | 1080×1080 活動介紹（左字右直向金框相，face-aware） |
-| `poster-event-intro-BC.mjs` | B：1080×1350 直向 split；C：1080×1080 full-bleed 壓字 |
+| `poster-event-intro-A2.mjs` | 1080×1350 活動介紹（4:5 直式，左字右直向金框相 474×1270 cover，face-aware） |
+| `poster-event-intro-BC.mjs` | B＋C 均 1080×1350（4:5）：B 上下 split；C full-bleed 壓字 |
 | `precrop-portrait.mjs` | sharp 面部中心預裁 474×1000 直向相 |
 
 ## 本地設定（唔入 repo）

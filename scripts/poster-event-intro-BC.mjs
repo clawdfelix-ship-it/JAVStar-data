@@ -1,6 +1,5 @@
-// 活動介紹海報 B + C
-// B: 1080×1350 直向左右 split（雜誌感）
-// C: 1080×1080 full-bleed 照片 + 底部漸層壓字
+// 活動介紹海報 B + C（均 1080×1350 4:5 直式，2026 IG 新規格）
+// B: 直向上下 split（雜誌感）；C: full-bleed 照片 + 底部漸層壓字
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -88,15 +87,15 @@ const treeB=h('div',{style:{width:WB,height:HB,background:C.bg,fontFamily:'Noto'
 );
 await render(treeB,WB,HB,`/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_event_intro_B_${actressId}_${row.id}.png`);
 
-// ============ C：1080×1080 full-bleed 壓字 ============
-const WS=1080,HS=1080;
+// ============ C：1080×1350 full-bleed 壓字（4:5 直式）============
+const WS=1080,HS=1350;
 const treeC=h('div',{style:{width:WS,height:HS,position:'relative',fontFamily:'Noto',
   background:'#000',overflow:'hidden'}},
   // 照片鋪滿
   photo?h('img',{src:photo,width:WS,height:HS,style:{position:'absolute',top:0,left:0,objectFit:'cover',objectPosition:'top center'}})
        :h('div',{style:{position:'absolute',inset:0,background:'linear-gradient(160deg,#F0C078,#A87850)'}}),
-  // 底部黑金漸層 scrim（由透明到實，高度 46%）
-  h('div',{style:{position:'absolute',left:0,right:0,bottom:0,height:500,
+  // 底部黑金漸層 scrim（直式拉高到 ~52%）
+  h('div',{style:{position:'absolute',left:0,right:0,bottom:0,height:640,
     background:'linear-gradient(180deg, rgba(20,14,4,0) 0%, rgba(20,14,4,0.55) 35%, rgba(20,14,4,0.92) 100%)'}}),
   // 頂部 pill
   h('div',{style:{position:'absolute',top:48,left:56,display:'flex',alignItems:'center',

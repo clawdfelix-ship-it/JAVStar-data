@@ -1,4 +1,4 @@
-// 活動介紹海報 A2 — 左字右圖 split，1080×1080
+// 活動介紹海報 A2 — 左字右圖 split，1080×1350（4:5 直式，2026 IG 新規格）
 // 右圖直向長方形（face-aware），左欄 editorial 文字；flex 排版唔 overlap、embed Noto
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
@@ -28,7 +28,7 @@ const fonts = [
   { name:'Noto', data:readFileSync(`${D}/NotoSansTC-Regular.otf`), weight:400 },
   { name:'Noto', data:readFileSync(`${D}/NotoSansTC-Bold.otf`), weight:700 },
 ];
-const W=1080,H=1080;
+const W=1080,H=1350;
 const C={bg:'#F0F0D8',gold:'#F0C078',goldDk:'#E0A050',goldInk:'#7C5022',
   rose:'#C75B5B',roseDeep:'#A03E3E',roseBg:'#FBE6E6',ink:'#3D2B0A',sub:'#8A5A28',line:'#E0D3B0'};
 
@@ -86,15 +86,15 @@ const tree=h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
       h('div',{style:{fontSize:14,fontWeight:400,color:C.sub,marginTop:2}},'資訊平台 JCHING')),
   ),
 
-  // ===== 右欄：直向長方形圖片（明確 474×1000，face-aware）=====
+  // ===== 右欄：直向長方形圖片（474×1270，填滿 4:5 畫布高度，face-aware）=====
   h('div',{style:{display:'flex',paddingTop:40,paddingRight:40,paddingBottom:40}},
-    h('div',{style:{width:474,height:1000,borderRadius:24,overflow:'hidden',
+    h('div',{style:{width:474,height:1270,borderRadius:24,overflow:'hidden',
       border:`3px solid ${C.gold}`,background:'#000',flexShrink:0,
       boxShadow:'0 12px 34px rgba(124,80,34,0.22)'}},
       photo
-        ? h('img',{src:photo,width:474,height:1000,
-            style:{objectFit:'fill',objectPosition:'center'}})
-        : h('div',{style:{width:474,height:1000,display:'flex',alignItems:'center',justifyContent:'center',
+        ? h('img',{src:photo,width:474,height:1270,
+            style:{objectFit:'cover',objectPosition:'top center'}})
+        : h('div',{style:{width:474,height:1270,display:'flex',alignItems:'center',justifyContent:'center',
             fontSize:140,color:C.gold}},(ev.actressJa||ev.actress||'?').slice(0,1))),
   ),
 );
