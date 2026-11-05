@@ -89,7 +89,10 @@ const treeB=h('div',{style:{width:WB,height:HB,background:C.bg,fontFamily:'Noto'
     h('div',{style:{fontSize:18,fontWeight:700,color:C.roseDeep}},ev.hashtag),
     h('div',{style:{fontSize:16,fontWeight:400,color:C.sub}},'資訊平台 JCHING')),
 );
-await render(treeB,WB,HB,`/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_event_intro_B_${actressId}_${row.id}.png`);
+// --only-c：MFE 批次只需 C 版，跳過 B render
+if (!args['only-c']) {
+  await render(treeB,WB,HB,`/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_event_intro_B_${actressId}_${row.id}.png`);
+}
 
 // ============ C：1080×1350 full-bleed 壓字（4:5 直式）============
 const WS=1080,HS=1350;
