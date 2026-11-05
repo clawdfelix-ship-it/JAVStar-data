@@ -40,7 +40,26 @@ try {
   item.published_at = new Date().toISOString();
   q.done = q.items.filter((x) => x.status === "posted").length;
   writeFileSync(QUEUE, JSON.stringify(q, null, 2));
-  console.log(`✅ 已發 ${item.name} → ${item.permalink}（進度 ${q.done}/${q.total}）`);
+  console.log(`✅ 已發 feed ${item.name} → ${item.permalink}（進度 ${q.done}/${q.total}）`);
+
+  // 緊接發對應限時動態（同一張 4:5 圖；Graph STORIES 不支援 caption，24h 自動消失）
+  try {
+    const sout = execFileSync(
+      "node",
+      ["scripts/ig-story-publish.mjs", "--account", q.account, "--image", item.image],
+      { cwd: REPO, encoding: "utf8", env: { ...process.env, IG_ACCOUNTS_FILE: REG }, stdio: ["ignore", "pipe", "pipe"] }
+    );
+    const sm = sout.match(/Story 已發佈 media id:\s*(\d+)/);
+    item.story_media_id = sm ? sm[1] : "";
+    item.story_published_at = new Date().toISOString();
+    writeFileSync(QUEUE, JSON.stringify(q, null, 2));
+    console.log(`📸 已發 Story ${item.name}（media ${item.story_media_id || "?"}）`);
+  } catch (se) {
+    // Story 失敗唔阻 feed（feed 已出）；記低等下次人工補
+    item.story_error = (se.stderr || se.message || "").toString().slice(0, 300);
+    writeFileSync(QUEUE, JSON.stringify(q, null, 2));
+    console.log(`⚠️ ${item.name} feed 已發但 Story 失敗：${item.story_error}`);
+  }
 } catch (e) {
   item.last_error = (e.stderr || e.message || "").toString().slice(0, 300);
   if (item.attempts >= MAX_ATTEMPTS) {
