@@ -182,13 +182,14 @@
   },
   "822902": {
     "name_ja": "小野六花",
-    "agency": "(minnano fallback)",
-    "source_page": "https://www.minnano-av.com/",
-    "image_url": "https://www.minnano-av.com/p_actress_125_125/020/822902.jpg?newav",
-    "license": "公開頭像（事務所官網缺圖時 fallback，非事務所直出）",
-    "orientation": "square",
-    "source_tier": "fallback",
-    "fetched_at": "2026-11-05T14:17:09.602089"
+    "agency": "ALL PROMOTION",
+    "source_page": "(用戶提供高清相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供",
+    "orientation": "portrait",
+    "source_tier": "user_provided",
+    "replaces": "minnano 448×365 fallback",
+    "fetched_at": "2026-11-05T17:21:06.426900"
   },
   "666598": {
     "name_ja": "楓ふうあ",
