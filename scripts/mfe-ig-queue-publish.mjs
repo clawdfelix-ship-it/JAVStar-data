@@ -42,18 +42,26 @@ try {
   writeFileSync(QUEUE, JSON.stringify(q, null, 2));
   console.log(`✅ 已發 feed ${item.name} → ${item.permalink}（進度 ${q.done}/${q.total}）`);
 
-  // 緊接發對應限時動態（同一張 4:5 圖；Graph STORIES 不支援 caption，24h 自動消失）
+  // 緊接發對應限時動態：先把 4:5 海報嵌入 9:16 全屏 canvas（等比不變形＋燒 handle），再發
+  // 注意：直接餵 4:5 給 STORIES 會被 IG 垂直拉長變形（2026-11 實測），必須先轉 9:16
   try {
+    const storyPng = `/Users/siulungchan/.hermes/profiles/it/cache/scratch/story_${item.actress_id}_9x16.png`;
+    execFileSync(
+      "node",
+      ["scripts/ig-story-9x16.mjs", "--id", item.actress_id, "--poster", item.image, "--out", storyPng],
+      { cwd: REPO, encoding: "utf8", env: { ...process.env, IG_ACCOUNTS_FILE: REG }, stdio: ["ignore", "pipe", "pipe"] }
+    );
     const sout = execFileSync(
       "node",
-      ["scripts/ig-story-publish.mjs", "--account", q.account, "--image", item.image],
+      ["scripts/ig-story-publish.mjs", "--account", q.account, "--image", storyPng],
       { cwd: REPO, encoding: "utf8", env: { ...process.env, IG_ACCOUNTS_FILE: REG }, stdio: ["ignore", "pipe", "pipe"] }
     );
     const sm = sout.match(/Story 已發佈 media id:\s*(\d+)/);
     item.story_media_id = sm ? sm[1] : "";
     item.story_published_at = new Date().toISOString();
+    item.story_format = "9x16";
     writeFileSync(QUEUE, JSON.stringify(q, null, 2));
-    console.log(`📸 已發 Story ${item.name}（media ${item.story_media_id || "?"}）`);
+    console.log(`📸 已發 9:16 Story ${item.name}（media ${item.story_media_id || "?"}）`);
   } catch (se) {
     // Story 失敗唔阻 feed（feed 已出）；記低等下次人工補
     item.story_error = (se.stderr || se.message || "").toString().slice(0, 300);
