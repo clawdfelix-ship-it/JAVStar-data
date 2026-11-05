@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = join(__dirname, '..');
@@ -35,6 +36,18 @@ const adapters = {
     const m = html.match(/p-talent-detail__vis-slider-img[^>]*background-image:\s*url\(["']?([^"')]+)/);
     return m ? m[1] : null;
   },
+  // マインズ Mine'S：detail 頁唯一一張 talent_images 直向相
+  'mines': (html) => {
+    const m = html.match(/<img[^>]+src=["']([^"']*talent_images[^"']+)["']/);
+    if (!m) return null;
+    return m[1].startsWith('http') ? m[1] : new URL(m[1], 'https://mines-pro.jp/').href;
+  },
+  // C-more：主相 img/model/<slug>/<slug>.jpg（唔要 top_ 橫 banner）
+  'cmore': (html, profileUrl) => {
+    const m = html.match(/<img[^>]+src=["']([^"']*img\/model\/[^"']+\/(?!top_)[^"']+\.jpg)["']/);
+    if (!m) return null;
+    return new URL(m[1], profileUrl).href;
+  },
 };
 
 function loadSources() {
@@ -47,13 +60,13 @@ async function fetchText(url) {
   return await res.text();
 }
 
-async function downloadImage(url, referer) {
+async function downloadImage(url, referer, minBytes = 8000) {
   const res = await fetch(url, { headers: { 'User-Agent': UA, Referer: referer } });
   if (!res.ok) throw new Error(`image HTTP ${res.status}`);
   const type = res.headers.get('content-type') || '';
   const buf = Buffer.from(await res.arrayBuffer());
   if (!/image\/(jpe?g|png|webp)/.test(type)) throw new Error(`非圖片 content-type: ${type}`);
-  if (buf.length < 8000) throw new Error(`圖片太細（${buf.length} bytes），可能係占位圖`);
+  if (buf.length < minBytes) throw new Error(`圖片太細（${buf.length} bytes），可能係占位圖`);
   return buf;
 }
 
@@ -80,12 +93,17 @@ for (const job of jobs) {
       skipN++;
       continue;
     }
-    const html = await fetchText(job.profile_url);
-    const adapter = adapters[job.agency];
-    if (!adapter) throw new Error(`無 adapter：${job.agency}`);
-    const imgUrl = adapter(html);
+    // 有直接 image_url 就跳過 HTML parse（細事務所/列表頁用）
+    let imgUrl = job.image_url || null;
+    if (!imgUrl) {
+      const html = await fetchText(job.profile_url);
+      const adapter = adapters[job.agency];
+      if (!adapter) throw new Error(`無 adapter 且無 image_url：${job.agency}`);
+      imgUrl = adapter(html, job.profile_url);
+    }
     if (!imgUrl) throw new Error('抽唔到 profile 相 URL');
-    const buf = await downloadImage(imgUrl, job.profile_url);
+    // 方形/細事務所相可能較細：門檻降到 5KB（真占位圖通常 <2KB）
+    const buf = await downloadImage(imgUrl, job.profile_url, 5000);
 
     if (!execute) {
       console.log(`DRY  ${tag} <- ${imgUrl} (${buf.length} bytes)`);
@@ -93,17 +111,22 @@ for (const job of jobs) {
       continue;
     }
     mkdirSync(OUT_DIR, { recursive: true });
-    writeFileSync(outPath, buf);
+    // webp（BStar 等）統一轉 jpeg，其餘原樣寫入；輸出一律 <id>.jpg
+    const isWebp = /\.webp(\?|$)/i.test(imgUrl);
+    const outBuf = isWebp ? await sharp(buf).jpeg({ quality: 90 }).toBuffer() : buf;
+    writeFileSync(outPath, outBuf);
     sources[job.id] = {
       name_ja: job.name_ja,
       agency: job.agency,
       source_page: job.profile_url,
       image_url: imgUrl,
       license: '事務所官方公開 profile 宣傳照',
+      orientation: job.orientation || 'portrait',
+      converted_from_webp: isWebp,
       fetched_at: new Date().toISOString(),
     };
     writeFileSync(SOURCES, JSON.stringify(sources, null, 2));
-    console.log(`SAVE ${tag} -> actress-promos/${job.id}.jpg (${buf.length} bytes)`);
+    console.log(`SAVE ${tag} -> actress-promos/${job.id}.jpg (${outBuf.length} bytes${isWebp ? ', webp->jpg' : ''})`);
     okN++;
   } catch (e) {
     console.log(`FAIL ${tag}: ${e.message}`);

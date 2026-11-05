@@ -11,5 +11,27 @@
     "955286": { "name_ja": "楪カレン", "profile_url": "https://www.t-powers.co.jp/talent/%E6%A5%AA%E3%82%AB%E3%83%AC%E3%83%B3/" },
     "945093": { "name_ja": "河北彩花", "profile_url": "https://www.t-powers.co.jp/talent/kawakitasaika/" },
     "502570": { "name_ja": "吉高寧々", "profile_url": "https://www.t-powers.co.jp/talent/yoshitakanene/" }
+  },
+  "mines": {
+    "228437": { "name_ja": "紗倉まな", "profile_url": "https://mines-pro.jp/model/10218", "orientation": "portrait" },
+    "163082": { "name_ja": "田野憂", "profile_url": "https://mines-pro.jp/model/10992", "orientation": "portrait" }
+  },
+  "cmore": {
+    "273627": { "name_ja": "明里つむぎ", "profile_url": "https://cmore.jp/official/model-akari.html", "orientation": "square" },
+    "493582": { "name_ja": "本庄鈴", "profile_url": "https://cmore.jp/official/model-honjo.html", "orientation": "square" },
+    "380512": { "name_ja": "青空ひかり", "profile_url": "https://cmore.jp/official/model-aozora.html", "orientation": "square" }
+  },
+  "luminous": {
+    "641091": { "name_ja": "宮下玲奈", "profile_url": "https://luminous-pro.tokyo/sns", "image_url": "https://luminous-pro.tokyo/image/model/204/2/3/204.jpeg", "orientation": "portrait" }
+  },
+  "bdash": {
+    "113949": { "name_ja": "美園和花", "profile_url": "https://modelz.tv/model/", "image_url": "https://modelz.tv/wp/wp-content/themes/b_dash/common/images/model/pic_misono.jpg", "orientation": "square" }
+  },
+  "bstar": {
+    "125605": { "name_ja": "瀬戸環奈", "profile_url": "https://bstar-pro.com/model.html?mid=355", "image_url": "https://bstar-pro.com/images/models/355/2.webp", "orientation": "portrait" },
+    "291714": { "name_ja": "金松季歩", "profile_url": "https://bstar-pro.com/model.html?mid=349", "image_url": "https://bstar-pro.com/images/models/349/2.webp", "orientation": "portrait" }
+  },
+  "funstar": {
+    "671983": { "name_ja": "神木麗", "profile_url": "https://funstar.jp/", "image_url": "https://funstar.jp/wp-content/themes/jobav/img/actor_002.jpg", "orientation": "square" }
   }
 }

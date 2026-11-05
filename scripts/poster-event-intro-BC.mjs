@@ -64,7 +64,7 @@ const treeB=h('div',{style:{width:WB,height:HB,background:C.bg,fontFamily:'Noto'
   h('div',{style:{margin:'30px 60px 0 60px',height:640,borderRadius:24,overflow:'hidden',
     border:`3px solid ${C.gold}`,background:'#000',flexShrink:0,
     boxShadow:'0 10px 30px rgba(124,80,34,0.18)'}},
-    photo?h('img',{src:photo,width:960,height:640,style:{objectFit:'cover',objectPosition:'top center'}})
+    photo?h('img',{src:photo,width:960,height:640,style:{objectFit:'contain',objectPosition:'center',background:C.bg}})
           :h('div',{style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',fontSize:160,color:C.gold}},(ev.actressJa||ev.actress||'?').slice(0,1))),
   // 標題
   h('div',{style:{marginLeft:60,marginTop:34}},
