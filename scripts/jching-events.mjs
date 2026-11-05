@@ -176,9 +176,13 @@ export function toIntroEvent(row, overrides = {}) {
   const venueKey = `${dateISO}|${row.event_type}|${row.actress_id}`;
   const venue = overrides.venue || byId.venue || cfg.venues?.[venueKey] || cityOf(row);
   const orgRaw = row.organizer || '';
-  const org = orgRaw
-    .replace(/^javstarmeet$/i, 'JAVStarMeet')
-    .replace(/^community$/i, '合作夥伴') || 'JAVStarMeet';
+  // MFE 綜合展：實際主辦係 MEGA FANS EXPO，唔好顯示泛稱「合作夥伴」
+  const isMfe = /【MFE】/i.test(row.title || '');
+  const org = isMfe
+    ? 'MFE'
+    : (orgRaw
+        .replace(/^javstarmeet$/i, 'JAVStarMeet')
+        .replace(/^community$/i, '合作夥伴') || 'JAVStarMeet');
   // 注意：DB name_cn 試過係垃圾（例如「古賀まつな【旧名】」），唔可信；
   // 中文名用 override actressCn map，否則退回日文顯示名。
   const cn = cfg.actressCn?.[String(row.actress_id)];
@@ -197,10 +201,12 @@ export function toIntroEvent(row, overrides = {}) {
     typeLabel: overrides.typeLabel || byId.typeLabel || defaultTypeLabel(row),
     sessions: overrides.sessions || byId.sessions || '',
     sessionsChip: overrides.sessionsChip || byId.sessionsChip || '',
-    // 自家場標主辦 hashtag；第三方（community→合作夥伴）唔好將「合作夥伴」做 hashtag
-    hashtag: orgRaw.toLowerCase() === 'community'
-      ? `#JCHING　#${actress}`
-      : `#${org.replace(/\s+/g, '')}　#${actress}`,
+    // hashtag：MFE 標展名；自家場標主辦；其餘 community 場唔好將「合作夥伴」做 hashtag
+    hashtag: isMfe
+      ? `#MEGAFANSEXPO　#${actress}`
+      : (orgRaw.toLowerCase() === 'community'
+        ? `#JCHING　#${actress}`
+        : `#${org.replace(/\s+/g, '')}　#${actress}`),
     raw: row,
   };
 }
