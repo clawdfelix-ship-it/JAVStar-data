@@ -17,11 +17,14 @@
   },
   "113949": {
     "name_ja": "美園和花",
-    "agency": "bdash",
-    "source_page": "https://modelz.tv/model/",
-    "image_url": "https://modelz.tv/wp/wp-content/themes/b_dash/common/images/model/pic_misono.jpg",
-    "license": "事務所官方公開 profile 宣傳照",
-    "fetched_at": "2026-11-05T05:01:35.196Z"
+    "agency": "B-DASH Promotion",
+    "source_page": "(用戶提供高清活動相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供活動留影",
+    "orientation": "portrait",
+    "source_tier": "user_provided",
+    "replaces": "bdash 190px 方形官網圖",
+    "fetched_at": "2026-11-05T16:13:45.218799"
   },
   "125605": {
     "name_ja": "瀬戸環奈",
@@ -117,11 +120,13 @@
   },
   "641091": {
     "name_ja": "宮下玲奈",
-    "agency": "luminous",
-    "source_page": "https://luminous-pro.tokyo/sns",
-    "image_url": "https://luminous-pro.tokyo/image/model/204/2/3/204.jpeg",
-    "license": "事務所官方公開 profile 宣傳照",
-    "fetched_at": "2026-11-05T05:01:34.737Z"
+    "agency": "Luminous/官方",
+    "source_page": "(用戶提供高清活動相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供活動留影",
+    "orientation": "portrait",
+    "source_tier": "user_provided",
+    "fetched_at": "2026-11-05T16:20:44.666645"
   },
   "671983": {
     "name_ja": "神木麗",
@@ -187,13 +192,13 @@
   },
   "666598": {
     "name_ja": "楓ふうあ",
-    "agency": "(minnano fallback)",
-    "source_page": "https://www.minnano-av.com/",
-    "image_url": "https://www.minnano-av.com/p_actress_125_125/021/666598.jpg?newav",
-    "license": "公開頭像（事務所官網缺圖時 fallback，非事務所直出）",
-    "orientation": "square",
-    "source_tier": "fallback",
-    "fetched_at": "2026-11-05T14:17:09.602094"
+    "agency": "Attractive/官方",
+    "source_page": "(用戶提供高清活動相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供活動留影",
+    "orientation": "portrait",
+    "source_tier": "user_provided",
+    "fetched_at": "2026-11-05T16:20:44.667216"
   },
   "687516": {
     "name_ja": "浅野こころ",
@@ -217,12 +222,12 @@
   },
   "272417": {
     "name_ja": "弥生みづき",
-    "agency": "(minnano fallback)",
-    "source_page": "https://www.minnano-av.com/",
-    "image_url": "https://www.minnano-av.com/p_actress_125_125/019/272417.jpg?newav",
-    "license": "公開頭像（事務所官網缺圖時 fallback，非事務所直出）",
+    "agency": "Luminous/官方",
+    "source_page": "(用戶提供高清活動相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供活動留影",
     "orientation": "portrait",
-    "source_tier": "fallback",
-    "fetched_at": "2026-11-05T14:17:09.602101"
+    "source_tier": "user_provided",
+    "fetched_at": "2026-11-05T16:20:44.665807"
   }
 }
