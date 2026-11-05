@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
             cover_url, source_url, release_date, price_jpy, order_note, status, created_at
        FROM photobooks ${where}
       ORDER BY release_date DESC NULLS LAST, created_at DESC
-      LIMIT $2`,
+      LIMIT $${filter === 'all' ? '1' : '2'}`,
     filter === 'all' ? [limit] : [filter, limit]
   )) as Array<Record<string, unknown>>;
 

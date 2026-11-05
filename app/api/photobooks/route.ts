@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const params: unknown[] = [];
     if (publisher) {
       params.push(publisher);
-      conds.push(`publisher = $${params.length + 2}`);
+      conds.push(`publisher = $${params.length}`);
     }
 
     // count

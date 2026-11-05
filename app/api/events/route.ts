@@ -60,8 +60,8 @@ export async function GET(request: NextRequest) {
       const parts: string[] = ['e.date_iso IS NOT NULL'];
       if (!pastFilter) parts.push('e.date_iso >= CURRENT_DATE');
       parts.push("e.actress_id IS NOT NULL AND e.actress_id != '0' AND e.actress_id != 'unknown'");
-      if (prefecture) parts.push(`e.prefecture = '${prefecture}'`);
-      if (eventType) parts.push(`e.event_type = '${eventType}'`);
+      if (prefecture) parts.push(`e.prefecture = '${prefecture.replace(/'/g, "''")}'`);
+      if (eventType) parts.push(`e.event_type = '${eventType.replace(/'/g, "''")}'`);
       if (organizer) parts.push(`e.organizer = '${organizer.replace(/'/g, "''")}'`);
       if (region && region !== 'all' && regionClauses[region]) {
         parts.push(regionClauses[region]);
@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
       const parts: string[] = ['date_iso IS NOT NULL'];
       if (!pastFilter) parts.push('date_iso >= CURRENT_DATE');
       parts.push("actress_id IS NOT NULL AND actress_id != '0' AND actress_id != 'unknown'");
-      if (prefecture) parts.push(`prefecture = '${prefecture}'`);
-      if (eventType) parts.push(`event_type = '${eventType}'`);
+      if (prefecture) parts.push(`prefecture = '${prefecture.replace(/'/g, "''")}'`);
+      if (eventType) parts.push(`event_type = '${eventType.replace(/'/g, "''")}'`);
       if (organizer) parts.push(`organizer = '${organizer.replace(/'/g, "''")}'`);
       if (region && region !== 'all' && regionClauses[region]) {
         parts.push(regionClauses[region]);
