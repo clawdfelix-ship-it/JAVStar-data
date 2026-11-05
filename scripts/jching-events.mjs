@@ -145,6 +145,23 @@ export async function weeklyEvents(opts = {}) {
   return { from, to, days, total, cityCount };
 }
 
+// 多日展期：由 title 抽「M/DD-DD」（同月份），結合 date_iso 年份/月，輸出「2026.11.13（五）— 11.15（日）」
+// 抽唔到範圍就退回單日 label。跨月/跨年格式唔喺 title 出現，唔處理。
+function dateRangeLabel(row, dateISO, fallback) {
+  const title = row.title || '';
+  const m = title.match(/(\d{1,2})\s*\/\s*(\d{1,2})\s*[-–—~]\s*(\d{1,2})/);
+  if (!m) return fallback;
+  const [, mon, startD, endD] = m.map((x, i) => (i === 0 ? x : Number(x)));
+  const year = dateISO.slice(0, 4);
+  const isoOf = (day) => `${year}-${String(mon).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  const wdOf = (day) => {
+    const dt = new Date(isoOf(day) + 'T00:00:00+08:00');
+    return ['日', '一', '二', '三', '四', '五', '六'][dt.getDay()];
+  };
+  const mm = String(mon).padStart(2, '0');
+  return `${year}.${mm}.${String(startD).padStart(2, '0')}（${wdOf(startD)}）— ${mm}.${String(endD).padStart(2, '0')}（${wdOf(endD)}）`;
+}
+
 // 活動介紹海報用：用 API row + 本地 override 組一場活動嘅展示資料
 export function toIntroEvent(row, overrides = {}) {
   const cfg = loadOverride();
@@ -153,6 +170,8 @@ export function toIntroEvent(row, overrides = {}) {
   const d = new Date(dateISO + 'T00:00:00+08:00');
   const wd = ['日','一','二','三','四','五','六'][d.getDay()];
   const dateLabel = `${dateISO.replace(/-/g, '.')}（${wd}）`;
+  // 多日展（如 MFE title 帶「11/13-15」）：由標題抽範圍，顯示完整展期；抽唔到就用單日
+  const rangeLabel = dateRangeLabel(row, dateISO, dateLabel);
 
   const venueKey = `${dateISO}|${row.event_type}|${row.actress_id}`;
   const venue = overrides.venue || byId.venue || cfg.venues?.[venueKey] || cityOf(row);
@@ -170,8 +189,9 @@ export function toIntroEvent(row, overrides = {}) {
     actressId: String(row.actress_id),
     actressJa: row.actress_name,
     actress,
-    date: dateLabel,
+    date: rangeLabel,
     dateISO,
+    dateRange: rangeLabel !== dateLabel,
     venue,
     org,
     typeLabel: overrides.typeLabel || byId.typeLabel || defaultTypeLabel(row),
