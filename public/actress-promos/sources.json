@@ -213,13 +213,14 @@
   },
   "272292": {
     "name_ja": "ひなの花音",
-    "agency": "(minnano fallback)",
-    "source_page": "https://www.minnano-av.com/",
-    "image_url": "https://www.minnano-av.com/p_actress_125_125/292/272292.jpg?newav",
-    "license": "公開頭像（事務所官網缺圖時 fallback，非事務所直出）",
+    "agency": "(待補)",
+    "source_page": "(用戶提供高清相)",
+    "image_url": "(user-provided)",
+    "license": "用戶提供",
     "orientation": "portrait",
-    "source_tier": "fallback",
-    "fetched_at": "2026-11-05T14:17:09.602099"
+    "source_tier": "user_provided",
+    "replaces": "minnano 342×367 fallback",
+    "fetched_at": "2026-11-05T17:39:05.633981"
   },
   "272417": {
     "name_ja": "弥生みづき",
