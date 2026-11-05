@@ -18,13 +18,13 @@
   "113949": {
     "name_ja": "美園和花",
     "agency": "B-DASH Promotion",
-    "source_page": "(用戶提供高清活動相)",
+    "source_page": "(用戶指定高清電梯相)",
     "image_url": "(user-provided)",
     "license": "用戶提供活動留影",
     "orientation": "portrait",
     "source_tier": "user_provided",
-    "replaces": "bdash 190px 方形官網圖",
-    "fetched_at": "2026-11-05T16:13:45.218799"
+    "replaces": "前 user_provided 720px 電梯圖（104KB），換 923×1280 更闊構圖",
+    "fetched_at": "2026-11-05T18:58:32.347638"
   },
   "125605": {
     "name_ja": "瀬戸環奈",
