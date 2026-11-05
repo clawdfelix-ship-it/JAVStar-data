@@ -88,6 +88,18 @@ node scripts/ig-publish.mjs --images a.png b.png c.png --caption "..."
 - 本地檔統一上 Blob `ig/YYYY-MM-DD-<檔名>`，HTTP URL 直接傳則跳過上傳
 - 手動試跑期間：每週先生週曆 → `--dry-run` 預覽 → 確認先正式發
 
+### 手動補充場（唔入 DB、唔使女優 ID）
+資料庫冇收錄嘅女優（例如寫真偶像、jkface/minnano 查唔到 ID），可喺 `~/.config/jching-poster.json` 加 `manualEvents`，週曆海報會同 DB 場一齊 render，但**唔寫入資料庫、唔使 actress_id**：
+
+```json
+"manualEvents": [
+  { "date": "2026-11-14", "actress": "吉瀨結", "organizer": "STAR POINT", "event_type": "photo", "city": "台北" }
+]
+```
+- 欄位：`date`（YYYY-MM-DD，多日場填首日）、`actress`（純顯示名）、`organizer`、`event_type`（photo/meet/other）、`city`（預設台北）
+- merge 邏輯喺 `jching-events.mjs` 的 `weeklyEvents`，受 `--region`／`--from/--to` 過濾；每週 7 天槽，超出該週唔顯示
+- 用途：2026-11 補 4 場（吉瀨結、乃南結一、波崎天結、千歲吉野），等日後查到真 ID 或重建 jkface pipeline 再正式入 DB
+
 ### 帳號標籤（@tag）限制（2026-11 實測）
 - 新 Meta App 預設**開發模式**，`business_discovery` 一律回 `#10 Application does not have permission`（連查自己都 fail），未過 App Review 前**攞唔到任何 IG 帳號內部 ID**
 - 冇 ID 就用唔到 `user_tags`（可點擊帳號標籤）；caption 入面打純文字 `@handle` 只顯示文字、**唔會變連結**

@@ -117,6 +117,26 @@ export async function weeklyEvents(opts = {}) {
     days.push({ md: iso.slice(5).replace('-', '/'), wd: WD[i], iso, evs });
   }
 
+  // 手動補充場（唔入 DB、唔使女優 ID）：~/.config/jching-poster.json 的 manualEvents
+  // 形狀：{date:"2026-11-14", actress:"吉瀨結", organizer:"STAR POINT",
+  //        event_type:"photo", city:"台北"}；多日場填首日。
+  const manual = (cfg.manualEvents || []).filter((m) => m.date >= from && m.date <= to);
+  for (const m of manual) {
+    const city = m.city || '台北';
+    const inTW = TW.has(city);
+    const inHK = city.includes('香港');
+    if (!((regions.has('taiwan') && inTW) || (regions.has('hk') && inHK))) continue;
+    const day = days.find((d) => d.iso === m.date);
+    if (!day) continue;
+    day.evs.push({
+      actress: m.actress,
+      org: m.organizer || '',
+      city,
+      kind: kindLabel(m.event_type || 'photo'),
+      raw: { id: `manual-${m.date}-${m.actress}`, manual: true },
+    });
+  }
+
   // 統計
   const cityCount = {};
   let total = 0;
