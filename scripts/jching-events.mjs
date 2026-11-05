@@ -156,7 +156,10 @@ export function toIntroEvent(row, overrides = {}) {
 
   const venueKey = `${dateISO}|${row.event_type}|${row.actress_id}`;
   const venue = overrides.venue || byId.venue || cfg.venues?.[venueKey] || cityOf(row);
-  const org = (row.organizer || '').replace(/^javstarmeet$/i, 'JAVStarMeet') || 'JAVStarMeet';
+  const orgRaw = row.organizer || '';
+  const org = orgRaw
+    .replace(/^javstarmeet$/i, 'JAVStarMeet')
+    .replace(/^community$/i, '合作夥伴') || 'JAVStarMeet';
   // 注意：DB name_cn 試過係垃圾（例如「古賀まつな【旧名】」），唔可信；
   // 中文名用 override actressCn map，否則退回日文顯示名。
   const cn = cfg.actressCn?.[String(row.actress_id)];
@@ -174,7 +177,10 @@ export function toIntroEvent(row, overrides = {}) {
     typeLabel: overrides.typeLabel || byId.typeLabel || defaultTypeLabel(row),
     sessions: overrides.sessions || byId.sessions || '',
     sessionsChip: overrides.sessionsChip || byId.sessionsChip || '',
-    hashtag: `#${org.replace(/\s+/g, '')}　#${actress}`,
+    // 自家場標主辦 hashtag；第三方（community→合作夥伴）唔好將「合作夥伴」做 hashtag
+    hashtag: orgRaw.toLowerCase() === 'community'
+      ? `#JCHING　#${actress}`
+      : `#${org.replace(/\s+/g, '')}　#${actress}`,
     raw: row,
   };
 }
@@ -183,7 +189,15 @@ export function toIntroEvent(row, overrides = {}) {
 function cnFromJa(ja) { return ja || null; }
 
 function defaultTypeLabel(row) {
-  if ((row.title || '').includes('旺角快閃')) return '旺角快閃攝影見面會';
+  const title = row.title || '';
+  if (title.includes('旺角快閃')) return '旺角快閃攝影見面會';
+  // 第三方綜合展（標題帶【XXX】前綴，如【MFE】MEGA FANS EXPO）：用展名做標題
+  const m = title.match(/^【([^】]+)】\s*(.*?)\s*(?:（[\d/\-]+）)?$/);
+  if (m) {
+    const tag = m[1].toUpperCase();
+    if (tag === 'MFE') return 'MEGA FANS EXPO 香港';
+    return m[2] || `${m[1]} 活動`;
+  }
   if (row.event_type === 'photo') return '香港粉絲攝影會';
   if (row.event_type === 'meet') return '香港粉絲見面會';
   if (row.event_type === 'offkai') return 'OFF 會';

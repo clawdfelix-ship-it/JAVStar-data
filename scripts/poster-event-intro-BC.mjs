@@ -17,7 +17,11 @@ const row = await findEvent({
 });
 const ev0 = toIntroEvent(row);
 const actressId = ev0.actressId;
-const ev = { ...ev0, hashtag: `${ev0.hashtag}　#JCHING` };
+// community 場 hashtag 已含 #JCHING，避免重複；自家場先補上
+const ev = {
+  ...ev0,
+  hashtag: ev0.hashtag.includes('#JCHING') ? ev0.hashtag : `${ev0.hashtag}　#JCHING`,
+};
 
 const D = '/Users/siulungchan/.hermes/profiles/it/cache/scratch';
 const fonts = [
