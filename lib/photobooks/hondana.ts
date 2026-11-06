@@ -28,7 +28,20 @@ export const HONDANA_PUBLISHERS: HondanaPublisher[] = [
     base: 'https://www.tokuma.jp',
     listPaths: ['/smp/search/new.html'],
   },
-  // 玄光社、白夜書房待列表頁結構確認後補 listPaths（產品頁 parser 已通用）
+  {
+    key: 'genkosha',
+    publisher: '玄光社',
+    base: 'https://www.genkosha.co.jp',
+    // 同 hondana 平台，新刊列表路徑與竹書房一致（實測 12 本/頁）
+    listPaths: ['/search/new.html'],
+  },
+  {
+    key: 'byakuya',
+    publisher: '白夜書房',
+    base: 'https://www.byakuya-shobo.co.jp',
+    // 同 hondana 平台，新刊列表路徑一致（實測 12 本/頁）
+    listPaths: ['/search/new.html'],
+  },
 ];
 
 const UA =
