@@ -7,13 +7,15 @@ import PhotobooksAdminClient from './photobooks/PhotobooksAdminClient';
 import EventSubmissionsAdmin from './event-submissions/AdminClient';
 import FansAdminClient from './fans/AdminClient';
 import ContactAdminClient from './contact-messages/AdminClient';
+import FanPhotosAdminClient from './fan-photos/AdminClient';
 
-type Section = 'news' | 'photobooks' | 'submissions' | 'fans' | 'contact';
+type Section = 'news' | 'photobooks' | 'submissions' | 'fans' | 'contact' | 'fanphotos';
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: 'news', label: '女優情報' },
   { key: 'photobooks', label: '寫真集' },
   { key: 'submissions', label: '活動報料' },
+  { key: 'fanphotos', label: '粉絲相冊' },
   { key: 'fans', label: '粉絲' },
   { key: 'contact', label: '訊息' },
 ];
@@ -95,6 +97,7 @@ export default function UnifiedAdminClient() {
       {section === 'news' && <NewsAdminClient embeddedToken={token} />}
       {section === 'photobooks' && <PhotobooksAdminClient embeddedToken={token} />}
       {section === 'submissions' && <EventSubmissionsAdmin embeddedToken={token} />}
+      {section === 'fanphotos' && <FanPhotosAdminClient embeddedToken={token} />}
       {section === 'fans' && <FansAdminClient embeddedToken={token} />}
       {section === 'contact' && <ContactAdminClient embeddedToken={token} />}
     </main>
