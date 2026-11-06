@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
          FROM photobooks
         WHERE ${conds.join(' AND ')}
         ORDER BY
-          -- 預售新刊 hanmoto 暫未有封面（URL 404），排喺已有真圖嘅書後面
-          (release_date IS NOT NULL AND release_date <= CURRENT_DATE) DESC,
+          -- 有封面行先（個別 hanmoto 預售封面若 404，由前端 onError 兜底顯示 📕）；
+          -- 再按發售日新到舊，令最新／預售新刊登首頁，唔再墊底（2026-11 修正）
           cover_url IS NOT NULL DESC,
           release_date DESC NULLS LAST,
           created_at DESC
