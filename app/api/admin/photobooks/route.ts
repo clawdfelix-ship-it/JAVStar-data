@@ -60,8 +60,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
+  const isBatch = Array.isArray(body.isbns);
+  // 單本請求先硬性要求 isbn；批量請求（isbns 陣列）喺下面各自校驗，唔行呢個 guard
   const isbn = String(body.isbn || '').trim();
-  if (!/^\d{13}$/.test(isbn)) {
+  if (!isBatch && !/^\d{13}$/.test(isbn)) {
     return NextResponse.json({ error: 'isbn (13 digits) required' }, { status: 400 });
   }
   const sql = getSql();
