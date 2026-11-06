@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
 
   let body: {
     isbn?: string;
+    isbns?: string[];
     action?: string;
     price_jpy?: number | null;
     order_note?: string | null;
@@ -100,6 +101,35 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'action must be approve/reject/update' }, { status: 400 });
   }
   const nextStatus = body.action === 'approve' ? 'published' : 'rejected';
+
+  // 批量：{ action:'approve'|'reject', isbns:[...] }
+  // 強制只改 status='pending' 嘅列，已 published/rejected 一律唔掂（冪等＋防誤傷）
+  if (Array.isArray(body.isbns)) {
+    const isbns = Array.from(
+      new Set((body.isbns as unknown[]).map((x) => String(x).trim()).filter((x) => /^\d{13}$/.test(x)))
+    );
+    if (!isbns.length) return NextResponse.json({ error: 'no valid isbns (13 digits)' }, { status: 400 });
+    if (isbns.length > 500) return NextResponse.json({ error: 'max 500 isbns per batch' }, { status: 400 });
+
+    const rows = (await sql.query(
+      `UPDATE photobooks SET status = $1, updated_at = NOW()
+        WHERE status = 'pending' AND isbn = ANY($2)
+        RETURNING isbn, status, book_title, actress_name, publisher`,
+      [nextStatus, isbns]
+    )) as Array<Record<string, unknown>>;
+
+    const changedIsbns = new Set(rows.map((r) => String(r.isbn)));
+    const skipped = isbns.filter((i) => !changedIsbns.has(i));
+    return NextResponse.json({
+      success: true,
+      requested: isbns.length,
+      updated: rows.length,
+      skipped,
+      action: body.action,
+      items: rows,
+    });
+  }
+
   const rows = (await sql.query(
     `UPDATE photobooks SET status = $1, updated_at = NOW()
       WHERE isbn = $2

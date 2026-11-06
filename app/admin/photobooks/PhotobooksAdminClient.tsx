@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Check, X, Loader2, ShieldCheck, ExternalLink, RefreshCw } from 'lucide-react';
-
 type PbRow = {
   isbn: string;
   book_title: string;
@@ -35,7 +34,19 @@ function statusBadge(s: string) {
   return map[s] || 'bg-gray-100';
 }
 
-function Row({ row, token, onChanged }: { row: PbRow; token: string; onChanged: () => void }) {
+function Row({
+  row,
+  token,
+  onChanged,
+  selected,
+  onToggle,
+}: {
+  row: PbRow;
+  token: string;
+  onChanged: () => void;
+  selected: boolean;
+  onToggle: (isbn: string) => void;
+}) {
   const [busy, setBusy] = useState<'approve' | 'reject' | null>(null);
   const [error, setError] = useState('');
   const [price, setPrice] = useState<string>(row.price_jpy != null ? String(row.price_jpy) : '');
@@ -84,8 +95,17 @@ function Row({ row, token, onChanged }: { row: PbRow; token: string; onChanged: 
   }
 
   return (
-    <div className="rounded-2xl border bg-white p-3">
+    <div className={`rounded-2xl border bg-white p-3 transition-colors ${selected ? 'border-pink-400 ring-1 ring-pink-200' : ''}`}>
       <div className="flex gap-3">
+        {row.status === 'pending' && (
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onToggle(row.isbn)}
+            aria-label={`選擇 ${row.book_title}`}
+            className="mt-1 h-4 w-4 shrink-0 accent-pink-600"
+          />
+        )}
         <div className="h-28 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
           {row.cover_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -183,6 +203,46 @@ export default function PhotobooksAdminClient({ embeddedToken }: { embeddedToken
   const [rows, setRows] = useState<PbRow[] | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [batchBusy, setBatchBusy] = useState<'approve' | 'reject' | null>(null);
+  const [batchMsg, setBatchMsg] = useState('');
+
+  const toggle = useCallback((isbn: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(isbn)) next.delete(isbn);
+      else next.add(isbn);
+      return next;
+    });
+  }, []);
+
+  // 切 tab／重新載入後清選擇
+  const clearSelection = useCallback(() => setSelected(new Set()), []);
+
+  async function batchAct(action: 'approve' | 'reject') {
+    const isbns = [...selected].filter((i) => /^\d{13}$/.test(i));
+    if (!isbns.length) return;
+    const verb = action === 'approve' ? '發布' : '拒絕';
+    if (!window.confirm(`確認批量${verb} ${isbns.length} 本？（只會改 pending 項，已審項不受影響）`)) return;
+    setBatchBusy(action);
+    setBatchMsg('');
+    try {
+      const res = await fetch('/api/admin/photobooks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ action, isbns }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const j = await res.json();
+      setBatchMsg(`已${verb} ${j.updated} 本${j.skipped?.length ? `，跳過 ${j.skipped.length} 本（非 pending）` : ''}`);
+      clearSelection();
+      await load(tab, token);
+    } catch (e) {
+      setBatchMsg(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBatchBusy(null);
+    }
+  }
 
   const load = useCallback(async (status: string, tk: string) => {
     setLoading(true);
@@ -215,8 +275,11 @@ export default function PhotobooksAdminClient({ embeddedToken }: { embeddedToken
   }, []);
 
   useEffect(() => {
-    if (authed) load(tab, token);
-  }, [authed, tab, token, load]);
+    if (authed) {
+      clearSelection();
+      load(tab, token);
+    }
+  }, [authed, tab, token, load, clearSelection]);
 
   function login() {
     if (token.trim()) {
@@ -281,9 +344,59 @@ export default function PhotobooksAdminClient({ embeddedToken }: { embeddedToken
       ) : !rows || rows.length === 0 ? (
         <p className="py-10 text-center text-sm text-text-tertiary">暫無項目</p>
       ) : (
-        <div className="space-y-3">
-          {rows.map((row) => <Row key={row.isbn} row={row} token={token} onChanged={() => load(tab, token)} />)}
-        </div>
+        <>
+          {tab === 'pending' && (
+            <div className="sticky top-0 z-10 mb-3 flex flex-wrap items-center gap-2 rounded-xl border bg-white/95 p-2.5 backdrop-blur">
+              <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-pink-600"
+                  checked={rows.length > 0 && rows.every((r) => selected.has(r.isbn))}
+                  ref={(el) => {
+                    if (el) el.indeterminate = rows.some((r) => selected.has(r.isbn)) && !rows.every((r) => selected.has(r.isbn));
+                  }}
+                  onChange={(e) => {
+                    if (e.target.checked) setSelected(new Set(rows.map((r) => r.isbn)));
+                    else clearSelection();
+                  }}
+                />
+                全選
+              </label>
+              <span className="text-xs text-text-tertiary">已選 {selected.size} 本</span>
+              <div className="ml-auto flex gap-2">
+                <button
+                  onClick={() => batchAct('approve')}
+                  disabled={batchBusy !== null || selected.size === 0}
+                  className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-700 disabled:opacity-40"
+                >
+                  {batchBusy === 'approve' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                  批量發布
+                </button>
+                <button
+                  onClick={() => batchAct('reject')}
+                  disabled={batchBusy !== null || selected.size === 0}
+                  className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-semibold text-text-secondary hover:bg-gray-50 disabled:opacity-40"
+                >
+                  {batchBusy === 'reject' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
+                  批量拒絕
+                </button>
+              </div>
+            </div>
+          )}
+          {batchMsg && <p className="mb-2 rounded-lg bg-pink-50 px-3 py-2 text-xs font-semibold text-pink-700">{batchMsg}</p>}
+          <div className="space-y-3">
+            {rows.map((row) => (
+              <Row
+                key={row.isbn}
+                row={row}
+                token={token}
+                onChanged={() => load(tab, token)}
+                selected={selected.has(row.isbn)}
+                onToggle={toggle}
+              />
+            ))}
+          </div>
+        </>
       )}
     </main>
   );
