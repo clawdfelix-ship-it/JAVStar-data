@@ -219,6 +219,22 @@ export default function PhotobooksAdminClient({ embeddedToken }: { embeddedToken
   // 切 tab／重新載入後清選擇
   const clearSelection = useCallback(() => setSelected(new Set()), []);
 
+  // 一鍵選取符合規則嘅 pending：有封面＋有定價＋2020-01-01 後出版
+  const selectQualified = useCallback(() => {
+    if (!rows) return;
+    const qualified = rows
+      .filter(
+        (r) =>
+          r.status === 'pending' &&
+          !!r.cover_url &&
+          r.price_jpy != null &&
+          !!r.release_date &&
+          new Date(r.release_date) >= new Date('2020-01-01T00:00:00Z')
+      )
+      .map((r) => r.isbn);
+    setSelected(new Set(qualified));
+  }, [rows]);
+
   async function batchAct(action: 'approve' | 'reject') {
     const isbns = [...selected].filter((i) => /^\d{13}$/.test(i));
     if (!isbns.length) return;
@@ -362,6 +378,13 @@ export default function PhotobooksAdminClient({ embeddedToken }: { embeddedToken
                 />
                 全選
               </label>
+              <button
+                onClick={selectQualified}
+                className="rounded-lg border border-pink-300 px-2.5 py-1 text-[11px] font-semibold text-pink-700 hover:bg-pink-50"
+                title="有封面＋有定價＋2020 年或以後出版"
+              >
+                選取 2020 後
+              </button>
               <span className="text-xs text-text-tertiary">已選 {selected.size} 本</span>
               <div className="ml-auto flex gap-2">
                 <button
