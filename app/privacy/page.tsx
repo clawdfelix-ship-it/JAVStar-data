@@ -21,7 +21,7 @@ export default function PrivacyPage() {
           <h2 className="text-base font-bold text-text-primary">1. 我哋收集嘅資料</h2>
           <p>本網站以匿名瀏覽為主，<strong>無需登記即可使用</strong>。我哋只會喺你自願使用以下功能時收集有限資料：</p>
           <ul className="list-disc pl-5 space-y-1">
-            <li><strong>Email 訂閱</strong>：你主動提交嘅 email 地址，用作發送活動通知；</li>
+            <li><strong>Telegram 活動通知訂閱</strong>：你經 @jching_calendar_bot 綁定嘅 Telegram chat 編號，用作發送活動通知；</li>
             <li><strong>投票／互動功能</strong>：喺你瀏覽器儲存嘅本地偏好（localStorage），唔會連結你嘅真實身份；</li>
             <li><strong>年齡確認</strong>：只記低你當日已確認嘅狀態（本地瀏覽器儲存，每日還原），唔會記錄你嘅個人資料。</li>
           </ul>
@@ -44,21 +44,21 @@ export default function PrivacyPage() {
           <h2 className="text-base font-bold text-text-primary">4. 第三方服務</h2>
           <p>
             本站透過 Vercel 提供網站託管，其可能記錄一般伺服器日誌（IP、瀏覽器類型、造訪時間）用作保安及流量統計。
-            `/promo` 訂閱頁使用 Meta Pixel 及 Conversions API 衡量訂閱成效；會傳送事件資料、IP、瀏覽器類型及經 SHA-256 雜湊嘅 email，不會向 Meta 傳送明文 email。
+            `/promo` 訂閱頁使用 Meta Pixel 及 Conversions API 衡量訂閱成效；只會傳送事件資料同 IP／瀏覽器類型，唔會傳送 Telegram chat 編號。
             外連網站（主辦方、票務平台等）有各自嘅私隱政策，本站無法控制亦不負責。
           </p>
         </section>
 
         <section>
           <h2 className="text-base font-bold text-text-primary">5. 資料保留</h2>
-          <p>訂閱 email 只保留至你取消訂閱為止；取消後會從通知名單移除。伺服器日誌按供應商預設週期自動清除。</p>
+          <p>訂閱記錄只保留至你取消訂閱為止；取消後會從通知名單移除。伺服器日誌按供應商預設週期自動清除。</p>
         </section>
 
         <section>
           <h2 className="text-base font-bold text-text-primary">6. 你嘅權利</h2>
           <p>
-            你有權查閱、更正或要求刪除你提交嘅個人資料（目前僅限訂閱 email），
-            亦可隨時透過 unsubscribe 連結取消訂閱。如有私隱查詢，可透過本站 Instagram / Telegram 聯絡。
+            你有權查閱、更正或要求刪除你提交嘅個人資料（目前僅限 Telegram 訂閱記錄），
+            亦可透過 JCHING 網站或 Instagram / Telegram 聯絡我哋取消訂閱。如有私隱查詢，可透過本站 Instagram / Telegram 聯絡。
           </p>
         </section>
 

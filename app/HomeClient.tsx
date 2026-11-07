@@ -122,42 +122,31 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     hasUpcoming,
   });
 
-  // Email signup state
-  const [email, setEmail] = useState('');
+  // Telegram 訂閱（全站）state
   const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [subscribeMessage, setSubscribeMessage] = useState('');
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !email.includes('@')) {
-      setSubscribeStatus('error');
-      setSubscribeMessage('請輸入有效 email');
-      return;
-    }
+  const handleTelegramSubscribe = async () => {
     setSubscribeStatus('loading');
     try {
-      const res = await fetch('/api/subscribe', {
+      const res = await fetch('/api/fan/bind-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'homepage' }),
+        body: JSON.stringify({ scope: 'site', region_pref: 'hk,taiwan' }),
       });
       const data = await res.json();
-      if (res.ok && data.success) {
-        setSubscribeStatus('success');
-        setSubscribeMessage(data.message || '已訂閱！');
-        setEmail('');
-      } else {
-        setSubscribeStatus('error');
-        setSubscribeMessage(data.error || '訂閱失敗');
-      }
-    } catch {
+      if (!res.ok || !data.deeplink) throw new Error(data.error || '開啟 Telegram 失敗');
+      window.open(data.deeplink, '_blank', 'noopener,noreferrer');
+      setSubscribeStatus('success');
+      setSubscribeMessage('已開啟 @jching_calendar_bot，請喺 Telegram 撳 Start 完成訂閱');
+    } catch (e) {
       setSubscribeStatus('error');
-      setSubscribeMessage('網絡錯誤，請重試');
+      setSubscribeMessage(e instanceof Error ? e.message : '網絡錯誤，請重試');
     }
   };
 
-  // Email Signup Form component
-  function EmailSignupForm() {
+  // Telegram 訂閱按鈕（全站活動通知）
+  function TelegramSubscribeForm() {
     if (subscribeStatus === 'success') {
       return (
         <div className="text-center py-3 subscribe-success">
@@ -167,24 +156,20 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       );
     }
     return (
-      <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-3">
-        <input
-          type="email"
-          placeholder="your@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-gray-500 focus:outline-none focus:border-pink-400"
-          disabled={subscribeStatus === 'loading'}
-        />
+      <div className="flex flex-col sm:flex-row gap-3 items-center">
         <button
-          type="submit"
+          type="button"
+          onClick={handleTelegramSubscribe}
           disabled={subscribeStatus === 'loading'}
           className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
-          style={{ backgroundColor: 'rgb(var(--color-nadeshiko-strong))', color: 'white' }}
+          style={{ backgroundColor: '#229ED9', color: 'white' }}
         >
-          {subscribeStatus === 'loading' ? '訂閱中...' : '🔔 訂閱通知'}
+          {subscribeStatus === 'loading' ? '開啟中...' : '✈️ 用 Telegram 訂閱'}
         </button>
-      </form>
+        {subscribeStatus === 'error' && (
+          <span className="text-sm text-red-300">{subscribeMessage}</span>
+        )}
+      </div>
     );
   }
 
@@ -377,14 +362,14 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   <h3 className="text-lg font-bold mb-1" style={{color:'rgb(var(--color-umenezumi))'}}>
                     <Camera className="w-4 h-4" /> 女優嚟香港見面會？第一個知道！
                   </h3>
-                  <p className="text-sm" style={{color:'rgb(var(--color-umenezumi-light)'}}>
-                    留低 email，新活動優先通知
+                  <p className="text-sm" style={{color:'rgb(var(--color-umenezumi-light))'}}>
+                    開 Telegram，新活動優先通知
                   </p>
                 </div>
-                <EmailSignupForm />
+                <TelegramSubscribeForm />
                 <p className="text-center text-xs mt-3 flex items-center justify-center gap-1" style={{color:'rgb(var(--color-umenezumi-light))'}}>
                   <Shield className="w-3 h-3" />
-                  只會喺有新活動時通知你，唔發垃圾郵件，唔會轉移你嘅 email。可隨時取消訂閱。
+                  只會喺有新活動時喺 Telegram 通知你，唔會騷擾你，唔會轉移你嘅資料。
                 </p>
               </div>
             </div>
