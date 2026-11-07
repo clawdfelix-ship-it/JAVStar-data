@@ -5,7 +5,7 @@ import PromoSubscribeForm from './PromoSubscribeForm';
 
 export const metadata: Metadata = {
   title: '港台日本女星活動週曆｜JCHING',
-  description: 'JCHING 每週整合香港同台北日本女星攝影會、見面會、POP UP 同寫真展資料。免費 email 訂閱新活動通知。',
+  description: 'JCHING 每週整合香港同台北日本女星攝影會、見面會、POP UP 同寫真展資料。免費 Telegram 訂閱新活動通知。',
   robots: { index: false, follow: false },
 };
 
@@ -56,7 +56,7 @@ export default function PromoPage() {
             <Bell className="h-5 w-5" aria-hidden />
           </div>
           <h2 className="text-2xl font-black">新活動，第一時間通知你</h2>
-          <p className="mb-6 mt-2 text-sm leading-relaxed text-[#6f675c]">免費訂閱，最新週曆同活動公佈直接送到你 inbox。</p>
+          <p className="mb-6 mt-2 text-sm leading-relaxed text-[#6f675c]">免費訂閱，最新週曆同活動公佈直接送到你 Telegram。</p>
           <PromoSubscribeForm />
         </div>
       </section>

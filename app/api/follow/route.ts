@@ -58,17 +58,12 @@ async function ensureTables() {
   _ddlDone = true;
 }
 
-// 三平台整合 Phase 1：女優「港台場通知」追蹤
-// POST body:
-//   { actress_id, tg_handle?, ig_handle?, email?, channel_pref?, region_pref?, fan_token?, action?: 'follow'|'unfollow' }
-// 規則：至少一個聯絡渠道；identity_key 用最優渠道去重用；冪等 upsert。
+// 女優「港台場 Telegram 通知」手動記錄（一鍵綁定則由 bind-confirm 寫入）。
+// POST body: { actress_id, tg_handle, region_pref?, fan_token?, action?: 'follow'|'unfollow' }
 
 type Body = {
   actress_id?: string;
   tg_handle?: string;
-  ig_handle?: string;
-  email?: string;
-  channel_pref?: string;
   region_pref?: string;
   fan_token?: string;
   action?: 'follow' | 'unfollow';
@@ -86,15 +81,6 @@ function clientIp(req: NextRequest): string {
   );
 }
 
-// choose one stable identity (email > tg > ig); identity_key namespaced by channel
-function pickIdentity(email: string, tg: string, ig: string): string | null {
-  if (email) return 'e:' + email.toLowerCase();
-  if (tg) return 't:' + tg.toLowerCase();
-  if (ig) return 'i:' + ig.toLowerCase();
-  return null;
-}
-
-const CHANNELS = new Set(['tg', 'ig', 'email']);
 const REGIONS = new Set(['hk', 'taiwan']);
 
 export async function POST(req: NextRequest) {
@@ -106,19 +92,13 @@ export async function POST(req: NextRequest) {
     if (!/^\d+$/.test(actressId)) {
       return NextResponse.json({ error: 'invalid actress_id' }, { status: 400 });
     }
-    const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean(b.email)) ? clean(b.email).toLowerCase() : '';
     const tg = clean(b.tg_handle);
-    const ig = clean(b.ig_handle);
-    if (!email && !tg && !ig) {
-      return NextResponse.json({ error: '請至少留一個聯絡方法（Telegram / IG / Email）' }, { status: 400 });
+    if (!tg) {
+      return NextResponse.json({ error: '請填 Telegram username 或電話' }, { status: 400 });
     }
     const action = b.action === 'unfollow' ? 'unfollow' : 'follow';
-    const identityKey = pickIdentity(email, tg, ig);
-    const channelPref = (b.channel_pref || 'tg')
-      .split(',')
-      .map((c) => c.trim())
-      .filter((c) => CHANNELS.has(c))
-      .join(',') || 'tg';
+    const identityKey = 't:' + tg.toLowerCase();
+    const channelPref = 'tg';
     const regionPref = (b.region_pref || 'hk')
       .split(',')
       .map((c) => c.trim())
@@ -150,7 +130,7 @@ export async function POST(req: NextRequest) {
       INSERT INTO fan_subscriptions
         (actress_id, email, tg_handle, ig_handle, identity_key, channel_pref, region_pref,
          source, fan_token, ip_address, status)
-      VALUES (${actressId}, ${email || null}, ${tg || null}, ${ig || null}, ${identityKey},
+      VALUES (${actressId}, null, ${tg || null}, null, ${identityKey},
               ${channelPref}, ${regionPref}, 'jching', ${fanToken || null}, ${ip}, 'active')
       ON CONFLICT (actress_id, identity_key)
       DO UPDATE SET
@@ -174,16 +154,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET ?actress_id=&email=|tg_handle=|ig_handle=  → 是否已追蹤
+// GET ?actress_id=&tg_handle= → 是否已追蹤
 export async function GET(req: NextRequest) {
   try {
     await ensureTables();
     const sp = req.nextUrl.searchParams;
     const actressId = clean(sp.get('actress_id'));
-    const email = clean(sp.get('email')).toLowerCase();
     const tg = clean(sp.get('tg_handle'));
-    const ig = clean(sp.get('ig_handle'));
-    const identity = pickIdentity(email, tg, ig);
+    const identity = tg ? 't:' + tg.toLowerCase() : null;
     if (!/^\d+$/.test(actressId) || !identity) {
       return NextResponse.json({ following: false });
     }

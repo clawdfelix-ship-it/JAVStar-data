@@ -47,6 +47,27 @@ export async function ensureFanNotifyTables() {
     )`;
   await sql`CREATE INDEX IF NOT EXISTS fan_outbox_pull_idx ON fan_notify_outbox(pull_code) WHERE pull_code IS NOT NULL`;
   await sql`
+    CREATE TABLE IF NOT EXISTS site_tg_links (
+      bind_code     TEXT PRIMARY KEY,
+      chat_id       BIGINT,
+      region_pref   TEXT NOT NULL DEFAULT 'hk,taiwan',
+      status        TEXT NOT NULL DEFAULT 'pending',
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+      expires_at    TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '15 minutes'),
+      consumed_at   TIMESTAMPTZ
+    )`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_subscriptions (
+      chat_id       BIGINT PRIMARY KEY,
+      tg_handle     TEXT,
+      region_pref   TEXT NOT NULL DEFAULT 'hk,taiwan',
+      source        TEXT NOT NULL DEFAULT 'jching-site',
+      status        TEXT NOT NULL DEFAULT 'active',
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+  await sql`CREATE INDEX IF NOT EXISTS site_subscriptions_status_idx ON site_subscriptions(status, region_pref)`;
+  await sql`
     CREATE TABLE IF NOT EXISTS fan_notify_recipients (
       outbox_id BIGINT NOT NULL,
       chat_id   BIGINT NOT NULL,

@@ -51,8 +51,7 @@ export async function POST(req: NextRequest) {
       `${row.title}\n` +
       `📅 ${dateHK}　📍 ${place}\n` +
       detailLine +
-      `你之前追蹤咗呢位女優，優先通知你 👇\n${link}\n\n` +
-      `（如唔想再收到，可到女優頁取消追蹤）`;
+      `你訂閱咗 JCHING 活動通知，優先話你知 👇\n${link}`;
 
     return NextResponse.json({
       ok: true, event_id: row.event_id, title: row.title,

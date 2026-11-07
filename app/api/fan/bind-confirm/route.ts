@@ -17,6 +17,26 @@ export async function POST(req: NextRequest) {
     if (!/^[A-Za-z0-9_-]{8,20}$/.test(code) || !Number.isInteger(chatId)) {
       return NextResponse.json({ error: 'bad request' }, { status: 400 });
     }
+    if (b.scope === 'site') {
+      const upd = await sql`
+        UPDATE site_tg_links
+        SET chat_id=${chatId}, status='bound', consumed_at=now()
+        WHERE bind_code=${code} AND status='pending' AND expires_at > now()
+        RETURNING region_pref`;
+      if ((upd as any[]).length === 0) {
+        return NextResponse.json({ error: '碼已使用或過期，請喺網頁重新撳一次' }, { status: 404 });
+      }
+      const handle = String(b.tg_handle || '').replace(/^@/, '').trim();
+      const region = (upd as any[])[0].region_pref;
+      await sql`
+        INSERT INTO site_subscriptions (chat_id, tg_handle, region_pref, status)
+        VALUES (${chatId}, ${handle || null}, ${region}, 'active')
+        ON CONFLICT (chat_id) DO UPDATE SET
+          tg_handle=COALESCE(NULLIF(EXCLUDED.tg_handle,''), site_subscriptions.tg_handle),
+          region_pref=EXCLUDED.region_pref, status='active', updated_at=now()`;
+      return NextResponse.json({ ok: true, scope: 'site' });
+    }
+
     const upd = await sql`
       UPDATE fan_tg_links
       SET chat_id=${chatId}, status='bound', consumed_at=now()
