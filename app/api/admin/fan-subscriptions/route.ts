@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSql } from '@/lib/db';
+import { ensureFanNotifyTables } from '@/lib/fanNotify';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,42 @@ export async function GET(req: NextRequest) {
     const status = sp.get('status') || 'active';
     const region = (sp.get('region') || '').trim();
     const fmt = sp.get('format') || 'json';
+    const scope = sp.get('scope') || 'actress';
+
+    if (scope === 'site') {
+      // 全站 Telegram 訂閱（site_subscriptions）
+      await ensureFanNotifyTables();
+      const statusFilter = status === 'all' ? '' : status === 'unsubscribed' ? 'unsubscribed' : 'active';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const siteRows: any[] = await (getSql() as any).query(
+        `SELECT g.chat_id, g.tg_handle, g.region_pref, g.status, g.source,
+                to_char(g.created_at AT TIME ZONE 'Asia/Hong_Kong', 'YYYY-MM-DD HH24:MI') AS created_at_hk,
+                g.created_at, g.updated_at
+         FROM site_subscriptions g
+         ${statusFilter ? `WHERE g.status = '${statusFilter}'` : ''}
+         ORDER BY g.created_at DESC
+         LIMIT 2000`,
+      ) as any[];
+
+      if (fmt === 'csv') {
+        const head = ['chat_id', 'tg_handle', 'region_pref', 'status', 'created_at'];
+        const esc = (v: unknown) => {
+          const x = v == null ? '' : String(v);
+          return /[",\n]/.test(x) ? `"${x.replace(/"/g, '""')}"` : x;
+        };
+        const lines = [head.join(',')].concat(
+          siteRows.map((r) => [r.chat_id, r.tg_handle, r.region_pref, r.status, r.created_at_hk].map(esc).join(',')),
+        );
+        return new NextResponse('﻿' + lines.join('\n'), {
+          headers: {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': 'attachment; filename="site-subscriptions.csv"',
+          },
+        });
+      }
+
+      return NextResponse.json({ scope: 'site', total: siteRows.length, data: siteRows });
+    }
 
     const where: string[] = [];
     if (actressId && /^\d+$/.test(actressId)) where.push(`s.actress_id = '${actressId}'`);
@@ -95,6 +132,17 @@ export async function DELETE(req: NextRequest) {
   if (!authed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const sp = req.nextUrl.searchParams;
+    const scope = (sp.get('scope') || 'actress').trim();
+    if (scope === 'site') {
+      await ensureFanNotifyTables();
+      const chatId = Number(sp.get('chat_id'));
+      if (!Number.isInteger(chatId) || chatId <= 0) {
+        return NextResponse.json({ error: 'bad request' }, { status: 400 });
+      }
+      const sql = getSql();
+      const del = await sql`DELETE FROM site_subscriptions WHERE chat_id=${chatId} RETURNING chat_id`;
+      return NextResponse.json({ deleted: (del as any[]).length });
+    }
     const actressId = (sp.get('actress_id') || '').trim();
     const identity = (sp.get('identity_key') || '').trim();
     if (!/^\d+$/.test(actressId) || !/^[a-z]{1,8}:[A-Za-z0-9_.@+-]{1,100}$/.test(identity)) {
