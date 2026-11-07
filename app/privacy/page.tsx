@@ -44,6 +44,7 @@ export default function PrivacyPage() {
           <h2 className="text-base font-bold text-text-primary">4. 第三方服務</h2>
           <p>
             本站透過 Vercel 提供網站託管，其可能記錄一般伺服器日誌（IP、瀏覽器類型、造訪時間）用作保安及流量統計。
+            `/promo` 訂閱頁使用 Meta Pixel 及 Conversions API 衡量訂閱成效；會傳送事件資料、IP、瀏覽器類型及經 SHA-256 雜湊嘅 email，不會向 Meta 傳送明文 email。
             外連網站（主辦方、票務平台等）有各自嘅私隱政策，本站無法控制亦不負責。
           </p>
         </section>

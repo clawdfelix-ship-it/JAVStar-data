@@ -1,10 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import EventBanner from '@/components/EventBanner';
-import BottomNav from '@/components/BottomNav';
-import AgeGate from '@/components/AgeGate';
-import TopNav from '@/components/TopNav';
-import SiteFooter from '@/components/SiteFooter';
+import SiteChrome from '@/components/SiteChrome';
 
 export const metadata: Metadata = {
   title: 'JCHING CALENDAR｜追星平台 🇭🇰',
@@ -42,12 +38,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="antialiased font-japanese bg-bg-secondary">
-        <AgeGate />
-        <TopNav />
-        <EventBanner />
-        {children}
-        <SiteFooter />
-        <BottomNav />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
