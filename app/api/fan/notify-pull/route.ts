@@ -40,9 +40,11 @@ export async function POST(req: NextRequest) {
 
     const dateHK = String(row.date).slice(0, 10).replace(/-/g, '/');
     const place = row.venue || (row.region === 'taiwan' ? '台灣' : '香港');
+    // 通知連結：相對路徑（如 /partner?to=...）統一用對外自訂網域，唔再暴露 vercel.app
+    const publicBase = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.jching-calendar.com').replace(/\/$/, '');
     const link = row.url && row.url.startsWith('http')
       ? row.url
-      : `https://j-star-data.vercel.app${row.url || ''}`;
+      : `${publicBase}${row.url || ''}`;
 
     const detail = formatProgramBrief(program);
     const detailLine = detail ? `\n${detail}\n` : '\n';
