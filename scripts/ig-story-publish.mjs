@@ -8,6 +8,10 @@
  *
  * 用法：
  *   node scripts/ig-story-publish.mjs --account jching --image p.jpg [--dry-run]
+ *   # 可點擊 mention（2025-07 起 Story 支援 user_tags，username 為公開 IG handle，
+ *   #   x/y 為 0–1 比例座標、Story 可選；多帳號重複 --tag username 或 --tags-file json）
+ *   node scripts/ig-story-publish.mjs --image p.jpg --tag megafans_expo --tag ono_rikka
+ *   node scripts/ig-story-publish.mjs --image p.jpg --tags-file tags.json
  * 憑證：IG_ACCOUNTS_FILE 環境變數指向登記庫；Blob token 由 .env.local 提供
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -19,6 +23,37 @@ const DRY = process.argv.includes("--dry-run");
 function arg(name) {
   const i = process.argv.indexOf(name);
   return i >= 0 ? process.argv[i + 1] : undefined;
+}
+function argList(name) {
+  const out = [];
+  for (let i = 0; i < process.argv.length; i++) if (process.argv[i] === name) out.push(process.argv[i + 1]);
+  return out;
+}
+// 收集 Story 可點擊 mention：--tag <username>（可重複）＋ --tags-file JSON
+// JSON 形狀：["handle1", {"username":"handle2"}] 或 [{"username":..,"x":0.5,"y":0.5}]
+function loadUserTags() {
+  const tags = argList("--tag").map((username) => ({ username }));
+  const tagsFile = arg("--tags-file");
+  if (tagsFile) {
+    const p = resolve(tagsFile);
+    if (!existsSync(p)) throw new Error(`搵唔到 tags file：${p}`);
+    const raw = JSON.parse(readFileSync(p, "utf8"));
+    if (!Array.isArray(raw)) throw new Error("tags file 必須係 JSON array");
+    for (const item of raw) {
+      const t = typeof item === "string" ? { username: item } : item;
+      if (t && t.username) tags.push(t);
+    }
+  }
+  const seen = new Set();
+  return tags
+    .map((t) => {
+      const username = String(t.username || "").trim().replace(/^@/, "");
+      const out = { username };
+      if (Number.isFinite(t.x)) out.x = Math.min(1, Math.max(0, Number(t.x)));
+      if (Number.isFinite(t.y)) out.y = Math.min(1, Math.max(0, Number(t.y)));
+      return out;
+    })
+    .filter((t) => t.username && !seen.has(t.username) && seen.add(t.username));
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -56,9 +91,15 @@ async function main() {
   console.log(`🎯 Story 目標：${accountKey} → @${acc.ig_username}`);
 
   const url = await ensurePublicUrl(image, prefix);
-  const creationId = (await graph(`${ig}/media`, {
+  const userTags = loadUserTags();
+  const containerParams = {
     access_token: token, image_url: url, media_type: "STORIES",
-  }, "POST")).id;
+  };
+  if (userTags.length) {
+    containerParams.user_tags = JSON.stringify(userTags);
+    console.log(`🏷️  Story mention tags：${userTags.length} 個 →`, userTags.map((t) => `@${t.username}`).join(" "));
+  }
+  const creationId = (await graph(`${ig}/media`, containerParams, "POST")).id;
   console.log("story container:", creationId);
 
   for (let i = 0; i < 30; i++) {

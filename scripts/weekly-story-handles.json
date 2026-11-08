@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "purpose": "JCHING 每週港台活動 Story 可點擊 mention（user_tags）用，username 為已核實公開 IG handle",
+    "verified_date": "2026-11-07",
+    "note": "Story user_tags 用 username（唔使 numeric id）；失效 handle 會令整個 container 失敗，故只放高信心帳號"
+  },
+  "organizers": {
+    "MEGA FANS EXPO": "megafans_expo",
+    "Foraver": "foraver_event",
+    "Secret9": "secret.9.knight",
+    "STAR POINT": "nystars.tw"
+  },
+  "actresses": {
+    "辻井ほのか": "5.tsujihoka",
+    "吉岡ひより": "y_hiyori88",
+    "吉瀨結": "kichiseyui"
+  }
+}

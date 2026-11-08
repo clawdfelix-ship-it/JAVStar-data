@@ -15,9 +15,12 @@ const outPath = resolve(arg("--out"));
 if (!id || !existsSync(posterPath) || !outPath) throw new Error("要 --id --poster --out");
 
 const D = "/Users/siulungchan/.hermes/profiles/it/cache/scratch";
+// 字體優先用穩定庫 ~/.hermes/fonts（cache/scratch 會被 24h prune），否則 fallback 舊位
+const FONT_DIR = existsSync(`${process.env.HOME}/.hermes/fonts/NotoSansTC-Regular.otf`)
+  ? `${process.env.HOME}/.hermes/fonts` : D;
 const fonts = [
-  { name: "Noto", data: readFileSync(`${D}/NotoSansTC-Regular.otf`), weight: 400 },
-  { name: "Noto", data: readFileSync(`${D}/NotoSansTC-Bold.otf`), weight: 700 },
+  { name: "Noto", data: readFileSync(`${FONT_DIR}/NotoSansTC-Regular.otf`), weight: 400 },
+  { name: "Noto", data: readFileSync(`${FONT_DIR}/NotoSansTC-Bold.otf`), weight: 700 },
 ];
 const handles = JSON.parse(readFileSync(new URL("./mfe-instagram-handles.json", import.meta.url), "utf8"));
 const info = handles[id];
