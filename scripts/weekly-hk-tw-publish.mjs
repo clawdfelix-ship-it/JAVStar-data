@@ -8,6 +8,7 @@ import { REGISTRY } from './lib/ig-accounts.mjs';
 import { upcomingWeekRange } from './jching-events.mjs';
 
 const ROOT = '/Users/siulungchan/.hermes/profiles/jching/data/weekly-posters';
+const HOLD_DIR = '/Users/siulungchan/.hermes/profiles/jching/data/weekly-posters-holds';
 const argAuto = process.argv.includes('--auto');
 const i = process.argv.indexOf('--dir');
 let dir = i >= 0 ? resolve(process.argv[i + 1] || '') : '';
@@ -18,6 +19,14 @@ if (argAuto) {
 }
 if (!dir || !existsSync(join(dir, 'manifest.json'))) {
   throw new Error(`要 --dir <含 manifest.json 嘅週期目錄>（或用 --auto 自動計）；當前：${dir || '(空)'}`);
+}
+// Hold 機制：Felix 喺 review 窗口覆「改」→ 寫 hold 檔 → 呢次跳過發佈
+const holdFile = join(HOLD_DIR, `${dir.split('/').pop()}.hold`);
+if (existsSync(holdFile)) {
+  const reason = readFileSync(holdFile, 'utf8').trim() || '（冇寫原因）';
+  console.log(`⏸️ 已被 hold，暫停發佈 ${dir.split('/').pop()}：${reason}`);
+  console.log('ℹ️ 確認要發嘅話，刪走呢個 hold 檔再重跑：' + holdFile);
+  process.exit(0);
 }
 const REPO = '/Users/siulungchan/projects/JAVStar-data';
 const REG = REGISTRY;

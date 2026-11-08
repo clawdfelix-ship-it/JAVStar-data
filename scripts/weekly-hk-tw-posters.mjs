@@ -144,6 +144,9 @@ for (const cfg of configs) {
 }
 
 writeFileSync(join(outDir, 'manifest.json'), JSON.stringify(result, null, 2) + '\n');
+console.log(`⏰ 週日 10:30 自動發佈（台灣 Feed→Story、香港 Feed→Story）`);
+console.log(`📌 有 30 分鐘 review：想改就直接覆「改」，我會暫停發佈並等你指示。唔覆就照發。`);
+console.log('---');
 for (const post of result.posts) {
   console.log(`${post.label}活動總覽｜${from} 至 ${to}｜${post.total} 場`);
   console.log(`MEDIA:${post.image}`);
