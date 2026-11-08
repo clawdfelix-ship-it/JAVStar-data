@@ -4,12 +4,13 @@
 import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
+import { REGISTRY } from './lib/ig-accounts.mjs';
 
 const i = process.argv.indexOf('--dir');
 const dir = i >= 0 ? resolve(process.argv[i + 1] || '') : '';
 if (!dir || !existsSync(join(dir, 'manifest.json'))) throw new Error('要 --dir <含 manifest.json 嘅週期目錄>');
 const REPO = '/Users/siulungchan/projects/JAVStar-data';
-const REG = '/Users/siulungchan/.hermes/profiles/javstar-ops/secrets/ig-accounts.json';
+const REG = REGISTRY;
 const manifest = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8'));
 const statePath = join(dir, 'published.json');
 const state = existsSync(statePath)

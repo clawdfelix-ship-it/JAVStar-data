@@ -5,14 +5,15 @@
  * - 調 ig-publish.mjs 正式發佈（--account jching）
  * - 成功→posted + permalink；失敗→attempts++，連續 3 次標 failed 並跳過（唔阻塞隊列）
  * - 全部完成→印 DONE，cron 可人手移除
- * 憑證經 IG_ACCOUNTS_FILE 環境變數指向 javstar-ops 登記庫
+ * 憑證經 IG_ACCOUNTS_FILE 環境變數或 scripts/lib/ig-accounts.mjs 嘅 REGISTRY（跨 agent 共用登記庫）
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { REGISTRY } from "./lib/ig-accounts.mjs";
 
 const QUEUE = "/Users/siulungchan/.hermes/profiles/it/cache/scratch/mfe_ig_kit/mfe_publish_queue.json";
 const REPO = "/Users/siulungchan/projects/JAVStar-data";
-const REG = "/Users/siulungchan/.hermes/profiles/javstar-ops/secrets/ig-accounts.json";
+const REG = REGISTRY;
 const MAX_ATTEMPTS = 3;
 
 const q = JSON.parse(readFileSync(QUEUE, "utf8"));

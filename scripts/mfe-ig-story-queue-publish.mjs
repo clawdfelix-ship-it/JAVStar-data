@@ -7,11 +7,12 @@
 import { readFileSync, writeFileSync, renameSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";
+import { REGISTRY } from "./lib/ig-accounts.mjs";
 
 const BASE = "/Users/siulungchan/.hermes/profiles/jching/data/mfe-story-queue";
 const QUEUE = join(BASE, "mfe_story_queue.json");
 const REPO = "/Users/siulungchan/projects/JAVStar-data";
-const REG = "/Users/siulungchan/.hermes/profiles/javstar-ops/secrets/ig-accounts.json";
+const REG = REGISTRY;
 const MAX_ATTEMPTS = 3;
 
 function save(q) {

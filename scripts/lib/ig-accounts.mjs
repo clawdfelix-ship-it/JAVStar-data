@@ -1,7 +1,7 @@
 // ig-accounts.mjs — 多 IG 帳號登記庫（跨 agent 共用）
 //
 // 登記庫位置（環境變數可覆寫，方便其他 Hermes profile／agent 重用）：
-//   IG_ACCOUNTS_FILE，預設 ~/.hermes/profiles/javstar-ops/secrets/ig-accounts.json
+//   IG_ACCOUNTS_FILE，預設 ~/JAVStar/shared/secrets/ig-accounts.json
 // App 層憑證（app_id / app_secret / long_user_token）仍讀 .meta_ig_config.json。
 //
 // 登記庫形狀：
@@ -22,7 +22,7 @@ export const META_CFG = join(
 );
 export const REGISTRY =
   process.env.IG_ACCOUNTS_FILE ||
-  join(homedir(), ".hermes/profiles/javstar-ops/secrets/ig-accounts.json");
+  join(homedir(), "JAVStar/shared/secrets/ig-accounts.json");
 
 export function loadMetaConfig() {
   return JSON.parse(readFileSync(META_CFG, "utf8"));
