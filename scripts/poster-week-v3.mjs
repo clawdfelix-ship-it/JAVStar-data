@@ -3,15 +3,17 @@
 // satori 用 Yoga engine，flex 會自動分配寬度，唔靠估字寬
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { weeklyEvents, parseArgs } from './jching-events.mjs';
 
 const args = parseArgs();
 // 資料源：JCHING 公開 API。--from/--to 指定週（YYYY-MM-DD），預設 HKT 今週（週一起）。
 // --region hk,taiwan（預設）；輸出檔可係第一個 positional（唔以 -- 開頭者）
 const outArg = args._[0];
+const region = args.region || 'hk,taiwan';
+const regionLabel = region === 'hk' ? '香港' : region === 'taiwan' ? '台灣' : '港台';
 const week = await weeklyEvents({
-  from: args.from, to: args.to, region: args.region || 'hk,taiwan',
+  from: args.from, to: args.to, region,
   actressId: args['actress-id'], base: args.base,
 });
 const { days, total, cityCount, from, to } = week;
@@ -23,19 +25,22 @@ const hkCount = cityCount['香港'] || 0;
 const rangeLabel = fmtRange(from, to);
 
 const D = '/Users/siulungchan/.hermes/profiles/it/cache/scratch';
+const FONT_DIR = existsSync(`${process.env.HOME}/.hermes/fonts/NotoSansTC-Regular.otf`)
+  ? `${process.env.HOME}/.hermes/fonts` : D;
 const fonts = [
-  { name: 'Noto', data: readFileSync(`${D}/NotoSansTC-Regular.otf`), weight: 400 },
-  { name: 'Noto', data: readFileSync(`${D}/NotoSansTC-Bold.otf`), weight: 700 },
+  { name: 'Noto', data: readFileSync(`${FONT_DIR}/NotoSansTC-Regular.otf`), weight: 400 },
+  { name: 'Noto', data: readFileSync(`${FONT_DIR}/NotoSansTC-Bold.otf`), weight: 700 },
 ];
 // 2026 IG feed 新規格：4:5 直式 1080×1350（舊 1:1 1080×1080 已退居次要）
 const W = 1080, H = 1350;
 const C = {
-  bg:'#F0F0D8', gold:'#F0C078', goldLine:'#E0A050', goldInk:'#7C5022',
+  bg: region === 'hk' ? '#FFFFFF' : '#F0F0D8', gold:'#F0C078', goldLine:'#E0A050', goldInk:'#7C5022',
   rose:'#C75B5B', roseDeep:'#A03E3E', roseBg:'#FBE6E6',
   ink:'#3D2B0A', sub:'#8A5A28', muted:'#6E6048', line:'#E0D3B0', dotEmpty:'#CDBF9E',
 };
 
 const h = (t,p={},...c)=>({type:t,props:{...p,children:c.flat()}});
+const dense = total > 14;
 
 // 一條事件列（flex row，軸點居中）
 const EventRow = e =>
@@ -56,7 +61,20 @@ const EventRow = e =>
         fontSize:16,fontWeight:700,color:C.roseDeep}},e.kind)),
     // 城市（固定 72 右對齊）
     h('div',{style:{width:72,textAlign:'right',fontSize:23,fontWeight:700,
-      color:C.goldInk,flexShrink:0}},e.city),
+      color:C.goldInk,flexShrink:0}},region === 'hk' ? '香港' : e.city),
+  );
+
+// 高密度週（>14 場）：每日活動用雙欄緊湊排列，避免同日大量場次溢出。
+// 城市已喺頂部 citySummary 統計，緊湊列只保留女優、主辦及類型。
+const DenseEventRow = e =>
+  h('div',{style:{display:'flex',alignItems:'center',width:'50%',height:38,flexShrink:0}},
+    h('div',{style:{width:170,fontSize:18,fontWeight:700,color:C.ink,flexShrink:0,
+      overflow:'hidden',whiteSpace:'nowrap'}},e.actress),
+    h('div',{style:{flex:'1 1 0',fontSize:12,fontWeight:400,color:C.sub,
+      overflow:'hidden',whiteSpace:'nowrap'}},e.org),
+    h('div',{style:{width:70,textAlign:'center',fontSize:12,fontWeight:700,color:C.roseDeep,
+      background:C.roseBg,border:`1px solid ${C.rose}`,borderRadius:6,padding:'3px 0',
+      flexShrink:0}},e.kind),
   );
 
 // 空列
@@ -64,7 +82,7 @@ const EmptyRow = () =>
   h('div',{style:{display:'flex',alignItems:'center',height:40}},
     h('div',{style:{width:36,display:'flex',justifyContent:'center',flexShrink:0}},
       h('div',{style:{width:10,height:10,borderRadius:999,background:C.dotEmpty}})),
-    h('div',{style:{fontSize:18,fontWeight:400,color:C.muted}},'港台暫無場次'),
+    h('div',{style:{fontSize:18,fontWeight:400,color:C.muted}},`${regionLabel}暫無場次`),
   );
 
 // 一日 = flex row：左日期欄 + 右事件區
@@ -82,9 +100,10 @@ const DayRow = d =>
           `週${d.wd}`),
       ),
     ),
-    // 事件欄（flex column，內含 row；第一個 row 嘅軸點對日期）
-    h('div',{style:{flex:'1 1 0',display:'flex',flexDirection:'column'}},
-      d.evs.length ? d.evs.map(EventRow) : h(EmptyRow),
+    // 事件欄（一般週單欄；高密度週雙欄 wrap）
+    h('div',{style:{flex:'1 1 0',display:'flex',flexDirection:dense?'row':'column',
+      flexWrap:dense?'wrap':'nowrap',alignContent:'flex-start'}},
+      d.evs.length ? d.evs.map(dense ? DenseEventRow : EventRow) : h(EmptyRow),
     ),
   );
 
@@ -107,20 +126,26 @@ const HeaderRow = () =>
 const tree = h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
   display:'flex',flexDirection:'column',position:'relative'}},
 
+  // 右上角地區徽章：兩個地區版本一眼可分辨
+  h('div',{style:{position:'absolute',top:48,right:56,display:'flex',
+    padding:'12px 22px',borderRadius:12,background:C.roseBg,
+    border:`3px solid ${C.rose}`,fontSize:46,fontWeight:700,
+    color:C.roseDeep,letterSpacing:4}},regionLabel),
+
   // masthead（左對齊）
   h('div',{style:{display:'flex',alignItems:'center',marginTop:52,marginLeft:56}},
     h('div',{style:{width:8,height:40,background:C.rose,borderRadius:2,marginRight:16}}),
     h('div',{style:{fontSize:19,fontWeight:700,color:C.roseDeep,letterSpacing:2}},
-      `${rangeLabel}　港台場週曆`),
+      `${rangeLabel}　${regionLabel}場週曆`),
   ),
   h('div',{style:{marginLeft:56,marginTop:12,fontSize:60,fontWeight:700,
     color:C.goldInk,letterSpacing:3,lineHeight:1}},'本週女優活動'),
   h('div',{style:{marginLeft:56,marginTop:12,fontSize:21,fontWeight:400,color:C.sub}},
-    total ? `香港 · 台灣共 ${total} 場${citySummary ? '　·　' + citySummary : ''}` : '本週港台暫無公佈場次'),
+    total ? `${regionLabel}共 ${total} 場${citySummary ? '　·　' + citySummary : ''}` : `本週${regionLabel}暫無公佈場次`),
 
-  // 表頭
-  h('div',{style:{marginTop:34,paddingRight:56}},
-    h(HeaderRow)),
+  // 表頭（高密度雙欄模式唔適用，慳返垂直空間）
+  h('div',{style:{marginTop:dense?18:34,paddingRight:56}},
+    ...(dense ? [] : [h(HeaderRow)])),
 
   // 時間軸 + 日子（用一條獨立垂直線疊喺軸點中心）
   h('div',{style:{flex:'1 1 0',display:'flex',flexDirection:'column',
@@ -152,6 +177,6 @@ const tree = h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
 
 const svg = await satori(tree,{width:W,height:H,fonts});
 const png = new Resvg(svg,{fitTo:{mode:'width',value:W}}).render().asPng();
-const out = outArg || `/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_week_${from}_${to}.png`;
+const out = outArg || `/Users/siulungchan/.hermes/profiles/it/cache/scratch/l2_week_${region}_${from}_${to}.png`;
 writeFileSync(out,png);
 console.log('saved',out,png.length);
