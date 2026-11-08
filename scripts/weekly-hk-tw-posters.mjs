@@ -3,23 +3,15 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { hktToday, weeklyEvents } from './jching-events.mjs';
+import { hktToday, upcomingWeekRange, weeklyEvents } from './jching-events.mjs';
 
 const REPO = '/Users/siulungchan/projects/JAVStar-data';
 const ROOT = '/Users/siulungchan/.hermes/profiles/jching/data/weekly-posters';
 const SITE = 'https://www.jching-calendar.com';
 const HANDLES = JSON.parse(readFileSync(new URL('./weekly-story-handles.json', import.meta.url), 'utf8'));
 const MFE_HANDLES = JSON.parse(readFileSync(new URL('./mfe-instagram-handles.json', import.meta.url), 'utf8'));
-const addDays = (iso, n) => {
-  const d = new Date(`${iso}T00:00:00+08:00`);
-  d.setDate(d.getDate() + n);
-  return new Date(d.getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
-};
 const today = hktToday();
-const weekday = new Date(`${today}T00:00:00+08:00`).getDay();
-const daysUntilNextMonday = (8 - weekday) % 7 || 7;
-const from = addDays(today, daysUntilNextMonday);
-const to = addDays(from, 6);
+const { from, to } = upcomingWeekRange();
 const outDir = join(ROOT, `${from}_${to}`);
 mkdirSync(outDir, { recursive: true });
 
