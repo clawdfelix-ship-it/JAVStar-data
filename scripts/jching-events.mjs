@@ -73,11 +73,12 @@ export function weekRangeContaining(isoDay) {
 }
 
 // 下一個「星期一至日」週期（用嚟出嚟緊一週總覽）
+// 用 UTC parse y/m/d 計星期，唔靠系統時區，唔會off-by-one
 export function upcomingWeekRange(d = new Date()) {
   const today = hktToday(d);
   const [y, m, dd] = today.split('-').map(Number);
-  const dow = new Date(Date.UTC(y, m - 1, dd)).getUTCDay();
-  const dowMon = (dow + 6) % 7;
+  const dow = new Date(Date.UTC(y, m - 1, dd)).getUTCDay(); // 0=日
+  const dowMon = (dow + 6) % 7;                          // 一=0 … 日=6
   const from = addDays(today, dowMon === 0 ? 7 : 7 - dowMon);
   return { from, to: addDays(from, 6) };
 }
