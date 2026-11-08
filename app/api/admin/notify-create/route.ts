@@ -13,7 +13,10 @@ export async function POST(req: NextRequest) {
     await ensureFanNotifyTables();
     const b = await req.json();
     const eventId = String(b.event_id || '').trim();
-    if (!/^javstar-\d{6,}-\d{8}-(meet|photo|off|flash)$/.test(eventId)) {
+    // 自家場：javstar-<actressId>-<YYYYMMDD>-<kind>
+    // 第三方港台場（ingest 腳本產生）：javstar-hk-<MMDD>-<actressId>-<kind>-<seq>、javstar-tw-1121-<actressId>
+    // 統一規則：javstar- 前綴、ASCII 字母數字、底線/連字號，長度 8–96，實際存在性靠下面 DB 查詢把關。
+    if (!/^javstar-[a-z0-9_-]{7,90}$/.test(eventId)) {
       return NextResponse.json({ error: 'invalid event_id' }, { status: 400 });
     }
 

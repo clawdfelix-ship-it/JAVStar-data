@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
                WHERE o.event_id = e.id AND o.status='pulled'
              ) AS batch_sent
       FROM events e
-      WHERE e.organizer='javstarmeet' AND e.date_iso >= CURRENT_DATE
+      WHERE e.organizer IN ('javstarmeet','community') AND e.date_iso >= CURRENT_DATE
       ORDER BY e.date_iso ASC, e.id ASC
       LIMIT 100`;
     return NextResponse.json({ events: rows });

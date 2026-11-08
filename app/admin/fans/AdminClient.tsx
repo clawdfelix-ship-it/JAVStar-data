@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { ShieldCheck, Loader2, Download, Bell, Copy, Check, Send } from 'lucide-react';
+import { ShieldCheck, Loader2, Download, Bell, Copy, Check, Send, Trash2 } from 'lucide-react';
 
 interface Sub {
   id: string;
@@ -17,6 +17,14 @@ interface Sub {
   created_at: string;
 }
 interface Count { actress_id: string; name: string; active: number; }
+interface SiteSub {
+  chat_id: string;
+  tg_handle: string | null;
+  region_pref: string;
+  status: string;
+  source: string;
+  created_at_hk: string;
+}
 interface NotifyEvent {
   id: string; title: string; date_iso: string; venue: string | null; prefecture: string | null;
   tg_recipients: number; batch_pending: boolean; batch_sent: boolean;
@@ -34,6 +42,38 @@ export default function FansAdminClient({ embeddedToken }: { embeddedToken?: str
   const [events, setEvents] = useState<NotifyEvent[]>([]);
   const [busyId, setBusyId] = useState('');
   const [codes, setCodes] = useState<Record<string, string>>({});
+  const [view, setView] = useState<'actress' | 'site'>('actress');
+  const [siteRows, setSiteRows] = useState<SiteSub[] | null>(null);
+  const [siteLoading, setSiteLoading] = useState(false);
+
+  const loadSite = useCallback(async (tk: string) => {
+    setSiteLoading(true);
+    try {
+      const r = await fetch('/api/admin/fan-subscriptions?scope=site&status=all', {
+        headers: { 'x-admin-token': tk },
+      });
+      if (r.ok) setSiteRows((await r.json()).data || []);
+    } finally { setSiteLoading(false); }
+  }, []);
+
+  async function deleteSite(chatId: string) {
+    if (!window.confirm(`確定刪除全站訂閱 chat ${chatId}？`)) return;
+    const r = await fetch(`/api/admin/fan-subscriptions?scope=site&chat_id=${chatId}`, {
+      method: 'DELETE', headers: { 'x-admin-token': token },
+    });
+    if (r.ok) loadSite(token);
+    else alert('刪除失敗');
+  }
+
+  function downloadSiteCsv() {
+    fetch('/api/admin/fan-subscriptions?scope=site&status=all&format=csv', { headers: { 'x-admin-token': token } })
+      .then((r) => r.blob()).then((b) => {
+        const url = URL.createObjectURL(b);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'site-subscriptions.csv'; a.click();
+        URL.revokeObjectURL(url);
+      });
+  }
 
   const loadCounts = useCallback(async (tk: string) => {
     const r = await fetch('/api/admin/fan-subscriptions', { headers: { 'x-admin-token': tk } });
@@ -65,6 +105,7 @@ export default function FansAdminClient({ embeddedToken }: { embeddedToken?: str
   }, []);
 
   useEffect(() => { if (authed) { loadCounts(token); loadEvents(token); } }, [authed, token, loadCounts, loadEvents]);
+  useEffect(() => { if (authed && view === 'site') loadSite(token); }, [authed, view, token, loadSite]);
 
   async function createBatch(ev: NotifyEvent) {
     setBusyId(ev.id);
@@ -120,6 +161,57 @@ export default function FansAdminClient({ embeddedToken }: { embeddedToken?: str
       </h1>
       <p className="text-xs text-text-tertiary mb-4">粉絲喺女優頁撳「🔔 港台場通知我」收集；開票時用嚟私訊推播。</p>
 
+      {/* 分頁：指定女優 / 全站訂閱 */}
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setView('actress')}
+          className={`text-xs font-semibold px-3 py-2 rounded-full border ${view === 'actress' ? 'bg-pink-600 text-white border-pink-600' : ''}`}>
+          指定女優訂閱
+        </button>
+        <button onClick={() => setView('site')}
+          className={`text-xs font-semibold px-3 py-2 rounded-full border ${view === 'site' ? 'bg-pink-600 text-white border-pink-600' : ''}`}>
+          全站 Telegram 訂閱
+        </button>
+      </div>
+
+      {view === 'site' ? (
+        <div className="bg-white rounded-2xl border p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-text-tertiary">
+              全站訂閱（site_subscriptions）· 共 {(siteRows || []).length} 筆
+            </p>
+            <button onClick={downloadSiteCsv}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-green-600 text-white">
+              <Download className="w-3.5 h-3.5" /> CSV
+            </button>
+          </div>
+          {siteLoading ? (
+            <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-pink-500" /></div>
+          ) : !siteRows || siteRows.length === 0 ? (
+            <p className="text-center text-text-tertiary text-sm py-10">暫無全站訂閱</p>
+          ) : (
+            <div className="space-y-2">
+              {siteRows.map((r) => (
+                <div key={r.chat_id} className="rounded-xl border p-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-text-primary break-all">
+                      {r.tg_handle ? '@' + r.tg_handle.replace(/^@/, '') : 'chat ' + r.chat_id}
+                    </p>
+                    <p className="text-[10px] text-text-tertiary mt-0.5">
+                      chat {r.chat_id} · {r.region_pref} · {r.created_at_hk}
+                      {r.status !== 'active' && <span className="ml-1 text-red-500">（已退訂）</span>}
+                    </p>
+                  </div>
+                  <button onClick={() => deleteSite(r.chat_id)}
+                    className="shrink-0 text-text-tertiary hover:text-red-600" title="刪除">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+      <>
       {/* per-actress active counts */}
       <div className="bg-white rounded-2xl border p-4 mb-4">
         <p className="text-xs font-semibold text-text-tertiary mb-2">各女優活躍追蹤人數</p>
@@ -233,6 +325,8 @@ export default function FansAdminClient({ embeddedToken }: { embeddedToken?: str
             );
           })}
         </div>
+      )}
+      </>
       )}
     </main>
   );
