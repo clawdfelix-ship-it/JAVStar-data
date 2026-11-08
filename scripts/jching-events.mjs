@@ -152,7 +152,12 @@ export async function weeklyEvents(opts = {}) {
         title: mfe[0].raw.title,
         aggregated: true,
         continuation: false,
-        participants: [...new Set(mfe.map((e) => e.actress).filter(Boolean))],
+        organizer: 'MEGA FANS EXPO',
+        url: mfe[0].raw.url || '',
+        venue: mfe[0].raw.venue || '香港',
+        participants: [...new Map(mfe.map((e) => [e.raw.actress_id, {
+          id: String(e.raw.actress_id), name: e.actress, rawId: e.raw.id,
+        }])).values()],
       },
     });
   }
