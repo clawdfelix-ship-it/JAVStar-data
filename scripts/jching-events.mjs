@@ -137,10 +137,50 @@ export async function weeklyEvents(opts = {}) {
     });
   }
 
-  // 統計
+  // MFE 係同一個綜合活動：同日多位女優合併；多日展期每日顯示，但統計只計一項。
+  for (const day of days) {
+    const mfe = day.evs.filter((e) => /【MFE】/i.test(e.raw.title || ''));
+    if (!mfe.length) continue;
+    day.evs = day.evs.filter((e) => !/【MFE】/i.test(e.raw.title || ''));
+    day.evs.push({
+      actress: 'MEGA FANS EXPO',
+      org: '多名女優',
+      city: '香港',
+      kind: kindLabel('meet'),
+      raw: {
+        id: `mfe-${day.iso}`,
+        title: mfe[0].raw.title,
+        aggregated: true,
+        continuation: false,
+        participants: [...new Set(mfe.map((e) => e.actress).filter(Boolean))],
+      },
+    });
+  }
+  for (const day of days) {
+    const seed = day.evs.find((e) => e.raw.aggregated && !e.raw.continuation);
+    if (!seed) continue;
+    const match = (seed.raw.title || '').match(/(\d{1,2})\s*\/\s*(\d{1,2})\s*[-–—~]\s*(\d{1,2})/);
+    if (!match) continue;
+    const endISO = `${day.iso.slice(0, 4)}-${String(Number(match[1])).padStart(2, '0')}-${String(Number(match[3])).padStart(2, '0')}`;
+    for (const later of days) {
+      if (later.iso <= day.iso || later.iso > endISO) continue;
+      const existing = later.evs.find((e) => e.raw.aggregated);
+      if (existing) existing.raw.continuation = true;
+      else later.evs.push({
+        ...seed,
+        raw: { ...seed.raw, id: `mfe-${later.iso}`, continuation: true },
+      });
+    }
+  }
+
+  // 統計（MFE 延續日唔重複計場數）
   const cityCount = {};
   let total = 0;
-  for (const d of days) for (const e of d.evs) { total++; cityCount[e.city] = (cityCount[e.city] || 0) + 1; }
+  for (const d of days) for (const e of d.evs) {
+    if (e.raw.continuation) continue;
+    total++;
+    cityCount[e.city] = (cityCount[e.city] || 0) + 1;
+  }
 
   return { from, to, days, total, cityCount };
 }
