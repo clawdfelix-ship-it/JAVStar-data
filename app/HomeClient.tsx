@@ -22,6 +22,7 @@ import JavsmEventsBanner from '@/components/JavsmEventsBanner';
 // import DvdRankingSection from '@/components/DvdRankingSection';
 import DailyActressBox from '@/components/DailyActressBox';
 import Logo from '@/components/Logo';
+import InstagramIcon, { JCHING_INSTAGRAM_URL } from '@/components/InstagramIcon';
 import { useActresses } from '@/hooks/useActresses';
 import { useEvents } from '@/hooks/useEvents';
 import { useStats } from '@/hooks/useStats';
@@ -753,7 +754,17 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           </div>
           
           <div className="border-t border-border mt-8 pt-8 space-y-3 text-center">
-            <nav aria-label="法律連結" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-text-secondary">
+            <nav aria-label="法律連結" className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-text-secondary">
+              <a
+                href={JCHING_INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--color-nadeshiko),0.35)] bg-[rgba(var(--color-sakura),0.55)] px-3 py-1.5 font-bold text-[rgb(var(--color-nadeshiko-dark))] transition-colors hover:text-[rgb(var(--color-wine))]"
+              >
+                <InstagramIcon className="h-4 w-4" />
+                @jching.calendar
+              </a>
+              <span aria-hidden className="text-text-tertiary">·</span>
               <Link href="/contact" className="font-semibold text-[rgb(var(--color-nadeshiko-dark))] hover:text-[rgb(var(--color-wine))] transition-colors">廣告查詢 / 合作</Link>
               <span aria-hidden className="text-text-tertiary">·</span>
               <Link href="/terms" className="hover:text-[rgb(var(--color-wine))] transition-colors">使用條款</Link>

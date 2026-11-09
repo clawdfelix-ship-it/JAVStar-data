@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Bell, CalendarDays, MapPin, TicketCheck, ArrowRight } from 'lucide-react';
 import MetaPixel from '@/components/MetaPixel';
 import Logo from '@/components/Logo';
+import InstagramIcon, { JCHING_INSTAGRAM_URL } from '@/components/InstagramIcon';
 import PromoSubscribeForm from './PromoSubscribeForm';
 
 export const metadata: Metadata = {
@@ -61,16 +62,6 @@ function formatDate(iso: string) {
   const d = new Date(`${iso}T00:00:00+08:00`);
   const weekday = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
   return { md: `${d.getMonth() + 1}/${d.getDate()}`, weekday: `週${weekday}` };
-}
-
-function InstagramIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-    </svg>
-  );
 }
 
 export default async function PromoPage() {
@@ -207,7 +198,7 @@ export default async function PromoPage() {
 
       <footer className="border-t border-[rgba(var(--color-sakura-gray),0.5)] px-5 py-8 text-center text-xs text-[rgb(var(--color-umenezumi-lighter))]">
         <a
-          href="https://www.instagram.com/jching.calendar"
+          href={JCHING_INSTAGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-[rgba(var(--color-nadeshiko),0.35)] bg-[rgba(var(--color-sakura),0.55)] px-4 py-2 text-sm font-bold text-[rgb(var(--color-nadeshiko-dark))] transition-all hover:shadow-pink-400/30 hover:shadow-md active:scale-[0.98]"
