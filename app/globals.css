@@ -505,3 +505,149 @@ body {
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* =========================================
+   /promo 沉浸式落地頁（純 CSS 動畫，零依賴）
+   ========================================= */
+
+/* Hero 漸層櫻色底 + 兩團柔光 blob */
+.promo-hero-bg {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(var(--color-nadeshiko-light), 0.34) 0%, rgba(var(--color-sakura), 0) 52%),
+    radial-gradient(120% 120% at 100% 8%, rgba(var(--color-nadeshiko), 0.20) 0%, rgba(var(--color-sakura), 0) 48%),
+    linear-gradient(180deg, rgba(var(--color-sakura), 0.92) 0%, rgb(var(--color-shiro)) 78%);
+  overflow: hidden;
+}
+.promo-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(56px);
+  opacity: 0.55;
+  z-index: -1;
+  pointer-events: none;
+  animation: promo-drift 14s ease-in-out infinite;
+}
+.promo-blob-1 {
+  width: 18rem; height: 18rem; top: -4rem; left: -5rem;
+  background: radial-gradient(circle, rgba(var(--color-nadeshiko), 0.42), transparent 70%);
+}
+.promo-blob-2 {
+  width: 22rem; height: 22rem; top: 6rem; right: -7rem;
+  background: radial-gradient(circle, rgba(var(--color-nadeshiko-light), 0.6), transparent 70%);
+  animation-delay: -6s;
+}
+@keyframes promo-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(1.2rem, -1.4rem, 0) scale(1.08); }
+}
+
+/* 浮動花瓣 */
+.promo-petal {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  color: rgba(var(--color-nadeshiko), 0.5);
+  animation: promo-float linear infinite;
+}
+@keyframes promo-float {
+  0%   { transform: translateY(-12%) rotate(0deg); opacity: 0; }
+  12%  { opacity: 0.85; }
+  88%  { opacity: 0.7; }
+  100% { transform: translateY(115vh) rotate(320deg); opacity: 0; }
+}
+
+/* 進場 stagger（只 transform/opacity） */
+@keyframes promo-rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.promo-rise {
+  opacity: 0;
+  animation: promo-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.promo-rise-1 { animation-delay: 0.05s; }
+.promo-rise-2 { animation-delay: 0.15s; }
+.promo-rise-3 { animation-delay: 0.25s; }
+.promo-rise-4 { animation-delay: 0.35s; }
+.promo-rise-5 { animation-delay: 0.45s; }
+
+/* Hero 主視覺浮動＋柔光邊 */
+.promo-hero-frame {
+  position: relative;
+  animation: promo-float-y 7s ease-in-out infinite;
+}
+.promo-hero-frame::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 32px 72px -24px rgba(var(--color-nadeshiko-dark), 0.42);
+  pointer-events: none;
+}
+@keyframes promo-float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* 漸層強調字 */
+.promo-gradient-text {
+  background: linear-gradient(100deg, rgb(var(--color-nadeshiko-strong)), rgb(var(--color-nadeshiko-dark)) 55%, rgb(var(--color-nadeshiko)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Bento 卡：玻璃感 + 粉色柔光陰影（陰影染色，唔用純黑） */
+.promo-bento {
+  position: relative;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(var(--color-nadeshiko), 0.16);
+  background: rgb(var(--color-shiro));
+  box-shadow: 0 22px 50px -24px rgba(var(--color-nadeshiko-dark), 0.38);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+}
+.promo-bento:hover {
+  transform: translateY(-4px);
+  border-color: rgba(var(--color-nadeshiko), 0.34);
+  box-shadow: 0 30px 60px -24px rgba(var(--color-nadeshiko-dark), 0.5);
+}
+/* 強調卡：深粉主題，做節奏對比 */
+.promo-bento-feature {
+  color: rgb(var(--color-shiro));
+  background: linear-gradient(150deg, rgb(var(--color-nadeshiko-strong)), rgb(var(--color-nadeshiko-dark)) 78%);
+  border-color: transparent;
+  box-shadow: 0 26px 60px -24px rgba(var(--color-nadeshiko-strong), 0.6);
+}
+.promo-bento-feature .promo-bento-icon {
+  background: rgba(255, 255, 255, 0.16);
+  color: rgb(var(--color-shiro));
+}
+.promo-bento-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem; height: 2.75rem;
+  border-radius: 0.9rem;
+  background: rgba(var(--color-nadeshiko), 0.12);
+  color: rgb(var(--color-nadeshiko-dark));
+}
+
+/* 轉換卡玻璃感 */
+.promo-convert {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 32px 80px -28px rgba(var(--color-nadeshiko-dark), 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* 活動列 hover 反饋 */
+.promo-event-row { transition: background-color 0.2s ease; }
+.promo-event-row:hover { background: rgba(var(--color-nadeshiko), 0.06); }
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-blob, .promo-petal, .promo-hero-frame,
+  .promo-rise, .promo-bento { animation: none !important; transition: none !important; }
+  .promo-rise { opacity: 1; transform: none; }
+}
