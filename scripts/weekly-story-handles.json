@@ -9,11 +9,13 @@
     "Foraver": "foraver_event",
     "Secret9": "secret.9.knight",
     "STAR POINT": "starpoint_official",
-    "TCE": "tce_cards"
+    "TCE": "tce_cards",
+    "D DRIVE HK": "ddrive_hk"
   },
   "actresses": {
     "辻井ほのか": "5.tsujihoka",
     "吉岡ひより": "y_hiyori88",
-    "吉瀨結": "kichiseyui"
+    "吉瀨結": "kichiseyui",
+    "沙月恵奈": "satsukiena"
   }
 }
