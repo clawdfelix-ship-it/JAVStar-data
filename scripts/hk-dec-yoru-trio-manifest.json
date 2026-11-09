@@ -1,0 +1,68 @@
+[
+  {
+    "id": "javstar-hk-20261212-334346-photo-1",
+    "actress_id": "334346",
+    "title": "役野満里奈 攝影會（Yoru+）",
+    "date": "2026-12-12",
+    "prefecture": "香港",
+    "venue": "",
+    "event_type": "photo",
+    "url": "",
+    "organizer": "community"
+  },
+  {
+    "id": "javstar-hk-20261213-334346-meet-1",
+    "actress_id": "334346",
+    "title": "役野満里奈 見面會（Yoru+）",
+    "date": "2026-12-13",
+    "prefecture": "香港",
+    "venue": "",
+    "event_type": "meet",
+    "url": "",
+    "organizer": "community"
+  },
+  {
+    "id": "javstar-hk-20261212-538781-photo-1",
+    "actress_id": "538781",
+    "title": "桜ゆの 攝影會（Yoru+）",
+    "date": "2026-12-12",
+    "prefecture": "香港",
+    "venue": "",
+    "event_type": "photo",
+    "url": "",
+    "organizer": "community"
+  },
+  {
+    "id": "javstar-hk-20261213-538781-meet-1",
+    "actress_id": "538781",
+    "title": "桜ゆの 見面會（Yoru+）",
+    "date": "2026-12-13",
+    "prefecture": "香港",
+    "venue": "",
+    "event_type": "meet",
+    "url": "",
+    "organizer": "community"
+  },
+  {
+    "id": "javstar-hk-20261212-573711-photo-1",
+    "actress_id": "573711",
+    "title": "奥井千晴 攝影會（Yoru+）",
+    "date": "2026-12-12",
+    "prefecture": "香港",
+    "venue": "",
+    "event_type": "photo",
+    "url": "",
+    "organizer": "community"
+  },
+  {
+    "id": "javstar-hk-20261213-573711-meet-1",
+    "actress_id": "573711",
+    "title": "奥井千晴 見面會（Yoru+）",
+    "date": "2026-12-13",
+    "prefecture": "香港",
+    "venue": "",
+    "event_type": "meet",
+    "url": "",
+    "organizer": "community"
+  }
+]
