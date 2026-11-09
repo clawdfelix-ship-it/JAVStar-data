@@ -63,6 +63,16 @@ function formatDate(iso: string) {
   return { md: `${d.getMonth() + 1}/${d.getDate()}`, weekday: `週${weekday}` };
 }
 
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
+
 export default async function PromoPage() {
   const events = await getUpcomingEvents();
 
@@ -195,8 +205,17 @@ export default async function PromoPage() {
         </div>
       </section>
 
-      <footer className="border-t border-[rgba(var(--color-sakura-gray),0.5)] px-5 py-6 text-center text-xs text-[rgb(var(--color-umenezumi-lighter))]">
-        JCHING CALENDAR · 中立活動情報整理 · 資料以官方公佈為準
+      <footer className="border-t border-[rgba(var(--color-sakura-gray),0.5)] px-5 py-8 text-center text-xs text-[rgb(var(--color-umenezumi-lighter))]">
+        <a
+          href="https://www.instagram.com/jching.calendar"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mx-auto mb-3 inline-flex items-center gap-2 rounded-full border border-[rgba(var(--color-nadeshiko),0.35)] bg-[rgba(var(--color-sakura),0.55)] px-4 py-2 text-sm font-bold text-[rgb(var(--color-nadeshiko-dark))] transition-all hover:shadow-pink-400/30 hover:shadow-md active:scale-[0.98]"
+        >
+          <InstagramIcon className="h-4 w-4" />
+          Instagram：@jching.calendar
+        </a>
+        <p>JCHING CALENDAR · 中立活動情報整理 · 資料以官方公佈為準</p>
       </footer>
     </main>
   );
