@@ -156,18 +156,17 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
       );
     }
     return (
-      <div className="flex flex-col sm:flex-row gap-3 items-center">
+      <div className="flex flex-col gap-3 w-full">
         <button
           type="button"
           onClick={handleTelegramSubscribe}
           disabled={subscribeStatus === 'loading'}
-          className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
-          style={{ backgroundColor: '#229ED9', color: 'white' }}
+          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[rgb(var(--color-nadeshiko-strong))] to-[rgb(var(--color-nadeshiko-dark))] shadow-lg shadow-pink-300/30 transition-all hover:shadow-pink-400/40 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:hover:scale-100"
         >
           {subscribeStatus === 'loading' ? '開啟中...' : '✈️ 用 Telegram 訂閱'}
         </button>
         {subscribeStatus === 'error' && (
-          <span className="text-sm text-red-300">{subscribeMessage}</span>
+          <span className="text-sm text-red-300 text-center">{subscribeMessage}</span>
         )}
       </div>
     );

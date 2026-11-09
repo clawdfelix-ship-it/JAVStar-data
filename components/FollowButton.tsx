@@ -88,7 +88,7 @@ export default function FollowButton({ actressId, size = 'md', className = '' }:
                   type="button"
                   onClick={tgOneTap}
                   disabled={tgLinking}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#229ED9] py-2.5 text-sm font-bold text-white transition active:scale-[0.98] disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[rgb(var(--color-nadeshiko-strong))] to-[rgb(var(--color-nadeshiko-dark))] py-2.5 text-sm font-bold text-white shadow-lg shadow-pink-300/30 transition-all hover:shadow-pink-400/40 active:scale-[0.98] disabled:opacity-50"
                 >
                   {tgLinking ? '開啟中…' : '✈️ 一鍵用 Telegram 訂閱'}
                 </button>
@@ -96,7 +96,7 @@ export default function FollowButton({ actressId, size = 'md', className = '' }:
               </div>
             ) : (
               <div className="mt-4 space-y-4">
-                <p className="rounded-lg bg-[#f5efe4] p-3 text-sm leading-relaxed text-[rgb(var(--color-umenezumi-light))]" role="status">
+                <p className="rounded-lg bg-[rgba(var(--color-sakura),0.55)] p-3 text-sm leading-relaxed text-[rgb(var(--color-umenezumi))]" role="status">
                   已開啟 Telegram。請喺 @jching_calendar_bot 撳 <strong>Start</strong>，先完成訂閱。
                 </p>
                 <button onClick={close} className="w-full rounded-full border border-[rgba(var(--color-sakura-gray),0.6)] py-2 text-sm font-bold text-[rgb(var(--color-umenezumi-light))]">完成</button>
