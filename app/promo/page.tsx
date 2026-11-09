@@ -85,7 +85,7 @@ export default async function PromoPage() {
       <header className="sticky top-0 z-30 border-b border-[rgba(var(--color-sakura-gray),0.5)] bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 md:px-8">
           <span className="flex items-center gap-2.5">
-            <Logo size={32} withText={false} href="" />
+            <Logo size={32} withText={false} />
             <span className="leading-none">
               <span className="block text-base font-extrabold tracking-tight text-[#2F4053]">JCHING</span>
               <span className="mt-0.5 block text-[9px] font-light tracking-[0.22em] text-[#5b6b7c]">CALENDAR</span>
