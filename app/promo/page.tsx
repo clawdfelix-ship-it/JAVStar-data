@@ -42,14 +42,10 @@ interface ApiEvent {
 async function getUpcomingEvents(): Promise<ApiEvent[]> {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.jching-calendar.com';
   try {
-    const [hk, tw] = await Promise.all([
-      fetch(`${base}/api/events?region=hk&limit=20`, { next: { revalidate: 3600 } }),
-      fetch(`${base}/api/events?region=taiwan&limit=20`, { next: { revalidate: 3600 } }),
-    ]);
-    if (!hk.ok || !tw.ok) return [];
+    const hk = await fetch(`${base}/api/events?region=hk&limit=20`, { next: { revalidate: 3600 } });
+    if (!hk.ok) return [];
     const hkJson = await hk.json();
-    const twJson = await tw.json();
-    const all: ApiEvent[] = [...(hkJson.data || []), ...(twJson.data || [])];
+    const all: ApiEvent[] = hkJson.data || [];
     const seen = new Set<string>();
     return all
       .filter((e) => e.date_iso && !seen.has(e.id) && seen.add(e.id))
