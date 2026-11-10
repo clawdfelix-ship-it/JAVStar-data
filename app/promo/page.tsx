@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { Bell, CalendarDays, MapPin, TicketCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { Bell, CalendarDays, MapPin, TicketCheck, ArrowRight, Sparkles, ArrowUpRight } from 'lucide-react';
 import MetaPixel from '@/components/MetaPixel';
 import Logo from '@/components/Logo';
 import InstagramIcon, { JCHING_INSTAGRAM_URL } from '@/components/InstagramIcon';
@@ -59,108 +59,117 @@ async function getUpcomingEvents(): Promise<ApiEvent[]> {
   }
 }
 
-// 純裝飾花瓣（無語意、aria-hidden），減速模式下由 CSS 停掉
-const PETALS = [
-  { left: '8%', size: 14, dur: 13, delay: 0, op: 0.5 },
-  { left: '22%', size: 10, dur: 17, delay: 4, op: 0.35 },
-  { left: '46%', size: 16, dur: 15, delay: 8, op: 0.45 },
-  { left: '68%', size: 11, dur: 19, delay: 2, op: 0.4 },
-  { left: '86%', size: 15, dur: 14, delay: 6, op: 0.5 },
-  { left: '93%', size: 9, dur: 18, delay: 10, op: 0.32 },
-];
-
+// EverGreen 排版：全屏暗色 hero、浮動玻璃 nav、hero 下沿白色浮卡（活動＋訂閱）、
+// 淺灰 features、深色 CTA。保留現有資料來源同轉換邏輯。
 export default async function PromoPage() {
   const events = await getUpcomingEvents();
 
   return (
-    <main className="min-h-screen bg-white text-[rgb(var(--color-umenezumi))]">
+    <main className="min-h-screen bg-[#F2F2F2] text-[#0F0F09]">
       <MetaPixel />
 
-      {/* SaaS 風落地頁 header：白底、單細邊線、品牌 mark */}
-      <header className="sticky top-0 z-30 border-b border-[rgba(var(--color-sakura-gray),0.5)] bg-white/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 md:px-8">
-          <span className="flex items-center gap-2.5">
-            <Logo size={32} withText={false} />
-            <span className="leading-none">
-              <span className="block text-base font-extrabold tracking-tight text-[#2F4053]">JCHING</span>
-              <span className="mt-0.5 block text-[9px] font-light tracking-[0.22em] text-[#5b6b7c]">CALENDAR</span>
-            </span>
-          </span>
-          <span className="flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--color-umenezumi-light))]">
-            <span aria-hidden>🇭🇰</span>
-            <span aria-hidden>🇹🇼</span>
-            <span className="ml-1 hidden sm:inline">港台活動週曆</span>
-          </span>
-        </div>
-      </header>
-
-      {/* 沉浸式 Hero：漸層櫻色底 + 柔光 blob + 花瓣，左文案右主視覺＋轉換卡 */}
-      <section className="promo-hero-bg">
-        <div className="promo-blob promo-blob-1" aria-hidden />
-        <div className="promo-blob promo-blob-2" aria-hidden />
-        {PETALS.map((p, i) => (
-          <Sparkles
-            key={i}
-            aria-hidden
-            className="promo-petal"
-            style={{ left: p.left, width: p.size, height: p.size, animationDuration: `${p.dur}s`, animationDelay: `${p.delay}s`, opacity: p.op }}
+      {/* ── Hero：全屏圖＋暗色漸層，nav 浮喺上面 ───────────────────── */}
+      <section className="relative isolate overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/promo/hero-calendar.jpg"
+            alt="整潔工作枱上嘅月曆、拍立得同咖啡，象徵每週活動週曆整理"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
-        ))}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/70" />
+        </div>
 
-        <div className="relative mx-auto grid max-w-5xl gap-12 px-5 pb-16 pt-14 md:grid-cols-[1.05fr_.95fr] md:items-center md:px-8 md:pb-24 md:pt-20">
-          <div>
-            <p className="promo-rise promo-rise-1 mb-4 inline-flex items-center gap-2 rounded-full border border-[rgba(var(--color-nadeshiko),0.3)] bg-white/70 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[rgb(var(--color-nadeshiko-dark))] backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" aria-hidden />
-              Japan Star Event Calendar
-            </p>
-            <h1 className="promo-rise promo-rise-2 text-4xl font-black leading-[1.1] tracking-tight text-[#2F4053] md:text-6xl">
-              港台日本女星活動
-              <br />
-              <span className="promo-gradient-text">一張週曆睇晒</span>
-            </h1>
-            <p className="promo-rise promo-rise-3 mt-5 max-w-lg text-base font-medium leading-relaxed text-[rgb(var(--color-umenezumi))] md:text-lg">
-              攝影會、見面會、POP UP、寫真展，JCHING 中立整合港台公開活動資料，新場次第一時間經 Telegram 通知你。
-            </p>
+        {/* 浮動玻璃 nav：左 brand／中膠囊 menu／右 CTA（mobile 藏 menu） */}
+        <header className="absolute inset-x-0 top-0 z-30">
+          <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 md:px-8">
+            <span className="flex items-center gap-2.5 text-white">
+              <Logo size={32} withText={false} />
+              <span className="leading-none">
+                <span className="block text-base font-extrabold tracking-tight">JCHING</span>
+                <span className="mt-0.5 block text-[9px] font-light tracking-[0.22em] text-white/70">CALENDAR</span>
+              </span>
+            </span>
 
-            {/* 真實 upcoming 活動（server fetch，ISR 每小時刷新）；無數據時唔渲染成塊 card */}
-            {events.length > 0 && (
-              <div className="promo-rise promo-rise-4 mt-9 overflow-hidden rounded-2xl border border-[rgba(var(--color-nadeshiko),0.18)] bg-white/85 shadow-[0_24px_60px_-28px_rgba(219,39,119,0.4)] backdrop-blur">
-                <div className="flex items-center justify-between border-b border-[rgba(var(--color-sakura-gray),0.5)] px-5 py-3.5">
-                  <span className="text-sm font-bold text-[#2F4053]">即將舉行</span>
-                  <span className="flex items-center gap-1.5 text-[11px] font-medium text-[rgb(var(--color-umenezumi-lighter))]">
-                    <span className="relative flex h-2 w-2" aria-hidden>
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[rgb(var(--color-nadeshiko))] opacity-60" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-[rgb(var(--color-nadeshiko-dark))]" />
-                    </span>
-                    每小時自動更新
-                  </span>
-                </div>
-                <EventStackSwitcher events={events} typeLabels={TYPE_LABEL} />
-              </div>
-            )}
+            <nav className="hidden items-center gap-1 rounded-full border border-white/15 bg-white/10 p-1.5 backdrop-blur-md md:flex" aria-label="頁面導覽">
+              {['首頁', '週曆', '訂閱'].map((label, i) => (
+                <a
+                  key={label}
+                  href={['#top', 'https://www.jching-calendar.com', '#subscribe'][i]}
+                  className={
+                    i === 0
+                      ? 'rounded-full bg-white px-5 py-2 text-xs font-bold text-black'
+                      : 'rounded-full px-5 py-2 text-xs font-semibold text-white/90 transition hover:bg-white/10'
+                  }
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+
+            <a
+              href="#subscribe"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#C4CEB8] px-5 py-2.5 text-xs font-bold text-[#1c2415] transition hover:bg-[#b4c0a4]"
+            >
+              <Bell className="h-3.5 w-3.5" aria-hidden />
+              立即訂閱
+            </a>
           </div>
+        </header>
 
-          {/* 右欄：浮動主視覺 + 玻璃轉換卡 */}
-          <div className="promo-rise promo-rise-4 flex flex-col gap-6">
-            <div className="promo-hero-frame overflow-hidden rounded-2xl border border-white/60">
-              <Image
-                src="/promo/hero-calendar.jpg"
-                alt="俯視整潔工作枱：月曆、拍立得、櫻花花瓣同咖啡，象徵每週活動週曆整理"
-                width={1280}
-                height={720}
-                priority
-                sizes="(max-width: 768px) 100vw, 480px"
-                className="h-auto w-full object-cover"
-              />
+        {/* Hero 文案：左對齊標籤＋大標＋副文；留白撐位畀下沿浮卡 */}
+        <div id="top" className="mx-auto max-w-6xl px-5 pb-56 pt-40 md:px-8 md:pb-64 md:pt-48">
+          <div className="max-w-3xl">
+            <ul className="promo-rise promo-rise-1 mb-6 flex flex-wrap gap-2.5">
+              {['攝影會', '見面會', 'POP UP', '寫真展'].map((tag) => (
+                <li key={tag} className="rounded-full bg-white px-4 py-1.5 text-[11px] font-bold text-black/80">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+            <h1 className="promo-rise promo-rise-2 text-4xl font-semibold leading-[1.12] tracking-tight text-white md:text-6xl">
+              港台日本女星活動，
+              <br />
+              一張週曆即時睇晒。
+            </h1>
+            <p className="promo-rise promo-rise-3 mt-6 max-w-xl text-base font-medium leading-relaxed text-white/80 md:text-lg">
+              JCHING 中立整合港台公開活動資料，新場次同開票公佈第一時間經 Telegram 通知你，唔使四圍搵。
+            </p>
+          </div>
+        </div>
+
+        {/* ── 白色浮卡：疊住 hero 下沿，左活動 stack／右訂閱 ─────── */}
+        <div className="absolute inset-x-0 bottom-0 z-20 translate-y-1/2 px-5 md:px-8">
+          <div className="mx-auto grid max-w-6xl gap-0 overflow-hidden rounded-3xl bg-white shadow-[0_40px_90px_-32px_rgba(0,0,0,0.55)] md:grid-cols-[1.15fr_.85fr]">
+            {/* 左：即將活動 */}
+            <div className="border-b border-black/5 p-7 md:border-b-0 md:border-r md:p-9">
+              <div className="mb-5 flex items-center justify-between">
+                <h2 className="text-lg font-bold">睇吓即將舉行</h2>
+                <a
+                  href="https://www.jching-calendar.com"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-[#585E5F] transition hover:text-black"
+                >
+                  完整週曆
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                </a>
+              </div>
+              {events.length > 0 ? (
+                <EventStackSwitcher events={events} typeLabels={TYPE_LABEL} />
+              ) : (
+                <p className="py-8 text-sm text-[#585E5F]">活動資料更新中，請稍後再試。</p>
+              )}
             </div>
 
-            <div className="promo-convert rounded-2xl p-7 md:p-8">
-              <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(var(--color-nadeshiko),0.12)] text-[rgb(var(--color-nadeshiko-dark))]">
+            {/* 右：訂閱 */}
+            <div id="subscribe" className="scroll-mt-28 bg-[#F7F7F3] p-7 md:p-9">
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#C4CEB8] text-[#1c2415]">
                 <Bell className="h-5 w-5" aria-hidden />
               </div>
-              <h2 className="text-2xl font-black tracking-tight text-[#2F4053]">新活動，第一時間通知你</h2>
-              <p className="mb-6 mt-2 text-sm leading-relaxed text-[rgb(var(--color-umenezumi-light))]">
-                免費用 Telegram 訂閱，最新週曆同開票公佈直接送達，唔會錯過喜歡嘅場次。
+              <h2 className="text-xl font-bold tracking-tight">新活動，第一時間通知你</h2>
+              <p className="mb-6 mt-2 text-sm leading-relaxed text-[#585E5F]">
+                免費 Telegram 訂閱，最新週曆同開票公佈直接送達。
               </p>
               <PromoSubscribeForm />
             </div>
@@ -168,50 +177,67 @@ export default async function PromoPage() {
         </div>
       </section>
 
-      {/* Features：非對稱 bento，首卡跨欄深粉做視覺重心，入場 stagger */}
-      <section className="mx-auto max-w-5xl px-5 py-16 md:px-8 md:py-20">
-        <div className="grid gap-5 md:grid-cols-2">
-          {features.map(({ icon: Icon, title, text }, i) => {
-            const riseClass = ['promo-rise-2', 'promo-rise-3', 'promo-rise-4'][i] ?? 'promo-rise-2';
-            const isFeature = i === 0;
-            return (
+      {/* ── Features：淺灰底，要預留浮卡高度 ───────────────────────── */}
+      <section className="px-5 pb-20 pt-52 md:px-8 md:pb-24 md:pt-64">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 max-w-xl">
+            <p className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[#8D7658]">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+              Why JCHING
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">活動資料，唔使再四周圍搵</h2>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {features.map(({ icon: Icon, title, text }, i) => (
               <div
                 key={title}
-                className={`promo-rise ${riseClass} promo-bento p-7 ${isFeature ? 'promo-bento-feature md:col-span-2 md:flex md:items-center md:gap-6' : ''}`}
+                className="group rounded-3xl border border-black/5 bg-white p-8 transition hover:-translate-y-1 hover:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.35)]"
               >
-                <span className="promo-bento-icon mb-4 md:mb-0 md:shrink-0">
-                  <Icon className="h-6 w-6" aria-hidden />
+                <span className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EDF0E6] text-[#453F22] transition group-hover:bg-[#C4CEB8]">
+                  <Icon className="h-5 w-5" aria-hidden />
                 </span>
-                <div>
-                  <h3 className={`text-lg font-bold ${isFeature ? 'text-white' : 'text-[#2F4053]'}`}>{title}</h3>
-                  <p className={`mt-2 text-sm leading-relaxed ${isFeature ? 'text-white/85' : 'text-[rgb(var(--color-umenezumi))]'}`}>
-                    {text}
-                  </p>
-                </div>
+                <h3 className="text-lg font-bold">{title}</h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-[#585E5F]">{text}</p>
+                <span className="mt-6 inline-flex items-center gap-1 text-xs font-bold text-[#8D7658]">
+                  0{i + 1}
+                </span>
               </div>
-            );
-          })}
-        </div>
-
-        <div className="promo-rise promo-rise-5 mt-12 flex justify-center">
-          <a
-            href="https://t.me/jching_calendar_bot"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[rgb(var(--color-nadeshiko-strong))] to-[rgb(var(--color-nadeshiko-dark))] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-pink-300/40 transition-all hover:shadow-pink-400/50 hover:scale-[1.03] active:scale-[0.98]"
-          >
-            立即 Telegram 訂閱
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden />
-          </a>
+            ))}
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-[rgba(var(--color-sakura-gray),0.5)] bg-[rgba(var(--color-sakura),0.4)] px-5 py-10 text-center text-xs text-[rgb(var(--color-umenezumi-lighter))]">
+      {/* ── 深色 CTA ───────────────────────────────────────────────── */}
+      <section className="px-5 pb-20 md:px-8">
+        <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl bg-[#0F0F09] px-8 py-16 text-center md:px-16 md:py-20">
+          <h2 className="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white md:text-4xl">
+            下次開票，唔好再後知後覺
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/60 md:text-base">
+            免費訂閱 JCHING Telegram，港台日本女星活動週曆每週自動送到。
+          </p>
+          <div className="mt-9 flex justify-center">
+            <a
+              href="https://t.me/jching_calendar_bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#C4CEB8] px-8 py-3.5 text-sm font-bold text-[#1c2415] transition hover:bg-[#d3dcc8]"
+            >
+              立即 Telegram 訂閱
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ─────────────────────────────────────────────────── */}
+      <footer className="border-t border-black/5 px-5 py-12 text-center text-xs text-[#585E5F] md:px-8">
         <a
           href={JCHING_INSTAGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-[rgba(var(--color-nadeshiko),0.35)] bg-white px-4 py-2 text-sm font-bold text-[rgb(var(--color-nadeshiko-dark))] transition-all hover:shadow-pink-400/30 hover:shadow-md active:scale-[0.98]"
+          className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-bold text-black transition hover:shadow-md"
         >
           <InstagramIcon className="h-4 w-4" />
           Instagram：@jching.calendar
