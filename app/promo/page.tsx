@@ -36,6 +36,7 @@ interface ApiEvent {
   prefecture: string | null;
   venue: string | null;
   event_type: string | null;
+  actress_id?: string | null;
 }
 
 async function getUpcomingEvents(): Promise<ApiEvent[]> {
@@ -53,6 +54,8 @@ async function getUpcomingEvents(): Promise<ApiEvent[]> {
     return all
       .filter((e) => e.date_iso && !seen.has(e.id) && seen.add(e.id))
       .sort((a, b) => String(a.date_iso).localeCompare(String(b.date_iso)))
+      // 同一女優只保留最早一條 row，避免 stack 出現重複女優
+      .filter((e, _i, arr) => arr.findIndex((x) => x.actress_id === e.actress_id) === arr.indexOf(e))
       .slice(0, 4);
   } catch {
     return [];
