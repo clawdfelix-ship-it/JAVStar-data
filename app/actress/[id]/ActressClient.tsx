@@ -7,6 +7,7 @@ import FollowButton from '@/components/FollowButton';
 import EventCard from '@/components/EventCard';
 import ActivityTimeline from '@/components/ActivityTimeline';
 import FanPhotoSection from '@/components/FanPhotoSection';
+import TagStack from '@/components/TagStack';
 import { useFavorites } from '@/hooks/useFavorites';
 
 interface ActressDetail {
@@ -142,6 +143,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
     '小島南': '/collections/%E5%B0%8F%E5%B3%B6%E5%8D%97',
   };
   const crossSellUrl = crossSellActresses[actress.name_ja] || crossSellActresses[actress.name_cn || ''] || null;
+  const actressTags = parseTags(actress.tags);
 
   return (
     <div className="min-h-screen bg-bg-secondary">
@@ -400,20 +402,11 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                   )}
                 </div>
 
-                {/* Tags - DARK TEXT ON LIGHT BACKGROUND */}
-                {actress.tags && parseTags(actress.tags).length > 0 && (
+                {/* Tags - compact stack inspired by LeiBox; expands on hover, focus or tap */}
+                {actressTags.length > 0 && (
                   <div className="mt-6 pt-6 border-t border-border">
                     <span className="text-text-tertiary text-xs uppercase tracking-wide font-semibold block mb-3">標籤</span>
-                    <div className="flex flex-wrap gap-2">
-                      {parseTags(actress.tags).map((tag, i) => (
-                        <span
-                          key={i}
-                          className="px-4 py-2 bg-bg-secondary text-text-primary border border-border rounded-xl text-sm font-medium"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    <TagStack tags={actressTags} />
                   </div>
                 )}
 

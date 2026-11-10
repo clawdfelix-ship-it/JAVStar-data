@@ -5,6 +5,7 @@ import MetaPixel from '@/components/MetaPixel';
 import Logo from '@/components/Logo';
 import InstagramIcon, { JCHING_INSTAGRAM_URL } from '@/components/InstagramIcon';
 import PromoSubscribeForm from './PromoSubscribeForm';
+import EventStackSwitcher from '@/components/EventStackSwitcher';
 
 export const metadata: Metadata = {
   title: '港台日本女星活動週曆｜JCHING',
@@ -56,12 +57,6 @@ async function getUpcomingEvents(): Promise<ApiEvent[]> {
   } catch {
     return [];
   }
-}
-
-function formatDate(iso: string) {
-  const d = new Date(`${iso}T00:00:00+08:00`);
-  const weekday = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
-  return { md: `${d.getMonth() + 1}/${d.getDate()}`, weekday: `週${weekday}` };
 }
 
 // 純裝飾花瓣（無語意、aria-hidden），減速模式下由 CSS 停掉
@@ -140,33 +135,7 @@ export default async function PromoPage() {
                     每小時自動更新
                   </span>
                 </div>
-                {events.map((e) => {
-                  const { md, weekday } = formatDate(e.date_iso as string);
-                  const region =
-                    (e.prefecture || '').includes('台') || (e.prefecture || '').includes('臺') ? '台北' : '香港';
-                  const label = TYPE_LABEL[e.event_type || ''] || '活動';
-                  return (
-                    <div
-                      key={e.id}
-                      className="promo-event-row grid grid-cols-[3.4rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-[rgba(var(--color-sakura-gray),0.35)] px-5 py-3.5 last:border-0"
-                    >
-                      <div className="leading-tight">
-                        <div className="text-sm font-extrabold text-[#2F4053]">{md}</div>
-                        <div className="text-[10px] font-medium text-[rgb(var(--color-umenezumi-lighter))]">{weekday}</div>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold leading-snug text-[rgb(var(--color-umenezumi))] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">{e.title}</p>
-                        <p className="mt-0.5 truncate text-[11px] text-[rgb(var(--color-umenezumi-lighter))]">
-                          {label}
-                          {e.venue ? ` · ${e.venue}` : ''}
-                        </p>
-                      </div>
-                      <span className="shrink-0 rounded-md bg-[rgba(var(--color-nadeshiko),0.12)] px-2 py-1 text-[11px] font-bold text-[rgb(var(--color-nadeshiko-dark))]">
-                        {region}
-                      </span>
-                    </div>
-                  );
-                })}
+                <EventStackSwitcher events={events} typeLabels={TYPE_LABEL} />
               </div>
             )}
           </div>
