@@ -409,9 +409,9 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                       ))}
                   </div>
 
-                  {/* 女優資料：reveal 起先顯露 */}
+                  {/* 女優資料：reveal 起先顯露；固定 min-height 避免內容多寡令卡片忽大忽小 */}
                   <div
-                    className="p-4 text-center bg-white rounded-b-xl border-2 border-t-0"
+                    className="p-4 pt-3 text-center bg-white rounded-b-xl border-2 border-t-0 min-h-[172px] flex flex-col"
                     style={{
                       borderColor:
                         phase === 'done' || phase === 'reveal' || phase === 'silhouette'
@@ -452,18 +452,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                       </p>
                     )}
 
-                    {/* 其他名稱 / 曾用名 */}
-                    {phase === 'done' &&
-                      selectedActress.name_cn &&
-                      selectedActress.name_cn !== selectedActress.name_ja && (
-                        <div className="mt-1">
-                          <span className="text-[10px] text-text-tertiary">其他名稱：</span>
-                          <span className="text-xs text-text-secondary ml-1">
-                            {selectedActress.name_cn}
-                          </span>
-                        </div>
-                      )}
-                    <div className="flex justify-center gap-2 mt-2 flex-wrap">
+                    <div className="flex justify-center gap-2 mt-2 flex-wrap min-h-[1.5rem]">
                       {selectedActress.cup && (phase === 'reveal' || phase === 'done') && (
                         <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs">
                           {selectedActress.cup}
