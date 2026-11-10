@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { Gift, Dice5, User, Fingerprint, Star, Sparkles } from 'lucide-react';
+import { Gift, Dice5, User, Star, Sparkles } from 'lucide-react';
 
 interface Actress {
   id: string;
@@ -297,13 +297,15 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
               )}
 
               {selectedActress && rarity && phase !== 'idle' ? (
-                <div
-                  className={phase === 'impact' ? 'gacha-shaking' : ''}
-                  style={{ width: '10rem' }}
+                <Link
+                  href={`/actress/${selectedActress.id}`}
+                  className={`block ${phase === 'impact' ? 'gacha-shaking' : ''}`}
+                  style={{ width: '12rem' }}
+                  aria-label={`查看 ${selectedActress.name_ja} 詳情`}
                 >
                   {/* 卡面區：翻牌場景 */}
                   <div
-                    className="gacha-flip-scene relative w-40 aspect-square rounded-t-xl overflow-hidden bg-gray-100 gacha-thickness"
+                    className="gacha-flip-scene relative w-48 aspect-square rounded-t-xl overflow-hidden bg-gray-100 gacha-thickness"
                     style={{
                       border: `2px solid ${phase === 'done' || phase === 'reveal' || phase === 'silhouette' ? rarity.color : 'rgba(244,114,182,0.6)'}`,
                       boxShadow: isAnimating ? `0 0 24px -4px ${rarity.glow}` : undefined,
@@ -409,9 +411,9 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                       ))}
                   </div>
 
-                  {/* 女優資料：reveal 起先顯露；固定 min-height 避免內容多寡令卡片忽大忽小 */}
+                  {/* 女優資料：只留星級＋名字，固定高度令每張卡一致 */}
                   <div
-                    className="p-4 pt-3 text-center bg-white rounded-b-xl border-2 border-t-0 min-h-[172px] flex flex-col"
+                    className="px-3 py-3 text-center bg-white rounded-b-xl border-2 border-t-0 h-[88px] flex flex-col justify-center"
                     style={{
                       borderColor:
                         phase === 'done' || phase === 'reveal' || phase === 'silhouette'
@@ -433,46 +435,18 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                         ))}
                     </div>
 
-                    {/* 主名：最後落下；done/reveal 之後先變可點擊 Link */}
+                    {/* 主名：最後落下（成張卡已係 Link，呢度用 span 避免巢狀 <a>） */}
                     {phase === 'reveal' || phase === 'done' ? (
-                      <Link
-                        href={`/actress/${selectedActress.id}`}
-                        className="gacha-name-drop inline-block font-bold text-text-primary text-lg hover:text-pink-500 transition-colors"
-                      >
+                      <span className="gacha-name-drop inline-block font-bold text-text-primary text-base leading-tight truncate px-1">
                         {selectedActress.name_ja}
-                      </Link>
+                      </span>
                     ) : (
-                      <h3 className="font-bold text-text-primary text-lg opacity-60">？？？</h3>
+                      <h3 className="font-bold text-text-primary text-base opacity-60">？？？</h3>
                     )}
-
-                    {phase === 'done' && (
-                      <p className="text-[10px] text-pink-400 mt-1 flex items-center justify-center gap-1">
-                        <Fingerprint className="w-3 h-3" />
-                        點擊查看詳情
-                      </p>
-                    )}
-
-                    <div className="flex justify-center gap-2 mt-2 flex-wrap min-h-[1.5rem]">
-                      {selectedActress.cup && (phase === 'reveal' || phase === 'done') && (
-                        <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs">
-                          {selectedActress.cup}
-                        </span>
-                      )}
-                      {selectedActress.age && (phase === 'reveal' || phase === 'done') && (
-                        <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs">
-                          {selectedActress.age} 歲
-                        </span>
-                      )}
-                      {selectedActress.year_2026_events > 0 && (phase === 'reveal' || phase === 'done') && (
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
-                          {selectedActress.year_2026_events} 場活動
-                        </span>
-                      )}
-                    </div>
                   </div>
-                </div>
+                </Link>
               ) : (
-                <div className="bg-gradient-to-br from-nadeshiko-light/40 to-white rounded-xl border border-nadeshiko/30 shadow-sm w-40 h-52 flex flex-col items-center justify-center gap-3">
+                <div className="bg-gradient-to-br from-nadeshiko-light/40 to-white rounded-xl border border-nadeshiko/30 shadow-sm w-48 aspect-[192/280] flex flex-col items-center justify-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center">
                     <Gift className="w-6 h-6 text-nadeshiko-dark" />
                   </div>
