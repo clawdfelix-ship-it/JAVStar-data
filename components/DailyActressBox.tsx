@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { Gift, Dice5, User, Fingerprint } from 'lucide-react';
+import { Gift, Dice5, User, Fingerprint, Star, Sparkles } from 'lucide-react';
 
 interface Actress {
   id: string;
@@ -29,25 +29,110 @@ interface DailyActressBoxProps {
   actresses: Actress[];
 }
 
+// 抽卡階段：idle → charging → meteor → impact → pause → flip → silhouette → reveal → done
+type GachaPhase =
+  | 'idle'
+  | 'charging'
+  | 'meteor'
+  | 'impact'
+  | 'pause'
+  | 'flip'
+  | 'silhouette'
+  | 'reveal'
+  | 'done';
+
+type Rarity = {
+  key: 'rare' | 'epic' | 'legend';
+  label: string;
+  stars: number;
+  color: string;
+  glow: string;
+};
+
+const RARITY_TABLE: Record<Rarity['key'], Rarity> = {
+  rare: {
+    key: 'rare',
+    label: '稀有',
+    stars: 3,
+    color: '#60a5fa',
+    glow: 'rgba(96,165,250,0.45)',
+  },
+  epic: {
+    key: 'epic',
+    label: '史詩',
+    stars: 4,
+    color: '#c084fc',
+    glow: 'rgba(192,132,252,0.5)',
+  },
+  legend: {
+    key: 'legend',
+    label: '傳說',
+    stars: 5,
+    color: '#f5c542',
+    glow: 'rgba(245,197,66,0.6)',
+  },
+};
+
+// 停頓一拍：8 粒光點由四周聚向中心
+const CONVERGE_DOTS = [
+  { dx: 56, dy: 56 }, { dx: -56, dy: 56 }, { dx: 56, dy: -56 }, { dx: -56, dy: -56 },
+  { dx: 0, dy: 66 }, { dx: 0, dy: -66 }, { dx: 66, dy: 0 }, { dx: -66, dy: 0 },
+];
+
+// 余韵：慢漂光點
+const DRIFT_DOTS = [
+  { left: '18%', bottom: '12%', delay: '0s' },
+  { left: '72%', bottom: '20%', delay: '1.4s' },
+  { left: '46%', bottom: '8%', delay: '2.6s' },
+];
+
 export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
   const [selectedActress, setSelectedActress] = useState<Actress | null>(null);
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [rarity, setRarity] = useState<Rarity | null>(null);
+  const [phase, setPhase] = useState<GachaPhase>('idle');
   const [futureActresses, setFutureActresses] = useState<Actress[]>([]);
+
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const runIdRef = useRef(0);
+  const reducedMotionRef = useRef(false);
+
+  const isAnimating =
+    phase !== 'idle' && phase !== 'done';
 
   // 獲取未來有活動的女優
   useEffect(() => {
     fetchFutureActresses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actresses]);
+
+  useEffect(() => {
+    reducedMotionRef.current =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  // unmount 清晒所有計時器
+  useEffect(() => {
+    return () => {
+      runIdRef.current += 1;
+      timersRef.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  const schedule = useCallback((fn: () => void, ms: number) => {
+    const t = setTimeout(fn, ms);
+    timersRef.current.push(t);
+  }, []);
 
   const fetchFutureActresses = async () => {
     try {
       const res = await fetch('/api/events');
       const data = await res.json();
-      
+
       // 過濾未來有活動的女優
       const now = new Date();
       const uniqueActressIds = new Set<string>();
-      
+
       if (data.data && Array.isArray(data.data)) {
         data.data.forEach((e: any) => {
           // 檢查活動日期是否為未來
@@ -57,28 +142,22 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
           }
         });
       }
-      
-      console.log('未來活動女優 ID 數量:', uniqueActressIds.size);
-      console.log('女優列表總數:', actresses.length);
-      
+
       // 過濾出女優列表入面有未來活動的
       let filtered = actresses.filter(a => {
         const hasFutureEvent = uniqueActressIds.has(a.id);
         const has2026Events = a.year_2026_events > 0;
         return hasFutureEvent || has2026Events; // 任一條件符合即可
       });
-      
-      console.log('過濾後女優數量:', filtered.length);
-      
+
       // 如果過濾後太少，就用評分最高的 50 個
       if (filtered.length < 5) {
-        console.log('過濾後數量太少，使用評分排序');
         filtered = [...actresses].sort((a, b) => b.final_score - a.final_score).slice(0, 50);
       }
-      
+
       // 按人氣評分排序，只取頭 50 名
       const sortedByScore = filtered.sort((a, b) => b.final_score - a.final_score).slice(0, 50);
-      
+
       setFutureActresses(sortedByScore);
     } catch (error) {
       console.error('獲取未來活動失敗:', error);
@@ -88,28 +167,93 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
     }
   };
 
-  const handleRandomPick = () => {
-    if (futureActresses.length === 0 || isSpinning) return;
+  // 加權隨機稀有度：稀有 80%／史詩 15%／傳說 5%（同抽中邊位女優脫鈎）
+  const rollRarity = (): Rarity => {
+    const r = Math.random();
+    if (r < 0.05) return RARITY_TABLE.legend;
+    if (r < 0.2) return RARITY_TABLE.epic;
+    return RARITY_TABLE.rare;
+  };
 
-    setIsSpinning(true);
+  const handleRandomPick = () => {
+    if (futureActresses.length === 0 || isAnimating) return;
+
+    // 清走上一輪殘留計時器
+    runIdRef.current += 1;
+    const runId = runIdRef.current;
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
 
     const shuffled = [...futureActresses].sort(() => Math.random() - 0.5);
+    const finalPick = shuffled[Math.floor(Math.random() * shuffled.length)];
+    const pickedRarity = rollRarity();
 
-    let spins = 0;
-    const maxSpins = 15;
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * shuffled.length);
-      setSelectedActress(shuffled[randomIndex]);
-      spins++;
+    // reduced-motion：直接出結果，唔播動畫
+    if (reducedMotionRef.current) {
+      setSelectedActress(finalPick);
+      setRarity(pickedRarity);
+      setPhase('done');
+      return;
+    }
 
-      if (spins >= maxSpins) {
-        clearInterval(interval);
-        const finalIndex = Math.floor(Math.random() * shuffled.length);
-        setSelectedActress(shuffled[finalIndex]);
-        setIsSpinning(false);
-      }
-    }, 100);
+    const alive = () => runIdRef.current === runId;
+
+    // 1. 按下蓄力 0.15s
+    setPhase('charging');
+    schedule(() => {
+      if (!alive()) return;
+      // 2+3. 流星 1.3s（藍→紫→金，CSS 內置變色閃爍）
+      setPhase('meteor');
+    }, 150);
+
+    // 4. 落地衝擊：波紋＋震動 0.55s
+    schedule(() => {
+      if (!alive()) return;
+      setPhase('impact');
+    }, 1450);
+
+    // 5. 停頓一拍：光點聚合 0.55s
+    schedule(() => {
+      if (!alive()) return;
+      setPhase('pause');
+    }, 2000);
+
+    // 預先鎖定結果，等翻牌時卡面有圖
+    schedule(() => {
+      if (!alive()) return;
+      setSelectedActress(finalPick);
+      setRarity(pickedRarity);
+      // 6. 翻牌 0.7s
+      setPhase('flip');
+    }, 2550);
+
+    // 8. 金邊剪影 0.45s
+    schedule(() => {
+      if (!alive()) return;
+      setPhase('silhouette');
+    }, 3250);
+
+    // 上色＋9. 星級逐亮／名字落下（CSS animation-delay 接手）
+    schedule(() => {
+      if (!alive()) return;
+      setPhase('reveal');
+    }, 3700);
+
+    // 10. 余韵呼吸
+    schedule(() => {
+      if (!alive()) return;
+      setPhase('done');
+    }, 4250);
   };
+
+  const buttonLabel =
+    phase === 'charging' ? '蓄力中…'
+    : phase === 'meteor' ? '流星降臨…'
+    : phase === 'impact' ? '衝擊！'
+    : phase === 'pause' ? '即將揭曉…'
+    : phase === 'flip' || phase === 'silhouette' ? '開卡中…'
+    : phase === 'reveal' ? '揭曉！'
+    : '立即抽取';
 
   return (
     <section className="py-6 px-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-y border-border">
@@ -132,68 +276,205 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
             </p>
             <button
               onClick={handleRandomPick}
-              disabled={futureActresses.length === 0 || isSpinning}
-              className="mt-4 px-6 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg font-medium text-sm hover:from-pink-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
+              disabled={futureActresses.length === 0 || isAnimating}
+              className={`mt-4 px-6 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg font-medium text-sm hover:from-pink-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2 ${
+                phase === 'charging' ? 'gacha-charging' : ''
+              }`}
             >
-              <Dice5 className="w-4 h-4" />
-              {isSpinning ? '抽取中...' : '立即抽取'}
+              <Dice5 className={`w-4 h-4 ${isAnimating ? 'animate-spin' : ''}`} />
+              {buttonLabel}
             </button>
           </div>
 
           {/* 右邊：結果顯示 (mobile: order-1 top) */}
           <div className="order-1 md:order-2 min-w-[200px] flex justify-center">
-            {selectedActress ? (
-              <Link 
-                href={`/actress/${selectedActress.id}`}
-                className={`block bg-white rounded-xl shadow-lg overflow-hidden border-2 ${isSpinning ? 'border-pink-400 animate-pulse' : 'border-transparent hover:border-pink-300'} transition-all duration-300 cursor-pointer hover:shadow-xl`}
-              >
-                <div className="relative">
-                  {/* 女優頭像 */}
-                  <div className="aspect-square w-40 mx-auto overflow-hidden bg-gray-100">
-                    {selectedActress.avatar_url ? (
-                      <img
-                        src={selectedActress.avatar_url}
-                        alt={selectedActress.name_cn || selectedActress.name_ja}
-                        className={`w-full h-full object-cover ${isSpinning ? 'blur-sm' : ''}`}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">
-                        <User className="w-12 h-12" />
-                      </div>
-                    )}
+            <div className="relative">
+              {/* 2+3. 流星（飛越卡區） */}
+              {phase === 'meteor' && (
+                <div className="absolute inset-0 overflow-visible pointer-events-none z-20">
+                  <span className="gacha-meteor" />
+                </div>
+              )}
+
+              {selectedActress && rarity && phase !== 'idle' ? (
+                <div
+                  className={phase === 'impact' ? 'gacha-shaking' : ''}
+                  style={{ width: '10rem' }}
+                >
+                  {/* 卡面區：翻牌場景 */}
+                  <div
+                    className="gacha-flip-scene relative w-40 aspect-square rounded-t-xl overflow-hidden bg-gray-100 gacha-thickness"
+                    style={{
+                      border: `2px solid ${phase === 'done' || phase === 'reveal' || phase === 'silhouette' ? rarity.color : 'rgba(244,114,182,0.6)'}`,
+                      boxShadow: isAnimating ? `0 0 24px -4px ${rarity.glow}` : undefined,
+                    }}
+                  >
+                    {/* 4a. 落地波紋 */}
+                    {phase === 'impact' && <span className="gacha-ripple" />}
+
+                    {/* 5. 停頓光點聚合 */}
+                    {phase === 'pause' &&
+                      CONVERGE_DOTS.map((d, i) => (
+                        <span
+                          key={i}
+                          className="gacha-converge-dot"
+                          style={{ ['--dx' as string]: `${d.dx}px`, ['--dy' as string]: `${d.dy}px` }}
+                        />
+                      ))}
+
+                    <div
+                      className="w-full h-full"
+                    >
+                      {/* 翻牌：未到 flip 階段顯示卡背；reduced-motion 直接出卡面（唔用 3D 結構，避免停喺背面） */}
+                      {reducedMotionRef.current ? (
+                        <div className="relative w-full h-full">
+                          {selectedActress.avatar_url ? (
+                            <img
+                              src={selectedActress.avatar_url}
+                              alt={selectedActress.name_cn || selectedActress.name_ja}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">
+                              <User className="w-12 h-12" />
+                            </div>
+                          )}
+                          <span
+                            className="absolute top-1.5 right-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
+                            style={{ backgroundColor: rarity.color }}
+                          >
+                            {rarity.label}
+                          </span>
+                        </div>
+                      ) : (phase === 'flip' || phase === 'silhouette' || phase === 'reveal' || phase === 'done') ? (
+                        <div className="gacha-flip-inner">
+                          {/* 卡背（翻轉時喺背面） */}
+                          <div className="gacha-face gacha-face-back gacha-card-back flex items-center justify-center">
+                            <Sparkles className="w-10 h-10 text-pink-300/80" />
+                          </div>
+                          {/* 卡面 */}
+                          <div className="gacha-face relative">
+                            {selectedActress.avatar_url ? (
+                              <img
+                                src={selectedActress.avatar_url}
+                                alt={selectedActress.name_cn || selectedActress.name_ja}
+                                className={`w-full h-full object-cover ${
+                                  phase === 'silhouette'
+                                    ? 'gacha-silhouette'
+                                    : 'gacha-revealed'
+                                } ${phase === 'done' ? 'gacha-breathe' : ''}`}
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">
+                                <User className="w-12 h-12" />
+                              </div>
+                            )}
+
+                            {/* 7. 金光爆發（史詩／傳說） */}
+                            {phase === 'reveal' && rarity.key !== 'rare' && (
+                              <span className="gacha-burst" />
+                            )}
+                            {phase === 'reveal' && rarity.key === 'legend' && (
+                              <span className="gacha-rays" />
+                            )}
+
+                            {/* 6. 翻完高光掃過 */}
+                            {phase === 'silhouette' && <span className="gacha-sheen" />}
+
+                            {/* 稀有度角章 */}
+                            <span
+                              className="absolute top-1.5 right-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow"
+                              style={{ backgroundColor: rarity.color }}
+                            >
+                              {rarity.label}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        /* flip 之前：靜態卡背（蓄力／流星／衝擊／停頓階段） */
+                        <div className="w-full h-full gacha-card-back flex items-center justify-center">
+                          <Sparkles className={`w-10 h-10 text-pink-300/80 ${isAnimating ? 'animate-pulse' : ''}`} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 10. 余韵慢漂光點 */}
+                    {phase === 'done' &&
+                      DRIFT_DOTS.map((d, i) => (
+                        <span
+                          key={i}
+                          className="gacha-drift-dot"
+                          style={{ left: d.left, bottom: d.bottom, animationDelay: d.delay }}
+                        />
+                      ))}
                   </div>
 
-                  {/* 女優資料 */}
-                  <div className="p-4 text-center">
-                    {/* 主名（可點擊） */}
-                    <h3 className="font-bold text-text-primary text-lg hover:text-pink-500 transition-colors">
-                      {selectedActress.name_ja}
-                    </h3>
-                    <p className="text-[10px] text-pink-400 mt-1 flex items-center justify-center gap-1">
-                      <Fingerprint className="w-3 h-3" />
-                      點擊查看詳情
-                    </p>
-                    {/* 其他名稱 / 曾用名 */}
-                    {selectedActress.name_cn && selectedActress.name_cn !== selectedActress.name_ja && (
-                      <div className="mt-1">
-                        <span className="text-[10px] text-text-tertiary">其他名稱：</span>
-                        <span className="text-xs text-text-secondary ml-1">
-                          {selectedActress.name_cn}
-                        </span>
-                      </div>
+                  {/* 女優資料：reveal 起先顯露 */}
+                  <div
+                    className="p-4 text-center bg-white rounded-b-xl border-2 border-t-0"
+                    style={{
+                      borderColor:
+                        phase === 'done' || phase === 'reveal' || phase === 'silhouette'
+                          ? rarity.color
+                          : 'rgba(244,114,182,0.6)',
+                    }}
+                  >
+                    {/* 9. 星級逐亮（0.12s 一顆） */}
+                    <div className="flex justify-center gap-0.5 mb-1.5" style={{ minHeight: '1rem' }}>
+                      {(phase === 'reveal' || phase === 'done') &&
+                        Array.from({ length: rarity.stars }).map((_, i) => (
+                          <span
+                            key={i}
+                            className="gacha-star"
+                            style={{ animationDelay: `${i * 0.12}s`, color: rarity.color }}
+                          >
+                            <Star className="w-4 h-4" fill="currentColor" strokeWidth={0} />
+                          </span>
+                        ))}
+                    </div>
+
+                    {/* 主名：最後落下；done/reveal 之後先變可點擊 Link */}
+                    {phase === 'reveal' || phase === 'done' ? (
+                      <Link
+                        href={`/actress/${selectedActress.id}`}
+                        className="gacha-name-drop inline-block font-bold text-text-primary text-lg hover:text-pink-500 transition-colors"
+                      >
+                        {selectedActress.name_ja}
+                      </Link>
+                    ) : (
+                      <h3 className="font-bold text-text-primary text-lg opacity-60">？？？</h3>
                     )}
+
+                    {phase === 'done' && (
+                      <p className="text-[10px] text-pink-400 mt-1 flex items-center justify-center gap-1">
+                        <Fingerprint className="w-3 h-3" />
+                        點擊查看詳情
+                      </p>
+                    )}
+
+                    {/* 其他名稱 / 曾用名 */}
+                    {phase === 'done' &&
+                      selectedActress.name_cn &&
+                      selectedActress.name_cn !== selectedActress.name_ja && (
+                        <div className="mt-1">
+                          <span className="text-[10px] text-text-tertiary">其他名稱：</span>
+                          <span className="text-xs text-text-secondary ml-1">
+                            {selectedActress.name_cn}
+                          </span>
+                        </div>
+                      )}
                     <div className="flex justify-center gap-2 mt-2 flex-wrap">
-                      {selectedActress.cup && (
+                      {selectedActress.cup && (phase === 'reveal' || phase === 'done') && (
                         <span className="px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs">
                           {selectedActress.cup}
                         </span>
                       )}
-                      {selectedActress.age && (
+                      {selectedActress.age && (phase === 'reveal' || phase === 'done') && (
                         <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs">
                           {selectedActress.age} 歲
                         </span>
                       )}
-                      {selectedActress.year_2026_events > 0 && (
+                      {selectedActress.year_2026_events > 0 && (phase === 'reveal' || phase === 'done') && (
                         <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
                           {selectedActress.year_2026_events} 場活動
                         </span>
@@ -201,17 +482,17 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
                     </div>
                   </div>
                 </div>
-              </Link>
-            ) : (
-              <div className="bg-gradient-to-br from-nadeshiko-light/40 to-white rounded-xl border border-nadeshiko/30 shadow-sm w-40 h-52 flex flex-col items-center justify-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center">
-                  <Gift className="w-6 h-6 text-nadeshiko-dark" />
+              ) : (
+                <div className="bg-gradient-to-br from-nadeshiko-light/40 to-white rounded-xl border border-nadeshiko/30 shadow-sm w-40 h-52 flex flex-col items-center justify-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center">
+                    <Gift className="w-6 h-6 text-nadeshiko-dark" />
+                  </div>
+                  <p className="text-text-secondary text-xs text-center font-medium px-3 leading-relaxed">
+                    未抽取<br /><span className="text-text-tertiary font-normal">按「立即抽取」試試今日運氣</span>
+                  </p>
                 </div>
-                <p className="text-text-secondary text-xs text-center font-medium px-3 leading-relaxed">
-                  未抽取<br /><span className="text-text-tertiary font-normal">按「立即抽取」試試今日運氣</span>
-                </p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

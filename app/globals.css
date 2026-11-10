@@ -505,3 +505,239 @@ body {
   from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ============================================================
+   女優盲盒抽卡演出（10 招）
+   命名空間 gacha-*；全部 transform/opacity/filter GPU 友善
+   ============================================================ */
+
+/* 1. 按下蓄力：按鈕沉落＋光往內收 */
+@keyframes gacha-charge {
+  0%   { transform: scale(1); box-shadow: 0 10px 24px -8px rgba(219, 39, 119, 0.55), inset 0 0 0 rgba(255,255,255,0); }
+  60%  { transform: scale(0.94); box-shadow: 0 4px 10px -6px rgba(219, 39, 119, 0.4), inset 0 2px 10px rgba(80, 7, 36, 0.35); }
+  100% { transform: scale(0.94); box-shadow: 0 4px 10px -6px rgba(219, 39, 119, 0.4), inset 0 2px 10px rgba(80, 7, 36, 0.35); }
+}
+.gacha-charging { animation: gacha-charge 0.15s ease-in forwards; }
+
+/* 2+3. 流星：斜向墜落、越落越快（ease-in），中途藍→紫→金變色＋閃爍 */
+@keyframes gacha-meteor-fly {
+  0%   { transform: translate3d(-110%, -70%, 0) rotate(45deg) scale(0.8); opacity: 0; }
+  8%   { opacity: 1; }
+  100% { transform: translate3d(70%, 90%, 0) rotate(45deg) scale(1.25); opacity: 1; }
+}
+@keyframes gacha-meteor-color {
+  0%, 38%   { background: #60a5fa; box-shadow: 0 0 14px 4px rgba(96,165,250,.85); }
+  39%, 43%  { background: #dbeafe; box-shadow: 0 0 22px 8px rgba(191,219,254,.95); } /* 閃一下 */
+  44%, 72%  { background: #c084fc; box-shadow: 0 0 16px 5px rgba(192,132,252,.9); }
+  73%, 77%  { background: #f3e8ff; box-shadow: 0 0 24px 9px rgba(233,213,255,.95); } /* 再閃 */
+  78%, 100% { background: #f5c542; box-shadow: 0 0 20px 7px rgba(245,197,66,.95); }
+}
+.gacha-meteor {
+  position: absolute;
+  width: 10px; height: 10px;
+  border-radius: 9999px;
+  pointer-events: none;
+  animation:
+    gacha-meteor-fly 1.3s cubic-bezier(0.5, 0, 0.9, 0.4) forwards,
+    gacha-meteor-color 1.3s linear forwards;
+}
+.gacha-meteor::after { /* 流星尾巴 */
+  content: "";
+  position: absolute;
+  right: 100%; top: 50%;
+  width: 56px; height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.85));
+  border-radius: 2px;
+}
+
+/* 4a. 落地衝擊波紋 */
+@keyframes gacha-ripple {
+  0%   { transform: scale(0.25); opacity: 0.85; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.gacha-ripple {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 90px; height: 90px;
+  border-radius: 9999px;
+  border: 3px solid rgba(244, 114, 182, 0.7);
+  pointer-events: none;
+  animation: gacha-ripple 0.55s ease-out forwards;
+}
+/* 4b. 鏡頭震動 0.25s */
+@keyframes gacha-shake {
+  0%, 100% { transform: translate3d(0,0,0); }
+  20% { transform: translate3d(-4px, 2px, 0); }
+  40% { transform: translate3d(4px, -2px, 0); }
+  60% { transform: translate3d(-3px, -1px, 0); }
+  80% { transform: translate3d(3px, 1px, 0); }
+}
+.gacha-shaking { animation: gacha-shake 0.25s ease-in-out; }
+
+/* 5. 停頓一拍：光點往卡中心聚 */
+@keyframes gacha-converge {
+  0%   { transform: translate(var(--dx, 40px), var(--dy, 40px)) scale(1); opacity: 0.9; }
+  100% { transform: translate(0, 0) scale(0.2); opacity: 0; }
+}
+.gacha-converge-dot {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 6px; height: 6px;
+  border-radius: 9999px;
+  background: rgb(var(--color-nadeshiko));
+  box-shadow: 0 0 10px 2px rgba(var(--color-nadeshiko), 0.7);
+  pointer-events: none;
+  animation: gacha-converge 0.55s ease-in forwards;
+}
+
+/* 6. 翻牌：3D rotateY，卡背→卡面 */
+.gacha-flip-scene { perspective: 1100px; }
+.gacha-flip-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  animation: gacha-flip-rotate 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes gacha-flip-rotate {
+  from { transform: rotateY(180deg); }
+  to   { transform: rotateY(0deg); }
+}
+.gacha-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.gacha-face-back { transform: rotateY(180deg); }
+/* 卡邊厚度：翻轉途中側邊陰影 */
+.gacha-thickness {
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.08),
+    0 4px 0 rgba(0,0,0,0.06),
+    0 8px 22px -6px rgba(219, 39, 119, 0.45);
+}
+/* 翻完高光掃過 */
+@keyframes gacha-sheen {
+  0%   { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
+  30%  { opacity: 0.85; }
+  100% { transform: translateX(230%) skewX(-18deg); opacity: 0; }
+}
+.gacha-sheen {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+  pointer-events: none;
+  animation: gacha-sheen 0.6s ease-out 0.15s forwards;
+}
+
+/* 7. 金光爆發：閃一下就收，光線慢轉 */
+@keyframes gacha-burst {
+  0%   { opacity: 0; transform: scale(0.4); }
+  25%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+.gacha-burst {
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,236,170,0.95) 0%, rgba(245,197,66,0.55) 45%, transparent 72%);
+  animation: gacha-burst 0.5s ease-out forwards;
+}
+@keyframes gacha-rays-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.gacha-rays {
+  position: absolute; inset: -28%;
+  pointer-events: none;
+  background: conic-gradient(from 0deg,
+    transparent 0deg, rgba(245,197,66,0.28) 12deg, transparent 24deg,
+    transparent 45deg, rgba(245,197,66,0.22) 57deg, transparent 69deg,
+    transparent 90deg, rgba(245,197,66,0.28) 102deg, transparent 114deg,
+    transparent 135deg, rgba(245,197,66,0.22) 147deg, transparent 159deg,
+    transparent 180deg, rgba(245,197,66,0.28) 192deg, transparent 204deg,
+    transparent 225deg, rgba(245,197,66,0.22) 237deg, transparent 249deg,
+    transparent 270deg, rgba(245,197,66,0.28) 282deg, transparent 294deg,
+    transparent 315deg, rgba(245,197,66,0.22) 327deg, transparent 339deg);
+  animation: gacha-rays-spin 2.6s linear 0.15s 1 forwards;
+  opacity: 0;
+}
+
+/* 8. 金邊剪影：filter 過渡由剪影→上色 */
+.gacha-silhouette {
+  filter: brightness(0);
+  transition: filter 0.45s ease;
+}
+.gacha-silhouette::after {
+  content: "";
+  position: absolute; inset: 0;
+  box-shadow: inset 0 0 0 3px rgba(245,197,66,0.9), 0 0 18px rgba(245,197,66,0.55);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.gacha-revealed { filter: none; }
+
+/* 9. 星級逐亮 */
+@keyframes gacha-star-pop {
+  0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+  70%  { transform: scale(1.25) rotate(6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.gacha-star {
+  display: inline-flex;
+  opacity: 0;
+  animation: gacha-star-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+/* 名字最後落下 */
+@keyframes gacha-name-drop {
+  0%   { transform: translateY(-10px); opacity: 0; letter-spacing: 0.18em; }
+  100% { transform: translateY(0); opacity: 1; letter-spacing: normal; }
+}
+.gacha-name-drop { animation: gacha-name-drop 0.4s ease-out forwards; }
+
+/* 10. 余韵呼吸：人物輕呼吸＋光點慢漂＋背景慢推 */
+@keyframes gacha-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.025); }
+}
+.gacha-breathe { animation: gacha-breathe 3.2s ease-in-out infinite; }
+@keyframes gacha-drift {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  15%  { opacity: 0.7; }
+  85%  { opacity: 0.5; }
+  100% { transform: translateY(-46px) translateX(10px); opacity: 0; }
+}
+.gacha-drift-dot {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 9999px;
+  background: rgba(var(--color-nadeshiko), 0.55);
+  pointer-events: none;
+  animation: gacha-drift 4.5s ease-in-out infinite;
+}
+@keyframes gacha-bg-zoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+.gacha-bg-zoom { animation: gacha-bg-zoom 12s ease-in-out infinite alternate; }
+
+/* 卡背神秘圖案 */
+.gacha-card-back {
+  background:
+    radial-gradient(circle at 50% 32%, rgba(244,114,182,0.35), transparent 62%),
+    linear-gradient(150deg, #2a1026 0%, #4a1942 55%, #2a1026 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gacha-charging, .gacha-meteor, .gacha-ripple, .gacha-shaking,
+  .gacha-converge-dot, .gacha-flip-inner, .gacha-sheen, .gacha-burst,
+  .gacha-rays, .gacha-star, .gacha-name-drop, .gacha-breathe,
+  .gacha-drift-dot, .gacha-bg-zoom {
+    animation: none !important;
+    transition: none !important;
+  }
+  .gacha-star { opacity: 1; }
+  .gacha-silhouette { filter: none; }
+}
