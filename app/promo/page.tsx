@@ -69,7 +69,7 @@ export default async function PromoPage() {
       <MetaPixel />
 
       {/* ── Hero：全屏圖＋暗色漸層，nav 浮喺上面 ───────────────────── */}
-      <section className="relative isolate overflow-hidden">
+      <section className="relative isolate">
         <div className="absolute inset-0 -z-10">
           <Image
             src="/promo/hero-calendar.jpg"
@@ -120,7 +120,7 @@ export default async function PromoPage() {
         </header>
 
         {/* Hero 文案：左對齊標籤＋大標＋副文；留白撐位畀下沿浮卡 */}
-        <div id="top" className="mx-auto max-w-6xl px-5 pb-56 pt-40 md:px-8 md:pb-64 md:pt-48">
+        <div id="top" className="mx-auto max-w-6xl px-5 pb-[380px] pt-40 md:px-8 md:pb-64 md:pt-48">
           <div className="max-w-3xl">
             <ul className="promo-rise promo-rise-1 mb-6 flex flex-wrap gap-2.5">
               {['攝影會', '見面會', 'POP UP', '寫真展'].map((tag) => (
@@ -140,9 +140,11 @@ export default async function PromoPage() {
           </div>
         </div>
 
-        {/* ── 白色浮卡：疊住 hero 下沿，左活動 stack／右訂閱 ─────── */}
-        <div className="absolute inset-x-0 bottom-0 z-20 translate-y-1/2 px-5 md:px-8">
-          <div className="mx-auto grid max-w-6xl gap-0 overflow-hidden rounded-3xl bg-white shadow-[0_40px_90px_-32px_rgba(0,0,0,0.55)] md:grid-cols-[1.15fr_.85fr]">
+      </section>
+
+      {/* ── 白色浮卡：normal flow＋負 margin 拉上半疊 hero 圖下沿 ─── */}
+      <div className="relative z-20 px-5 md:-mt-[192px] md:px-8">
+        <div className="mx-auto -mt-[345px] grid max-w-6xl gap-0 overflow-hidden rounded-3xl bg-white shadow-[0_40px_90px_-32px_rgba(0,0,0,0.55)] md:mt-0 md:grid-cols-[1.15fr_.85fr]">
             {/* 左：即將活動 */}
             <div className="border-b border-black/5 p-7 md:border-b-0 md:border-r md:p-9">
               <div className="mb-5 flex items-center justify-between">
@@ -175,10 +177,9 @@ export default async function PromoPage() {
             </div>
           </div>
         </div>
-      </section>
 
-      {/* ── Features：淺灰底，要預留浮卡高度 ───────────────────────── */}
-      <section className="px-5 pb-20 pt-52 md:px-8 md:pb-24 md:pt-64">
+      {/* ── Features ──────────────────────────────────────────────── */}
+      <section className="px-5 pb-20 pt-24 md:px-8 md:pb-24 md:pt-28">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 max-w-xl">
             <p className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[#8D7658]">
