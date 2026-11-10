@@ -42,14 +42,14 @@ interface ApiEvent {
 async function getUpcomingEvents(): Promise<ApiEvent[]> {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.jching-calendar.com';
   try {
-    const hk = await fetch(`${base}/api/events?region=hk&limit=20`, { next: { revalidate: 3600 } });
+    // API 預設日期降序；要攞最就近活動必須叫佢升序，否則近期 row 會被 limit 截走
+    const hk = await fetch(`${base}/api/events?region=hk&limit=20&sort=datetime&order=asc`, { next: { revalidate: 3600 } });
     if (!hk.ok) return [];
     const hkJson = await hk.json();
     const all: ApiEvent[] = hkJson.data || [];
     const seen = new Set<string>();
     return all
       .filter((e) => e.date_iso && !seen.has(e.id) && seen.add(e.id))
-      .sort((a, b) => String(a.date_iso).localeCompare(String(b.date_iso)))
       // 同一女優只保留最早一條 row，避免 stack 出現重複女優
       .filter((e, _i, arr) => arr.findIndex((x) => x.actress_id === e.actress_id) === arr.indexOf(e))
       .slice(0, 4);
