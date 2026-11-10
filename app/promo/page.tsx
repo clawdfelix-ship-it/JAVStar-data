@@ -43,7 +43,7 @@ async function getUpcomingEvents(): Promise<ApiEvent[]> {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.jching-calendar.com';
   try {
     // API 預設日期降序；要攞最就近活動必須叫佢升序，否則近期 row 會被 limit 截走
-    const hk = await fetch(`${base}/api/events?region=hk&limit=20&sort=datetime&order=asc`, { next: { revalidate: 3600 } });
+    const hk = await fetch(`${base}/api/events?region=hk&limit=30&sort=datetime&order=asc`, { next: { revalidate: 300 } });
     if (!hk.ok) return [];
     const hkJson = await hk.json();
     const all: ApiEvent[] = hkJson.data || [];
