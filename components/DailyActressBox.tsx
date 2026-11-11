@@ -127,44 +127,46 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
 
   const fetchFutureActresses = async () => {
     try {
-      const res = await fetch('/api/events');
-      const data = await res.json();
-
-      // 過濾未來有活動的女優
+      // 卡池＝未來 30 日有港台活動嘅女優（2026-11 修訂）
       const now = new Date();
-      const uniqueActressIds = new Set<string>();
+      const windowEnd = new Date(now);
+      windowEnd.setDate(windowEnd.getDate() + 30);
 
-      if (data.data && Array.isArray(data.data)) {
-        data.data.forEach((e: any) => {
-          // 檢查活動日期是否為未來
-          const eventDate = new Date(e.datetime);
-          if (eventDate > now && e.actress_id) {
-            uniqueActressIds.add(e.actress_id);
+      const [hkRes, twRes] = await Promise.all([
+        fetch('/api/events?region=hk&limit=200'),
+        fetch('/api/events?region=taiwan&limit=200'),
+      ]);
+      const hkJson = await hkRes.json();
+      const twJson = await twRes.json();
+      const rows: any[] = [...(hkJson.data || []), ...(twJson.data || [])];
+
+      // 直接由 event rows 建池（events API 已 JOIN name_ja/name_cn/avatar_url），
+      // 唔依賴外嚟 actresses prop（佢只係隨機一頁 100 個，覆蓋唔到全池）
+      const poolMap = new Map<string, Actress>();
+      rows.forEach((e) => {
+        if (!e.actress_id || !e.date_iso) return;
+        const d = new Date(`${e.date_iso}T00:00:00+08:00`);
+        if (d >= new Date(`${now.toISOString().slice(0, 10)}T00:00:00+08:00`) && d <= windowEnd) {
+          if (!poolMap.has(e.actress_id)) {
+            poolMap.set(e.actress_id, {
+              id: e.actress_id,
+              name_ja: e.name_ja || '',
+              name_cn: e.name_cn || null,
+              avatar_url: e.avatar_url || null,
+              age: null, zodiac: null, cup: null, height: null,
+              bust: null, waist: null, hip: null, agency: null, hobby: null,
+              debut_year: null, event_count: 0, year_2026_events: 0,
+              vote_count: 0, final_score: 0,
+            });
           }
-        });
-      }
-
-      // 過濾出女優列表入面有未來活動的
-      let filtered = actresses.filter(a => {
-        const hasFutureEvent = uniqueActressIds.has(a.id);
-        const has2026Events = a.year_2026_events > 0;
-        return hasFutureEvent || has2026Events; // 任一條件符合即可
+        }
       });
 
-      // 如果過濾後太少，就用評分最高的 50 個
-      if (filtered.length < 5) {
-        filtered = [...actresses].sort((a, b) => b.final_score - a.final_score).slice(0, 50);
-      }
-
-      // 按人氣評分排序，只取頭 50 名
-      const sortedByScore = filtered.sort((a, b) => b.final_score - a.final_score).slice(0, 50);
-
-      setFutureActresses(sortedByScore);
+      setFutureActresses([...poolMap.values()]);
     } catch (error) {
-      console.error('獲取未來活動失敗:', error);
-      // 如果失敗，默認用評分最高的 50 個
-      const sorted = [...actresses].sort((a, b) => b.final_score - a.final_score);
-      setFutureActresses(sorted.slice(0, 50));
+      console.error('獲取未來港台活動失敗:', error);
+      // 寧願卡池清空都唔好用人氣後備，保住「未來30日港台場」規則
+      setFutureActresses([]);
     }
   };
 
@@ -270,7 +272,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
               </span>
             </h2>
             <p className="text-text-tertiary mt-1 text-sm">
-              隨機抽取未來有活動嘅 Top 50 人氣女優，睇下今日嘅運氣！
+              隨機抽取未來 30 日有港台活動嘅女優，睇下今日嘅運氣！
             </p>
             <p className="text-[10px] text-text-tertiary mt-1">
               未來活動人數：{futureActresses.length} 位
@@ -480,9 +482,9 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
           {showHelp && (
             <div className="space-y-4 px-5 pb-5 text-sm leading-relaxed text-text-secondary">
               <div>
-                <p className="font-bold text-text-primary">① 女優池</p>
+                <p className="font-bold text-text-primary">① 女優卡池</p>
                 <p className="mt-1">
-                  系統按人氣評分（final score）揀出 Top 50 女優，優先包含未來有港台活動嘅場次；每次抽卡喺呢 50 位入面隨機抽出一位，每位機會均等。
+                  卡池淨係包含<strong>未來 30 日內（由今日起計）有香港或台灣公開活動</strong>嘅女優，活動過咗或超出 30 日就會自動離池；每次抽卡喺池內隨機抽出一位，每位機會均等。
                 </p>
               </div>
               <div>
