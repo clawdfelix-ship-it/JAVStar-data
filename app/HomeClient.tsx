@@ -588,9 +588,6 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             ) : (
               <EventCalendar events={calendarEvents} />
             )}
-
-            {/* 粉絲補充活動資料（提交後待管理員批核） */}
-            <EventSubmissionForm />
           </div>
         )}
 
@@ -696,6 +693,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             )}
           </div>
         )}
+
+        {/* 活動報料：三個 tab 共用（以前只喺日曆 tab 顯示），提交後待管理員批核 */}
+        <div className="max-w-3xl mx-auto mt-10">
+          <EventSubmissionForm />
+        </div>
       </main>
 
       {/* ==========================================
