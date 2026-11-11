@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, CalendarDays, GitCompareArrows, Newspaper } from 'lucide-react';
+import { Home, CalendarDays, GitCompareArrows, Newspaper, Mail } from 'lucide-react';
 
 const items = [
   { href: '/', label: '首頁', icon: Home, match: (p: string) => p === '/' },
@@ -13,13 +13,24 @@ const items = [
 
 export default function BottomNav() {
   const pathname = usePathname() || '/';
-  // 女優詳情頁等深層頁面唔搶焦點，但仍然顯示方便返回
+
+  // 撳「報料」：喺現有頁搵摺合表單，展開＋滾到位；搵唔到先跳去首頁。
+  function openReport() {
+    const btn = document.querySelector<HTMLButtonElement>('button[aria-expanded]');
+    if (btn) {
+      if (btn.getAttribute('aria-expanded') !== 'true') btn.click();
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      window.location.href = '/#report';
+    }
+  }
+
   return (
     <nav
       aria-label="底部導航"
       className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-border bg-white/85 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/70 pb-[env(safe-area-inset-bottom)]"
     >
-      <div className="grid grid-cols-4 max-w-md mx-auto">
+      <div className="grid grid-cols-5 max-w-md mx-auto">
         {items.map((it) => {
           const active = it.match(pathname);
           const Icon = it.icon;
@@ -39,6 +50,16 @@ export default function BottomNav() {
             </Link>
           );
         })}
+
+        <button
+          type="button"
+          onClick={openReport}
+          className="flex flex-col items-center justify-center gap-0.5 min-h-[52px] py-1.5 text-[11px] font-medium text-[rgb(var(--color-nadeshiko-dark))] transition-colors active:text-[rgb(var(--color-wine))]"
+          aria-label="報料：補充未收錄活動"
+        >
+          <Mail className="w-5 h-5" />
+          報料
+        </button>
       </div>
     </nav>
   );
