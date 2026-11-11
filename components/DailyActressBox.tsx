@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { Gift, Dice5, User, Star, Sparkles } from 'lucide-react';
+import { Gift, Dice5, User, Star, Sparkles, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Actress {
   id: string;
@@ -91,6 +91,7 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
   const [rarity, setRarity] = useState<Rarity | null>(null);
   const [phase, setPhase] = useState<GachaPhase>('idle');
   const [futureActresses, setFutureActresses] = useState<Actress[]>([]);
+  const [showHelp, setShowHelp] = useState(false);
 
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const runIdRef = useRef(0);
@@ -457,6 +458,60 @@ export default function DailyActressBox({ actresses }: DailyActressBoxProps) {
               )}
             </div>
           </div>
+        </div>
+
+        {/* 卡片稀有度點計：可展開簡介 */}
+        <div className="mx-auto mt-6 max-w-3xl overflow-hidden rounded-2xl border border-pink-200/60 bg-white/70">
+          <button
+            type="button"
+            onClick={() => setShowHelp((v) => !v)}
+            aria-expanded={showHelp}
+            className="flex min-h-[48px] w-full items-center gap-2.5 px-5 py-3 text-left"
+          >
+            <HelpCircle className="h-4 w-4 shrink-0 text-pink-600" />
+            <span className="flex-1 text-sm font-bold text-text-primary">
+              卡片稀有度點計？
+            </span>
+            {showHelp
+              ? <ChevronUp className="h-4 w-4 shrink-0 text-text-tertiary" />
+              : <ChevronDown className="h-4 w-4 shrink-0 text-text-tertiary" />}
+          </button>
+
+          {showHelp && (
+            <div className="space-y-4 px-5 pb-5 text-sm leading-relaxed text-text-secondary">
+              <div>
+                <p className="font-bold text-text-primary">① 女優池</p>
+                <p className="mt-1">
+                  系統按人氣評分（final score）揀出 Top 50 女優，優先包含未來有港台活動嘅場次；每次抽卡喺呢 50 位入面隨機抽出一位，每位機會均等。
+                </p>
+              </div>
+              <div>
+                <p className="font-bold text-text-primary">② 稀有度（同抽中邊位女優脫鈎）</p>
+                <p className="mt-1">稀有度係獨立擲骰，純睇運氣，唔關女優名氣事：</p>
+                <ul className="mt-2 space-y-1.5">
+                  {[
+                    { r: RARITY_TABLE.rare, p: '80%', note: '藍色邊框 · ★★★' },
+                    { r: RARITY_TABLE.epic, p: '15%', note: '紫色邊框 · ★★★★ · 開卡有金光爆發' },
+                    { r: RARITY_TABLE.legend, p: '5%', note: '金色邊框 · ★★★★★ · 開卡有光芒放射' },
+                  ].map(({ r, p, note }) => (
+                    <li key={r.key} className="flex items-center gap-3">
+                      <span
+                        className="inline-flex h-7 w-14 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                        style={{ backgroundColor: r.color }}
+                      >
+                        {r.label}
+                      </span>
+                      <span className="font-bold" style={{ color: r.color }}>{p}</span>
+                      <span className="text-xs text-text-tertiary">{note}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p className="text-xs text-text-tertiary">
+                即平均每 20 抽大約有 1 張傳說、3 張史詩；結果只係趣味收集，唔影響活動資料。
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>
