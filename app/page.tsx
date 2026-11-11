@@ -1,4 +1,5 @@
 import HomeClient from './HomeClient';
+import { fetchTopActressesForSSR } from '@/lib/server-actresses';
 
 // 首頁 SEO Metadata
 export const metadata = {
@@ -26,15 +27,15 @@ export const metadata = {
   publisher: 'JCHING CALENDAR',
   openGraph: {
     type: 'website',
-    locale: 'ja_JP',
-    alternateLocale: ['zh_HK', 'zh_TW'],
-    url: 'https://jav-star-data.vercel.app',
+    locale: 'zh_HK',
+    alternateLocale: ['zh_TW', 'ja_JP'],
+    url: 'https://www.jching-calendar.com',
     siteName: 'JCHING CALENDAR｜追星平台',
     title: 'JCHING CALENDAR｜追星平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
     images: [
       {
-        url: 'https://jav-star-data.vercel.app/og-image.png',
+        url: 'https://www.jching-calendar.com/og-image.png',
         width: 1200,
         height: 630,
         alt: 'JCHING CALENDAR - 追星平台',
@@ -45,10 +46,10 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'JCHING CALENDAR｜追星平台 🇭🇰',
     description: '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名。',
-    images: ['https://jav-star-data.vercel.app/og-image.png'],
+    images: ['https://www.jching-calendar.com/og-image.png'],
   },
   alternates: {
-    canonical: 'https://jav-star-data.vercel.app',
+    canonical: 'https://www.jching-calendar.com',
   },
   robots: {
     index: true,
@@ -65,28 +66,32 @@ const jsonLd = {
   "@type": "WebSite",
   "name": "JCHING CALENDAR",
   "alternateName": "JAVStar-data",
-  "url": "https://jav-star-data.vercel.app",
+  "url": "https://www.jching-calendar.com",
   "description": "追星平台 - 一站式追蹤心儀女優嘅最新日港台活動情報",
   "publisher": {
     "@type": "Organization",
     "name": "JCHING CALENDAR",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://jav-star-data.vercel.app/logo.png"
+      "url": "https://www.jching-calendar.com/logo.png"
     }
   },
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://jav-star-data.vercel.app/search?q={search_term_string}",
+    "target": "https://www.jching-calendar.com/search?q={search_term_string}",
     "query-input": "required name=search_term_string"
   }
 };
 
 // 服務端頁面組件
 export default async function HomePage() {
-  // 服務端預取數據（可選，用於提升首屏速度）
-  // 這裡留空，讓客戶端處理所有數據獲取和互動
-  // 未來可以在這裡加入服務端渲染的初始數據
+  // SSR 預取預設排名（hk_upcoming）第一頁，令唔執行 JS 嘅爬蟲／AI 都讀到女優名＋連結
+  let initialActresses: Awaited<ReturnType<typeof fetchTopActressesForSSR>> = [];
+  try {
+    initialActresses = await fetchTopActressesForSSR(10);
+  } catch (e) {
+    console.error('SSR top actresses fetch failed:', e);
+  }
 
   return (
     <>
@@ -95,7 +100,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HomeClient />
+      <HomeClient initialActresses={initialActresses} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://jav-star-data.vercel.app';
+const BASE_URL = 'https://www.jching-calendar.com';
 
 interface Actress {
   id: string;

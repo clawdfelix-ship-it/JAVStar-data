@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         '/_next/',
       ],
     },
-    sitemap: 'https://jav-star-data.vercel.app/sitemap.xml',
-    host: 'https://jav-star-data.vercel.app',
+    sitemap: 'https://www.jching-calendar.com/sitemap.xml',
+    host: 'https://www.jching-calendar.com',
   };
 }

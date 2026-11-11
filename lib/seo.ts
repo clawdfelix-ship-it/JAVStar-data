@@ -23,7 +23,7 @@ export interface EventSEOData {
 }
 
 const SITE_NAME = 'AV Intelligence｜日本 AV 女優情報平台';
-const SITE_URL = 'https://jav-star-data.vercel.app';
+const SITE_URL = 'https://www.jching-calendar.com';
 const DEFAULT_DESCRIPTION = '香港粉絲優先！整合 minnano-av.com 同 av-event.jp 資料，按活動數量排名';
 
 /**
@@ -63,8 +63,8 @@ export function generateActressMetadata(actress: ActressSEOData): Metadata {
     publisher: 'AV Intelligence',
     openGraph: {
       type: 'profile',
-      locale: 'ja_JP',
-      alternateLocale: ['zh_HK', 'zh_TW'],
+      locale: 'zh_HK',
+      alternateLocale: ['zh_TW', 'ja_JP'],
       url: `${SITE_URL}/actress/${actress.id}`,
       siteName: SITE_NAME,
       title,
@@ -114,8 +114,8 @@ export function generateHomeMetadata(): Metadata {
     publisher: 'AV Intelligence',
     openGraph: {
       type: 'website',
-      locale: 'ja_JP',
-      alternateLocale: ['zh_HK', 'zh_TW'],
+      locale: 'zh_HK',
+      alternateLocale: ['zh_TW', 'ja_JP'],
       url: SITE_URL,
       siteName: SITE_NAME,
       title: SITE_NAME,

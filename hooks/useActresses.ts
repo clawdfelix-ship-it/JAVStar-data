@@ -57,6 +57,7 @@ interface UseActressesOptions {
   sort?: string;
   search?: string;
   hasUpcoming?: boolean;
+  fallback?: ActressesResponse;
 }
 
 /**
@@ -69,6 +70,7 @@ export function useActresses({
   sort = 'final_score',
   search = '',
   hasUpcoming = false,
+  fallback,
 }: UseActressesOptions = {}) {
   // v20260901 = ranking/card data fix + cache fixes (event_count, date_iso)
   const CACHE_BUSTER = 'v=20260901';
@@ -87,6 +89,8 @@ export function useActresses({
     key,
     fetcher,
     {
+      // SSR 預取嘅第一頁做初始值（只喺 key 同 fallback 對應嗰頁先好生效，避免錯頁套用）
+      fallbackData: fallback && fallback.pagination?.page === page ? fallback : undefined,
       keepPreviousData: true, // 翻頁時保留舊數據
       revalidateOnFocus: true, // 切返去個 tab 自動刷新
       dedupingInterval: 15000, // 15 秒去重

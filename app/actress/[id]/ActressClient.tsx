@@ -132,7 +132,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
     "name": actress.name_ja,
     "alternateName": actress.name_cn || undefined,
     "image": actress.avatar_url || undefined,
-    "url": `https://jav-star-data.vercel.app/actress/${actressId}`,
+    "url": `https://www.jching-calendar.com/actress/${actressId}`,
     "jobTitle": "AV Actress",
     "description": `${actress.name_ja} - 日本女優，${actress.stats?.total_events || 0}個活動記錄`,
   };
@@ -255,7 +255,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                           <div className="absolute top-full left-0 mt-2 rounded-xl shadow-xl border p-3 z-50 min-w-[180px] bg-white border-border">
                             <button
                               onClick={() => {
-                                navigator.clipboard.writeText(`https://jav-star-data.vercel.app/actress/${actressId}`);
+                                navigator.clipboard.writeText(`https://www.jching-calendar.com/actress/${actressId}`);
                                 setShowShareMenu(false);
                                 alert('已複製鏈接！');
                               }}
@@ -267,7 +267,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                             <button
                               onClick={() => {
                                 const shareUrl = 'https://twitter.com/intent/tweet?url=' + 
-                                  encodeURIComponent(`https://jav-star-data.vercel.app/actress/${actressId}`) +
+                                  encodeURIComponent(`https://www.jching-calendar.com/actress/${actressId}`) +
                                   '&text=' + encodeURIComponent(`${actress.name_ja} - JCHING CALENDAR`);
                                 window.open(shareUrl, '_blank');
                                 setShowShareMenu(false);
@@ -280,7 +280,7 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
                             <button
                               onClick={() => {
                                 const shareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + 
-                                  encodeURIComponent(`https://jav-star-data.vercel.app/actress/${actressId}`);
+                                  encodeURIComponent(`https://www.jching-calendar.com/actress/${actressId}`);
                                 window.open(shareUrl, '_blank');
                                 setShowShareMenu(false);
                               }}

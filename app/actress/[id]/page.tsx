@@ -105,9 +105,9 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     keywords,
     openGraph: {
       type: 'profile',
-      locale: 'ja_JP',
-      alternateLocale: ['zh_HK', 'zh_TW'],
-      url: `https://jav-star-data.vercel.app/actress/${params.id}`,
+      locale: 'zh_HK',
+      alternateLocale: ['zh_TW', 'ja_JP'],
+      url: `https://www.jching-calendar.com/actress/${params.id}`,
       siteName: 'JCHING CALENDAR｜追星平台',
       title,
       description,
@@ -127,7 +127,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
       images: actress.avatar_url ? [actress.avatar_url] : [],
     },
     alternates: {
-      canonical: `https://jav-star-data.vercel.app/actress/${params.id}`,
+      canonical: `https://www.jching-calendar.com/actress/${params.id}`,
     },
   };
 }

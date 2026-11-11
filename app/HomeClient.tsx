@@ -114,6 +114,14 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
   // 活動日曆 tab 地區分頁：全部/日本/香港/台灣/オンライン（分類規則同 /api/events region）
   const [calendarRegion, setCalendarRegion] = useState<'all' | 'japan' | 'hk' | 'taiwan' | 'online'>('all');
 
+  // SSR 預取嘅第一頁 → 包成 ActressesResponse 做 fallback（總數未知時用一頁估算）
+  const fallbackRanking = initialActresses && initialActresses.length
+    ? {
+        data: initialActresses,
+        pagination: { page: 1, limit: 10, total: initialActresses.length, totalPages: 1 },
+      }
+    : undefined;
+
   // SWR Data Hooks - 自帶緩存、去重、重試
   const { actresses, pagination, loading, error, refresh: refreshActresses } = useActresses({
     page,
@@ -121,7 +129,23 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
     sort,
     search: '',
     hasUpcoming,
+    fallback: fallbackRanking,
   });
+
+  // SSR 兜底：第一頁＋預設排序時直接用 server 預取數據，唔顯示 skeleton，
+  // 令唔執行 JS 嘅爬蟲都見到女優卡片 DOM。客戶端 SWR 數據一到就接管。
+  const isDefaultFirstPage =
+    page === 1 && sort === 'hk_upcoming' && !hasUpcoming;
+  const displayActresses =
+    actresses.length
+      ? actresses
+      : isDefaultFirstPage && initialActresses
+        ? initialActresses
+        : actresses;
+  const effectiveLoading = loading && displayActresses.length === 0;
+  const effectivePagination = pagination || (isDefaultFirstPage && initialActresses?.length
+    ? { page: 1, limit: 10, total: initialActresses.length, totalPages: 1 }
+    : null);
 
   // Telegram 訂閱（全站）state
   const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -468,7 +492,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             </div>
 
             {/* Actress Grid */}
-            {loading ? (
+            {effectiveLoading ? (
               <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                   <div key={i} className="skeleton h-48 rounded-2xl" />
@@ -483,7 +507,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-                {actresses.map((actress, index) => (
+                {displayActresses.map((actress, index) => (
                   <div
                     key={actress.id}
                     className="grid-item-enter"
@@ -496,7 +520,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             )}
 
             {/* 零結果空狀態（P2：以前淨係顯示「0」） */}
-            {!loading && !error && actresses.length === 0 && (
+            {!effectiveLoading && !error && displayActresses.length === 0 && (
               <div className="fdb-card p-10 md:p-14 text-center max-w-md mx-auto">
                 <div className="text-5xl mb-4 flex justify-center" aria-hidden>
                   <Flower2 className="w-8 h-8 text-pink-400" />
@@ -515,7 +539,7 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
             )}
 
             {/* Pagination */}
-            {pagination && pagination.totalPages && pagination.totalPages > 1 && (
+            {effectivePagination && effectivePagination.totalPages && effectivePagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-8">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
@@ -525,11 +549,11 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
                   <ChevronLeft className="w-4 h-4" />上一頁
                 </button>
                 <span className="px-4 py-2 text-text-secondary">
-                  第 {page} 頁 / 共 {pagination.totalPages} 頁
+                  第 {page} 頁 / 共 {effectivePagination?.totalPages} 頁
                 </span>
                 <button
-                  onClick={() => setPage(p => Math.min(pagination.totalPages || 1, p + 1))}
-                  disabled={page >= (pagination.totalPages || 1)}
+                  onClick={() => setPage(p => Math.min(effectivePagination?.totalPages || 1, p + 1))}
+                  disabled={page >= (effectivePagination?.totalPages || 1)}
                   className="fdb-btn fdb-btn-outline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   下一頁<ChevronRight className="w-4 h-4" />
