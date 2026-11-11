@@ -4,6 +4,7 @@ import { Bell, CalendarDays, MapPin, TicketCheck, ArrowRight, Sparkles, ArrowUpR
 import MetaPixel from '@/components/MetaPixel';
 import Logo from '@/components/Logo';
 import InstagramIcon, { JCHING_INSTAGRAM_URL } from '@/components/InstagramIcon';
+import EventSubmissionForm from '@/components/EventSubmissionForm';
 import PromoSubscribeForm from './PromoSubscribeForm';
 import EventStackSwitcher from '@/components/EventStackSwitcher';
 
@@ -233,6 +234,10 @@ export default async function PromoPage() {
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className="border-t border-black/5 px-5 py-12 text-center text-xs text-[#585E5F] md:px-8">
+        {/* 活動報料區 */}
+        <div className="mx-auto mb-10 max-w-3xl text-left">
+          <EventSubmissionForm className="" />
+        </div>
         <a
           href={JCHING_INSTAGRAM_URL}
           target="_blank"
