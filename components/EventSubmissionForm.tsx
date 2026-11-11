@@ -8,7 +8,7 @@ import ActressSelectField, { type PickedActress } from './ActressSelectField';
 // 公開提交 → event_submissions(pending) → Felix 喺 /admin/event-submissions 批核
 const EMPTY = { eventDate: '', location: '', content: '', sourceUrl: '', contact: '' };
 
-export default function EventSubmissionForm() {
+export default function EventSubmissionForm({ className = 'mt-8' }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY);
   const [actress, setActress] = useState<PickedActress | null>(null);
@@ -50,7 +50,7 @@ export default function EventSubmissionForm() {
   }
 
   return (
-    <div className="mt-8 rounded-2xl border border-[rgba(var(--color-nadeshiko),0.3)] bg-[rgba(var(--color-sakura),0.25)] overflow-hidden">
+    <div className={`${className} rounded-2xl border border-[rgba(var(--color-nadeshiko),0.3)] bg-[rgba(var(--color-sakura),0.25)] overflow-hidden`}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
