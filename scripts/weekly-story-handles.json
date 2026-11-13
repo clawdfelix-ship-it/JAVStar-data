@@ -10,12 +10,17 @@
     "Secret9": "secret.9.knight",
     "STAR POINT": "starpoint_official",
     "TCE": "tce_cards",
-    "D DRIVE HK": "ddrive_hk"
+    "D DRIVE HK": "ddrive_hk",
+    "KOCHOU": "kochou.event",
+    "konger": "avkonger"
   },
   "actresses": {
     "辻井ほのか": "5.tsujihoka",
     "吉岡ひより": "y_hiyori88",
     "吉瀨結": "kichiseyui",
-    "沙月恵奈": "satsukiena"
+    "沙月恵奈": "satsukiena",
+    "桃乃木かな": "kana_momonogi",
+    "七瀬アリス": "nanase_alice_all",
+    "藍芽みずき": "aiga_mizuki"
   }
 }
