@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ShieldCheck, LogOut } from 'lucide-react';
 import NewsAstryxPanel from './news-astryx/NewsAstryxPanel';
 import PhotobooksAstryxPanel from './photobooks/PhotobooksAstryxPanel';
-import EventSubmissionsAdmin from './event-submissions/AdminClient';
+import EventSubmissionsAstryxPanel from './event-submissions/EventSubmissionsAstryxPanel';
 import FansAstryxPanel from './fans/FansAstryxPanel';
 import ContactAstryxPanel from './contact-messages/ContactAstryxPanel';
 import FanPhotosAstryxPanel from './fan-photos/FanPhotosAstryxPanel';
@@ -96,7 +96,7 @@ export default function UnifiedAdminClient() {
 
       {section === 'news' && <NewsAstryxPanel embeddedToken={token} />}
       {section === 'photobooks' && <PhotobooksAstryxPanel embeddedToken={token} />}
-      {section === 'submissions' && <EventSubmissionsAdmin embeddedToken={token} />}
+      {section === 'submissions' && <EventSubmissionsAstryxPanel embeddedToken={token} />}
       {section === 'fanphotos' && <FanPhotosAstryxPanel embeddedToken={token} />}
       {section === 'fans' && <FansAstryxPanel embeddedToken={token} />}
       {section === 'contact' && <ContactAstryxPanel embeddedToken={token} />}
