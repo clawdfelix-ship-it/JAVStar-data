@@ -6,6 +6,7 @@ import VoteButton from '@/components/VoteButton';
 import FollowButton from '@/components/FollowButton';
 import EventCard from '@/components/EventCard';
 import ActivityTimeline from '@/components/ActivityTimeline';
+import FanPhotoSection from '@/components/FanPhotoSection';
 import { useFavorites } from '@/hooks/useFavorites';
 
 interface ActressDetail {
@@ -495,6 +496,12 @@ export default function ActressClient({ initialData, actressId }: ActressClientP
               {/* 活動時間軸 */}
               <ActivityTimeline events={events} />
             </div>
+
+            {/* 粉絲相冊（粉絲上傳、admin 審批後顯示） */}
+            <FanPhotoSection
+              actressId={actressId}
+              events={events.map((e) => ({ id: e.id, title: e.title, datetime: e.datetime }))}
+            />
           </>
         ) : null}
       </main>

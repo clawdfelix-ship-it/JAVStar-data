@@ -7,13 +7,15 @@ import PhotobooksAstryxPanel from './photobooks/PhotobooksAstryxPanel';
 import EventSubmissionsAstryxPanel from './event-submissions/EventSubmissionsAstryxPanel';
 import FansAstryxPanel from './fans/FansAstryxPanel';
 import ContactAstryxPanel from './contact-messages/ContactAstryxPanel';
+import FanPhotosAstryxPanel from './fan-photos/FanPhotosAstryxPanel';
 
-type Section = 'news' | 'photobooks' | 'submissions' | 'fans' | 'contact';
+type Section = 'news' | 'photobooks' | 'submissions' | 'fans' | 'contact' | 'fanphotos';
 
 const SECTIONS: { key: Section; label: string }[] = [
   { key: 'news', label: '女優情報' },
   { key: 'photobooks', label: '寫真集' },
   { key: 'submissions', label: '活動報料' },
+  { key: 'fanphotos', label: '粉絲相冊' },
   { key: 'fans', label: '粉絲' },
   { key: 'contact', label: '訊息' },
 ];
@@ -95,6 +97,7 @@ export default function UnifiedAdminClient() {
       {section === 'news' && <NewsAstryxPanel embeddedToken={token} />}
       {section === 'photobooks' && <PhotobooksAstryxPanel embeddedToken={token} />}
       {section === 'submissions' && <EventSubmissionsAstryxPanel embeddedToken={token} />}
+      {section === 'fanphotos' && <FanPhotosAstryxPanel embeddedToken={token} />}
       {section === 'fans' && <FansAstryxPanel embeddedToken={token} />}
       {section === 'contact' && <ContactAstryxPanel embeddedToken={token} />}
     </main>
