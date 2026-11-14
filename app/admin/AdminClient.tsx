@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ShieldCheck, LogOut } from 'lucide-react';
 import NewsAstryxPanel from './news-astryx/NewsAstryxPanel';
-import PhotobooksAdminClient from './photobooks/PhotobooksAdminClient';
+import PhotobooksAstryxPanel from './photobooks/PhotobooksAstryxPanel';
 import EventSubmissionsAdmin from './event-submissions/AdminClient';
 import FansAstryxPanel from './fans/FansAstryxPanel';
 import ContactAstryxPanel from './contact-messages/ContactAstryxPanel';
@@ -95,7 +95,7 @@ export default function UnifiedAdminClient() {
       </div>
 
       {section === 'news' && <NewsAstryxPanel embeddedToken={token} />}
-      {section === 'photobooks' && <PhotobooksAdminClient embeddedToken={token} />}
+      {section === 'photobooks' && <PhotobooksAstryxPanel embeddedToken={token} />}
       {section === 'submissions' && <EventSubmissionsAdmin embeddedToken={token} />}
       {section === 'fanphotos' && <FanPhotosAstryxPanel embeddedToken={token} />}
       {section === 'fans' && <FansAstryxPanel embeddedToken={token} />}
