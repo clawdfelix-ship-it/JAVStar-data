@@ -1,0 +1,101 @@
+/*
+ * Astryx × Tailwind coexistence shim (scoped to an Astryx theme root only).
+ *
+ * Root cause: Tailwind Preflight is UNLAYERED and sets
+ *   button, [type="button"] ... { background-color: transparent; border-style: solid; ... }
+ * Astryx component styles live inside `@layer astryx-base`, and per the CSS cascade
+ * spec unlayered styles always beat layered ones — so Astryx buttons render with a
+ * transparent background even though the correct `--color-accent` var resolves.
+ *
+ * Fix: re-declare the Astryx surface rules UNLAYERED, but scoped under the theme
+ * attribute so the public (non-Astryx) site is completely untouched.
+ * Only background/border/color resets that Tailwind preflight strips are restored.
+ */
+
+[data-astryx-theme] .astryx-button {
+  background-color: var(--astryx-button-bg, transparent);
+  border-style: var(--astryx-button-border-style, solid);
+  background-image: none;
+}
+
+/* Primary / filled variants use the accent token (mirrors Astryx hash rule). */
+[data-astryx-theme] .astryx-button[data-variant="primary"] {
+  background-color: var(--color-accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+[data-astryx-theme] .astryx-button[data-variant="destructive"] {
+  background-color: #e1193b;
+  color: #fff;
+  border-color: transparent;
+}
+
+[data-astryx-theme] .astryx-button[data-variant="secondary"] {
+  background-color: var(--color-background-card, #fff);
+  color: var(--color-text-primary, #35202b);
+  border-color: rgba(53, 32, 43, 0.18);
+}
+
+[data-astryx-theme] .astryx-button[data-variant="ghost"] {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-accent);
+}
+
+/* Astryx cards rely on their own surface; stop preflight flattening borders. */
+[data-astryx-theme] .astryx-card {
+  background-color: var(--color-background-card, #fff);
+  border-style: solid;
+}
+
+/* Badges carry their own token backgrounds; preflight must not hollow them. */
+[data-astryx-theme] .astryx-badge {
+  border-style: solid;
+}
+
+/* Inputs: restore Astryx border + surface over Tailwind's inherit reset. */
+[data-astryx-theme] .astryx-input,
+[data-astryx-theme] input[class*="astryx"] {
+  background-color: var(--color-background-card, #fff);
+  border-style: solid;
+}
+
+/* Disabled/loading buttons keep the dimmed look but remain readable. */
+[data-astryx-theme] .astryx-button[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/*
+ * SegmentedControl selected indicator.
+ * Astryx paints the selected segment through a ::after overlay driven by the
+ * `--_segmented-after-background-color` token, but that token is absent in the
+ * neutral theme and the layered ::after rules don't survive Tailwind's
+ * unlayered preflight in this Next setup (computed ::after content:none /
+ * position:static, no accent class ever attached). The component still sets
+ * data-selected="selected" + aria-checked correctly, so style that attribute
+ * directly with the accent token.
+ */
+[data-astryx-theme] .astryx-segmented-control-item {
+  position: relative;
+  border-radius: 10px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+[data-astryx-theme] .astryx-segmented-control-item[data-selected="selected"] {
+  background-color: var(--color-accent) !important;
+  color: #fff;
+  box-shadow: var(--shadow-low, 0 1px 2px rgba(53, 32, 43, 0.18));
+}
+
+[data-astryx-theme] .astryx-segmented-control-item[data-selected="selected"]:not(#\#):not(#\#)::after {
+  content: none;
+}
+
+/* Tabs: ensure the selected tab reads in accent even when layered rules lose. */
+[data-astryx-theme] .astryx-tab[aria-selected="true"],
+[data-astryx-theme] .astryx-tab[data-selected="selected"] {
+  color: var(--color-accent);
+  font-weight: 600;
+}
