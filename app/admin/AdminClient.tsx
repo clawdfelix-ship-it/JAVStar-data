@@ -7,7 +7,7 @@ import PhotobooksAdminClient from './photobooks/PhotobooksAdminClient';
 import EventSubmissionsAdmin from './event-submissions/AdminClient';
 import FansAstryxPanel from './fans/FansAstryxPanel';
 import ContactAstryxPanel from './contact-messages/ContactAstryxPanel';
-import FanPhotosAdminClient from './fan-photos/AdminClient';
+import FanPhotosAstryxPanel from './fan-photos/FanPhotosAstryxPanel';
 
 type Section = 'news' | 'photobooks' | 'submissions' | 'fans' | 'contact' | 'fanphotos';
 
@@ -97,7 +97,7 @@ export default function UnifiedAdminClient() {
       {section === 'news' && <NewsAstryxPanel embeddedToken={token} />}
       {section === 'photobooks' && <PhotobooksAdminClient embeddedToken={token} />}
       {section === 'submissions' && <EventSubmissionsAdmin embeddedToken={token} />}
-      {section === 'fanphotos' && <FanPhotosAdminClient embeddedToken={token} />}
+      {section === 'fanphotos' && <FanPhotosAstryxPanel embeddedToken={token} />}
       {section === 'fans' && <FansAstryxPanel embeddedToken={token} />}
       {section === 'contact' && <ContactAstryxPanel embeddedToken={token} />}
     </main>
