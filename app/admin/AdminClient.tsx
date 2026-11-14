@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { ShieldCheck, LogOut } from 'lucide-react';
-import NewsAdminClient from './news/NewsAdminClient';
-import PhotobooksAdminClient from './photobooks/PhotobooksAdminClient';
-import EventSubmissionsAdmin from './event-submissions/AdminClient';
-import FansAdminClient from './fans/AdminClient';
-import ContactAdminClient from './contact-messages/AdminClient';
+import NewsAstryxPanel from './news-astryx/NewsAstryxPanel';
+import PhotobooksAstryxPanel from './photobooks/PhotobooksAstryxPanel';
+import EventSubmissionsAstryxPanel from './event-submissions/EventSubmissionsAstryxPanel';
+import FansAstryxPanel from './fans/FansAstryxPanel';
+import ContactAstryxPanel from './contact-messages/ContactAstryxPanel';
 
 type Section = 'news' | 'photobooks' | 'submissions' | 'fans' | 'contact';
 
@@ -92,11 +92,11 @@ export default function UnifiedAdminClient() {
         ))}
       </div>
 
-      {section === 'news' && <NewsAdminClient embeddedToken={token} />}
-      {section === 'photobooks' && <PhotobooksAdminClient embeddedToken={token} />}
-      {section === 'submissions' && <EventSubmissionsAdmin embeddedToken={token} />}
-      {section === 'fans' && <FansAdminClient embeddedToken={token} />}
-      {section === 'contact' && <ContactAdminClient embeddedToken={token} />}
+      {section === 'news' && <NewsAstryxPanel embeddedToken={token} />}
+      {section === 'photobooks' && <PhotobooksAstryxPanel embeddedToken={token} />}
+      {section === 'submissions' && <EventSubmissionsAstryxPanel embeddedToken={token} />}
+      {section === 'fans' && <FansAstryxPanel embeddedToken={token} />}
+      {section === 'contact' && <ContactAstryxPanel embeddedToken={token} />}
     </main>
   );
 }
