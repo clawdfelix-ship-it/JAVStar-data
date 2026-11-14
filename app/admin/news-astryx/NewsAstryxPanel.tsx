@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Theme,
-  defineTheme,
   Card,
   Button,
   Badge,
@@ -18,25 +16,7 @@ import {
   useToast,
   Link as AstryxLink,
 } from '@astryxdesign/core';
-import '@astryxdesign/core/reset.css';
-import '@astryxdesign/core/astryx.css';
-import '@astryxdesign/theme-neutral/theme.css';
-import './astryx-tailwind-shim.css';
-
-// JCHING nadeshiko/sakura mapped onto Astryx tokens (flat light values — see POC notes).
-const adminTheme = defineTheme({
-  name: 'jching-admin-news',
-  tokens: {
-    '--color-accent': '#ec6aa0',
-    '--color-accent-muted': '#f8c9dc',
-    '--color-background-surface': '#fff7fb',
-    '--color-background-body': '#fdf2f7',
-    '--color-background-card': '#ffffff',
-    '--color-text-primary': '#35202b',
-    '--color-text-secondary': '#6d4a58',
-    '--radius-container': '14px',
-  },
-});
+import { AstryxShell } from '../_astryx/AstryxShell';
 
 type NewsRow = {
   id: number;
@@ -294,9 +274,9 @@ function NewsAstryxApp({ embeddedToken, embedded = false }: { embeddedToken?: st
 // Standalone (full login gate) usage — e.g. the dedicated /admin/news-astryx route.
 export function NewsAstryxStandalone() {
   return (
-    <Theme theme={adminTheme} mode="light">
+    <AstryxShell>
       <NewsAstryxApp />
-    </Theme>
+    </AstryxShell>
   );
 }
 
@@ -305,8 +285,8 @@ export function NewsAstryxStandalone() {
 // shim apply inside the shell without touching the rest of the admin.
 export default function NewsAstryxPanel({ embeddedToken }: { embeddedToken?: string }) {
   return (
-    <Theme theme={adminTheme} mode="light">
+    <AstryxShell>
       <NewsAstryxApp embeddedToken={embeddedToken} embedded />
-    </Theme>
+    </AstryxShell>
   );
 }
