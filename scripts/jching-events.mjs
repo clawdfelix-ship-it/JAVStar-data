@@ -72,6 +72,16 @@ export function weekRangeContaining(isoDay) {
   return { from, to: addDays(from, 6) };
 }
 
+// 下一個「星期一至日」週期（用嚟出嚟緊一週總覽）
+export function upcomingWeekRange(d = new Date()) {
+  const today = hktToday(d);
+  const [y, m, dd] = today.split('-').map(Number);
+  const dow = new Date(Date.UTC(y, m - 1, dd)).getUTCDay();
+  const dowMon = (dow + 6) % 7;
+  const from = addDays(today, dowMon === 0 ? 7 : 7 - dowMon);
+  return { from, to: addDays(from, 6) };
+}
+
 export async function fetchEvents({ past = false, base } = {}) {
   const cfg = loadOverride();
   const BASE = base || cfg.base || BASE_DEFAULT;
