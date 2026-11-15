@@ -41,6 +41,8 @@ const C = {
 
 const h = (t,p={},...c)=>({type:t,props:{...p,children:c.flat()}});
 const dense = total > 14;
+// dense 時空日壓矮，唔好同活動多嘅日爭垂直空間
+const emptyH = dense ? 32 : 40;
 
 // 一條事件列（flex row，軸點居中）
 const EventRow = e =>
@@ -79,10 +81,10 @@ const DenseEventRow = e =>
 
 // 空列
 const EmptyRow = () =>
-  h('div',{style:{display:'flex',alignItems:'center',height:40}},
+  h('div',{style:{display:'flex',alignItems:'center',height:emptyH}},
     h('div',{style:{width:36,display:'flex',justifyContent:'center',flexShrink:0}},
       h('div',{style:{width:10,height:10,borderRadius:999,background:C.dotEmpty}})),
-    h('div',{style:{fontSize:18,fontWeight:400,color:C.muted}},`${regionLabel}暫無場次`),
+    h('div',{style:{fontSize:dense?15:18,fontWeight:400,color:C.muted}},`${regionLabel}暫無場次`),
   );
 
 // 一日 = flex row：左日期欄 + 右事件區
@@ -148,9 +150,13 @@ const tree = h('div',{style:{width:W,height:H,background:C.bg,fontFamily:'Noto',
     ...(dense ? [] : [h(HeaderRow)])),
 
   // 時間軸 + 日子（用一條獨立垂直線疊喺軸點中心）
-  h('div',{style:{flex:'1 1 0',display:'flex',flexDirection:'column',
-    justifyContent:'space-between',
-    marginTop:18,marginLeft:56,marginRight:56,position:'relative'}},
+  // dense 週（場次多）：自然高度 flex-start 排列，空日壓矮，活動日有幾多排幾多，
+  //   唔好用 space-between 強行拉勻（會令多場日超出被分配高度而被畫布裁走）。
+  // 普通週：space-between 七日平均拉開，視覺平衡。
+  h('div',{style:{flex:dense?'0 0 auto':'1 1 0',display:'flex',flexDirection:'column',
+    justifyContent:dense?'flex-start':'space-between',
+    marginTop:18,marginLeft:56,marginRight:56,
+    ...(dense?{gap:6}:{}),position:'relative'}},
     // 垂直線：左 offset = 日期120 + 軸中心(18) - 線半寬(1.5)
     h('div',{style:{position:'absolute',left:136.5,top:8,bottom:8,width:3,
       background:`linear-gradient(180deg, ${C.goldLine}, ${C.gold})`,
