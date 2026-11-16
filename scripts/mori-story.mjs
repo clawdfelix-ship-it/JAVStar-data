@@ -35,7 +35,7 @@ const tree = h("div", {
   h("div", { style: { height: 285, width: "100%", display: "flex", alignItems: "center",
     justifyContent: "center", flexDirection: "column", gap: 14, paddingBottom: 30 } },
     h("div", { style: { fontSize: 30, fontWeight: 700, color: C.ink } }, "女優 IG：@hinako_mori_"),
-    h("div", { style: { fontSize: 26, fontWeight: 700, color: C.sub } }, "主辦 IG：@javstarmeet"),
+    h("div", { style: { fontSize: 26, fontWeight: 700, color: C.sub } }, "主辦 IG：@ja.vstar.meet"),
     h("div", { style: { fontSize: 22, color: C.sub, letterSpacing: 2 } }, "森日向子 香港粉絲活動 · 旺角／觀塘"))
 );
 

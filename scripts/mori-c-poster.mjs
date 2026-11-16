@@ -66,7 +66,7 @@ const tree = h("div", { style: { width: W, height: H, position: "relative", font
     h("div", { style: { fontSize: 16, color: "#D8C8A8", marginTop: 2, paddingLeft: 4 } },
       `見面會 4 時段：${post.meetSessions.join("　")}`),
     h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 } },
-      h("div", { style: { fontSize: 18, color: "#D8C8A8" } }, "主辦 @javstarmeet　·　場地及票務詳情見官方公布"),
+      h("div", { style: { fontSize: 18, color: "#D8C8A8" } }, "主辦 @ja.vstar.meet　·　場地及票務詳情見官方公布"),
       h("div", { style: { fontSize: 17, fontWeight: 700, color: C.gold } }, "@jching.calendar")),
   ));
 
