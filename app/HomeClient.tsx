@@ -730,6 +730,13 @@ export default function HomeClient({ initialActresses, initialEvents, initialSta
           ========================================== */}
       <NewReleasesSection />
 
+      {/* ==========================================
+          報料區（寫真集下方；EventSubmissionForm 本身係完整摺疊卡片）
+          ========================================== */}
+      <section aria-label="活動報料" className="max-w-3xl mx-auto px-4 md:px-6">
+        <EventSubmissionForm />
+      </section>
+
       {/* =========================================
           Footer - Froala Design Blocks
           NIPPON COLORS
